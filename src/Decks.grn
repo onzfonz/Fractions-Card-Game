@@ -1,0 +1,102 @@
+<uml>
+   <greenVersion="30500"/>
+   <type>
+      <name="=Fractions Card Game August/src<deck{TricksDeck.java[TricksDeck"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="535"/>
+      <y="479"/>
+   </type>
+   <type>
+      <name="=Fractions Card Game August/src<deck{TeammatesDeck.java[TeammatesDeck"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="735"/>
+      <y="479"/>
+   </type>
+   <type>
+      <name="=Fractions Card Game August/src<deck{PlayDeckView.java[PlayDeckView"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="75"/>
+      <y="-2"/>
+   </type>
+   <type>
+      <name="=Fractions Card Game August/src<deck{PlayDeckIcon.java[PlayDeckIcon"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="372"/>
+      <y="-3"/>
+   </type>
+   <type>
+      <name="=Fractions Card Game August/src<deck{PlayDeck.java[PlayDeck"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="38"/>
+      <y="385"/>
+   </type>
+   <type>
+      <name="=Fractions Card Game August/src<deck{PlayDeckViewOld.java[PlayDeckViewOld"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="19"/>
+      <y="238"/>
+   </type>
+   <type>
+      <name="=Fractions Card Game August/src<deck{DeckSelection.java[DeckSelection"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="351"/>
+      <y="601"/>
+   </type>
+   <type>
+      <name="=Fractions Card Game August/src<deck{Deck.java[Deck"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="697"/>
+      <y="97"/>
+   </type>
+   <relationship>
+      <class="edu.buffalo.cse.green.relationship.association.AssociationPart"/>
+      <sourceType="=Fractions Card Game August/src<deck{PlayDeckView.java[PlayDeckView"/>
+      <targetType="=Fractions Card Game August/src<deck{PlayDeck.java[PlayDeck"/>
+      <bendpoints>
+      </bendpoints>
+   </relationship>
+   <relationship>
+      <class="edu.buffalo.cse.green.relationship.association.AssociationPart"/>
+      <sourceType="=Fractions Card Game August/src<deck{PlayDeckIcon.java[PlayDeckIcon"/>
+      <targetType="=Fractions Card Game August/src<deck{PlayDeck.java[PlayDeck"/>
+      <bendpoints>
+      </bendpoints>
+   </relationship>
+   <relationship>
+      <class="edu.buffalo.cse.green.relationship.generalization.GeneralizationPart"/>
+      <sourceType="=Fractions Card Game August/src<deck{PlayDeck.java[PlayDeck"/>
+      <targetType="=Fractions Card Game August/src<deck{Deck.java[Deck"/>
+      <bendpoints>
+      </bendpoints>
+   </relationship>
+   <relationship>
+      <class="edu.buffalo.cse.green.relationship.generalization.GeneralizationPart"/>
+      <sourceType="=Fractions Card Game August/src<deck{TricksDeck.java[TricksDeck"/>
+      <targetType="=Fractions Card Game August/src<deck{Deck.java[Deck"/>
+      <bendpoints>
+      </bendpoints>
+   </relationship>
+   <relationship>
+      <class="edu.buffalo.cse.green.relationship.association.AssociationPart"/>
+      <sourceType="=Fractions Card Game August/src<deck{PlayDeckViewOld.java[PlayDeckViewOld"/>
+      <targetType="=Fractions Card Game August/src<deck{PlayDeck.java[PlayDeck"/>
+      <bendpoints>
+      </bendpoints>
+   </relationship>
+   <relationship>
+      <class="edu.buffalo.cse.green.relationship.generalization.GeneralizationPart"/>
+      <sourceType="=Fractions Card Game August/src<deck{TeammatesDeck.java[TeammatesDeck"/>
+      <targetType="=Fractions Card Game August/src<deck{Deck.java[Deck"/>
+      <bendpoints>
+      </bendpoints>
+   </relationship>
+</uml>
+

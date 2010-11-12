@@ -1,0 +1,24 @@
+type, img, numerator, denominator, quantity
+stink, Stink---General-Bar---One-Half.png, 1, 2, 6
+stink, Stink---General-Bar---One-Quarter.png, 1, 4, 3
+stink, Stink---General-Bar---Three-Quarters.png, 3, 4, 3
+stink, Stink---General-Bar---Two-Thirds.png, 2, 3, 3
+stink, Stink---General-Bar---One-Third.png, 1, 3, 3
+stink, Stink---General-Bar---Point-5.png, 1, 2, 6
+stink, Stink---General-Bar---Point-25.png, 1, 4, 3
+stink, Stink---General-Bar---Point-75.png, 3, 4, 3
+air, Air---General-Bar---One-Half.png, 1, 2, 6
+air, Air---General-Bar---Point-5.png, 1, 2, 6
+air, Air---General-Bar---One-Quarter.png, 1, 4, 3
+air, Air---General-Bar---Point-25.png, 1, 4, 3
+air, Air---General-Bar---Three-Quarters.png, 3, 4, 3
+air, Air---General-Bar---Point-75.png, 3, 4, 3
+air, Air---General-Bar---Two-Thirds.png, 2, 3, 3
+air, Air---General-Bar---One-Third.png, 1, 3, 3
+ice, Ice-Cream---One-Half.png, 2, 2, 6
+ice, Ice-Cream---One-Quarter.png, 1, 3, 3
+ice, Ice-Cream---Three-Quarters.png, 3, 1, 3
+ice, Ice-Cream---One-Third.png, 1, 2, 3
+ice, Ice-Cream---Two-Thirds.png, 2, 1, 3
+radio, Radio---General.png, 1, 1, 10
+

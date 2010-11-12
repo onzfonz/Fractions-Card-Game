@@ -1,0 +1,20 @@
+Name, Description, Image, Value, Quantity
+The Twins,The Twins Have Joined Your Team,Teammates---The-Twins.png,2,3
+The Pirates,The Pirates Have Joined Your Team,Teammates---The-Pirates.png,2,3
+The 1st Graders,The 1st Graders Have Joined Your Team,Teammates---1st-Graders.png,4,5
+The Music Geeks,The Music Geeks Have Joined Your Team,Teammates---Music-Geeks.png,6,4
+The Johnson Family,The Johnson Family Have Joined Your Team,Teammates---Johnson-Family.png,8,3
+The Basketball Team,The Basketball Team Have Joined Your Team,Teammates---Basketball-Team.png,12,2
+Shadow Players,What Is 1/2 of 6?,Teammates---Shadow---One-Half-of-6.png,3,1
+Shadow Players,What Is 1/4 of 16?,Teammates---Shadow---One-Quarter-of-16.png,4,1
+Shadow Players,What Is 1/4 of 20?,Teammates---Shadow---One-Quarter-of-20.png,5,1
+Shadow Players,What Is 1/3 of 15?,Teammates---Shadow---One-Third-of-15.png,5,1
+Shadow Players,What Is 1/3 of 18?,Teammates---Shadow---One-Third-of-18.png,6,1
+Shadow Players,What Is 1/3 of 21?,Teammates---Shadow---One-Third-of-21.png,7,1
+Shadow Players,What Is 1/3 of 24?,Teammates---Shadow---One-Third-of-24.png,8,1
+Shadow Players,What Is 3/4 of 12?,Teammates---Shadow---Three-Quarters-of-12.png,9,1
+Shadow Players,What Is 3/4 of 8?,Teammates---Shadow---Three-Quarters-of-8.png,6,1
+Shadow Players,What Is 2/3 of 12?,Teammates---Shadow---Two-Thirds-of-12.png,8,1
+Shadow Players,What Is 2/3 of 15?,Teammates---Shadow---Two-Thirds-of-15.png,10,1
+Shadow Players,What Is 2/3 of 18?,Teammates---Shadow---Two-Thirds-of-18.png,12,1
+Shadow Players,What Is 2/3 of 9?,Teammates---Shadow---Two-Thirds-of-9.png,6,1

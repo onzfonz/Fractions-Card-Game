@@ -1,0 +1,93 @@
+<uml>
+   <greenVersion="30500"/>
+   <type>
+      <name="=Fractions Card Game August/src<cards{TeammateCard.java[TeammateCard"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="0"/>
+      <y="0"/>
+   </type>
+   <type>
+      <name="=Fractions Card Game August/src<cards{CardFrame.java[CardFrame"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="232"/>
+      <y="216"/>
+   </type>
+   <type>
+      <name="=Fractions Card Game August/src<cards{TrickCard.java[TrickCard"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="444"/>
+      <y="34"/>
+   </type>
+   <type>
+      <name="=Fractions Card Game August/src<cards{CardView.java[CardView"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="870"/>
+      <y="9"/>
+   </type>
+   <type>
+      <name="=Fractions Card Game August/src<cards{CardGameConstants.java[CardGameConstants"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="0"/>
+      <y="200"/>
+   </type>
+   <type>
+      <name="=Fractions Card Game August/src<cards{Card.java[Card"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="63"/>
+      <y="394"/>
+   </type>
+   <type>
+      <name="=Fractions Card Game August/src<cards{JRectangle.java[JRectangle"/>
+      <height="-1"/>
+      <width="-1"/>
+      <x="619"/>
+      <y="470"/>
+   </type>
+   <relationship>
+      <class="edu.buffalo.cse.green.relationship.association.AssociationPart"/>
+      <sourceType="=Fractions Card Game August/src<cards{CardView.java[CardView"/>
+      <targetType="=Fractions Card Game August/src<cards{Card.java[Card"/>
+      <bendpoints>
+      </bendpoints>
+   </relationship>
+   <relationship>
+      <class="edu.buffalo.cse.green.relationship.generalization.GeneralizationPart"/>
+      <sourceType="=Fractions Card Game August/src<cards{TeammateCard.java[TeammateCard"/>
+      <targetType="=Fractions Card Game August/src<cards{Card.java[Card"/>
+      <bendpoints>
+      </bendpoints>
+   </relationship>
+   <relationship>
+      <class="edu.buffalo.cse.green.relationship.dependency.DependencyIPart"/>
+      <sourceType="=Fractions Card Game August/src<cards{TrickCard.java[TrickCard"/>
+      <targetType="=Fractions Card Game August/src<cards{TrickCard.java[TrickCard"/>
+      <bendpoints>
+         <bendpoint>
+            <x="40"/>
+            <y="0"/>
+         </bendpoint>
+         <bendpoint>
+            <x="40"/>
+            <y="-40"/>
+         </bendpoint>
+         <bendpoint>
+            <x="0"/>
+            <y="-40"/>
+         </bendpoint>
+      </bendpoints>
+   </relationship>
+   <relationship>
+      <class="edu.buffalo.cse.green.relationship.generalization.GeneralizationPart"/>
+      <sourceType="=Fractions Card Game August/src<cards{TrickCard.java[TrickCard"/>
+      <targetType="=Fractions Card Game August/src<cards{Card.java[Card"/>
+      <bendpoints>
+      </bendpoints>
+   </relationship>
+</uml>
+

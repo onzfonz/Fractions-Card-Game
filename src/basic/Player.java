@@ -1,0 +1,464 @@
+package basic;
+/*
+ * File: Player.java
+ * -----------------
+ * File that holds the contents of the player's hand
+ * Each player will hold an ArrayList of PlayerDecks
+ */
+
+import java.util.*;
+
+import cards.*;
+import deck.*;
+
+
+public class Player implements CardGameConstants{
+	protected ArrayList<CardView> trickHand;
+	protected ArrayList<DeckView> decks;
+	protected Dealer d;
+	protected int points;
+	private ArrayList<PlayerListener> listeners;
+	private boolean isHuman;
+	
+	public Player(Dealer dlr) {
+		this(dlr, null);
+	}
+	
+	public Player(Dealer dlr, PlayerListener pl) {
+		this(dlr, pl, false, true);
+	}
+	
+	public Player(Dealer dlr, PlayerListener pl, boolean startRound, boolean human) {
+		d = dlr;
+		listeners = new ArrayList<PlayerListener>();
+		if(pl != null) {
+			addPlayerListener(pl);
+		}
+		trickHand = new ArrayList<CardView>();
+		decks = new ArrayList<DeckView>();
+		isHuman = human;
+		setPoints(0);
+		
+		if(startRound) {
+			newCardRound();
+		}
+	}
+	
+	public boolean isHuman() {
+		return isHuman;
+	}
+	
+	public void addPlayerListener(PlayerListener pl) {
+		listeners.add(pl);
+	}
+	
+	public void removePlayerListener(PlayerListener pl) {
+		listeners.remove(pl);
+	}
+	
+	public void addTrickCardToHand(TrickCard t) {
+		CardView ct = null;
+		if(isHuman()) {
+			ct = new CardView(t);
+		}else{
+			ct = new CardView(t, false);
+		}
+		trickHand.add(ct);
+		fireTrickCardAddedToHand(ct);
+	}
+	
+	public void addTeammateCard(TeammateCard t) {
+		PlayDeck newDeck = new PlayDeck(t);
+		CardView ct = new CardView(t);
+		DeckView newDeckView = new DeckView(newDeck, this);
+		decks.add(newDeckView);
+		firePlayDeckAdded(newDeckView);
+	}
+
+	//This was an older version when we would have text input from the user
+	public void addToPlayDeck(TrickCard t) {
+		Scanner s = new Scanner(System.in);
+		printPlayDecks();
+		System.out.println("Which Deck? Choose a number between 0 and " + decks.size());
+		int i = s.nextInt();
+		while(i < 0 || i > decks.size()) {
+			System.out.println("invalid number please try again ");
+			i = s.nextInt();
+		}
+		if(i == 0) {
+			System.out.println("Cancelling option...");
+			return;
+		}
+		DeckView curDeck = decks.get(i-1);
+		if(!curDeck.addTrickCard(t)) {
+			System.out.println("That trick card cannot be applied, Please wait for next turn");
+		}
+		firePlayDeckChanged();
+	}
+	
+	private boolean addToPlayDeck(DeckView dv, CardView cv) {
+		if(decks.indexOf(dv) == -1) {
+			System.out.println("adding to some weird deck");
+		}
+		boolean couldBeAdded = dv.addTrickCard(cv);
+		if(couldBeAdded) {
+			firePlayDeckChanged();
+		}
+		return couldBeAdded;
+	}
+	
+	private boolean couldAddToPlayDeck(DeckView dv, CardView cv) {
+		return dv.couldAddTrickCard(cv);
+	}
+	
+	public boolean addToPlayDeck(DeckView dv, CardView cv, Player cvOwner) {
+		TrickCard tc = (TrickCard) cv.getCard();
+		if(cvOwner == this) {
+			if(tc.isDefense()) {
+				boolean addSuccessful = addToPlayDeck(dv, cv);
+				if(addSuccessful && tc.isAir()) {
+					fireAirFreshenerPlayed(dv, cvOwner);
+				}
+				return addSuccessful;
+			}
+			return false;
+		}else{
+			if(!tc.isDefense()) {
+				boolean addSuccessful = addToPlayDeck(dv, cv);
+				if(addSuccessful && tc.isIceCream()) {
+					fireIceCreamTruckPlayed(dv, cvOwner);
+				}else if(addSuccessful && tc.isStink()) {
+					fireStinkBombPlayed(dv, cvOwner);
+				}
+				return addSuccessful;
+			}
+			return false;
+		}
+	}
+	
+	public boolean couldAddToPlayDeck(DeckView dv, CardView cv, Player cvOwner) {
+		TrickCard tc = (TrickCard) cv.getCard();
+		Player p = dv.getPlayer();
+		if(cvOwner == this) {
+			if(tc.isDefense()) {
+				return couldAddToPlayDeck(dv, cv);
+			}
+			return false;
+		}else{
+			if(!tc.isDefense()) {
+				return couldAddToPlayDeck(dv, cv);
+			}
+			return false;
+		}
+	}
+	
+	public TrickCard getTrickFromHand(int i) {
+		if(i >=0 && i < numTrickCards()) {
+			CardView cv = trickHand.remove(i);
+			Card c = cv.getCard();
+			if(!c.isTrickCard()) {
+				System.out.println("getTrickFromHand in Player.java is returning" + c.getName());
+			}
+			return (TrickCard) c;
+		}else{
+			return null;
+		}
+	}
+	
+	public void removeTrickFromHand(CardView cv) {
+		if(trickHand.remove(cv)) {
+			fireTrickCardRemovedFromHand(cv);
+		}else{
+			System.out.println("tried to remove" + cv.getCard() +" but that wasn't in the trickHand" + trickHand);
+		}
+	}
+	
+	public void removePlayDeckFromHand(DeckView dv) {
+		if(decks.remove(dv)) {
+			firePlayDeckRemoved(dv);
+		}else{
+			System.out.println("tried to remove" + dv.getTeammateCard() +" but that wasn't in the decks");
+		}
+	}
+	
+	public void removeIceRadiosFromDeck(DeckView dv) {
+		ArrayList<CardView> deckHand = dv.getAllCards();
+		for(int i = 1; i < deckHand.size(); i++) {
+			CardView cv = deckHand.get(i);
+			if(cv.isRadio() || cv.isIceCream()) {
+				dv.removeTrickCard(cv);
+			}
+		}
+		firePlayDeckChanged();
+	}
+
+	public boolean isCardInTrickHand(CardView cv) {
+		return trickHand.indexOf(cv) != -1;
+	}
+	
+	public int numTrickCards() {
+		return trickHand.size();
+	}
+	
+	public void replenishTrickHand() {
+		clearTrickHand();
+		while(numTrickCards() < TRICK_HAND_SIZE) {
+			addExtraTrickToHand();
+		}
+	}
+	
+	public void replenishTeamHand() {
+		clearDecks();
+		for(int i = 0; i < TEAM_HAND_SIZE; i++) {
+			addExtraTeammate();
+		}
+	}
+	
+	public void addExtraTeammate() {
+		addTeammateCard(d.dealTeammateCard());
+	}
+	
+	public void addExtraTrickToHand() {
+		addTrickCardToHand(d.dealTrickCard());
+	}
+	
+	public void newCardRound() {
+		replenishTrickHand();
+		replenishTeamHand();
+	}
+	
+	/* Eventually this method will have some type of input from the user
+	 * but for now we'll make a very lame computer simulation
+	 * of what they will pick from a card.
+	 */
+	public TrickCard chooseTrickToPlay() {
+		Scanner s = new Scanner(System.in);
+		printTrickCards();
+		System.out.println("Choose a number between 0 and " + numTrickCards());
+		int i = s.nextInt();
+		while(i < 0 || i > numTrickCards()) {
+			System.out.println("invalid number please try again ");
+			i = s.nextInt();
+		}
+		TrickCard t = getTrickFromHand(i-1);
+		fireTrickHandChanged();
+		return t;
+	}
+	
+	//might make this private later.
+	public void clearTrickHand() {
+		trickHand.clear();
+		fireTrickCardsTossed();
+	}
+	
+	private void clearDecks() {
+		decks.clear();
+		firePlayDecksTossed();
+	}
+	
+	protected void printTrickCards() {
+		System.out.println("Your Trick Hand");
+		for(int i = 0; i < trickHand.size(); i++) {
+			int iplus = i+1;
+			System.out.println(iplus + ") " +trickHand.get(i));
+		}
+	}
+	
+	protected void printPlayDecks() {
+		System.out.println("Decks");
+		for(int i = 0; i < decks.size(); i++) {
+			int iplus = i+1;
+			System.out.println(iplus+") " + ((PlayDeck) (decks.get(i)).getPlayDeck()).getTeammateCard());
+		}
+	}
+	
+	protected CardView getARadio() {
+		for(CardView cv:trickHand) {
+			if(cv.isRadio()) {
+				return cv;
+			}
+		}
+		return null;
+	}
+	
+	protected ArrayList<PossibleMove> buildPossibleMoves(CardView cv, ArrayList<DeckView> dvs) {
+		ArrayList<PossibleMove> moves = new ArrayList<PossibleMove>();
+		for(int i = 0; i < dvs.size(); i++) {
+			DeckView dv = dvs.get(i);
+			PossibleMove m = couldBePlayed(dv, cv);
+			if(m != null) {
+				moves.add(m);
+			}
+		}
+		return moves;
+	}
+	
+	//Assumes that there is an IceCream Truck ready to be placed here
+	public void playARadio(DeckView dv) {
+		CardView radio = getARadio();
+		PossibleMove move = couldBePlayed(dv, radio);
+		performMove(move, null);
+	}
+	
+	//Want something that would check to see if it was possible to add the card
+	protected PossibleMove couldBePlayed(DeckView dv, CardView cv) {
+		PossibleMove move = null;
+		if(dv.getPlayer().couldAddToPlayDeck(dv, cv, this)) {
+			int difference = dv.getPotentialScoreChange(cv);
+			move = new PossibleMove(dv, cv, difference);
+		}
+		return move;
+	}
+	
+	//Assumes move and player are both non-null;
+	protected void performMove(PossibleMove move, Player opponent) {
+		CardView cv = move.getTrickCard();
+		TrickCard tc = (TrickCard) cv.getCard();
+		Player p = null;
+		Player cvOwner = this;
+		if(tc.isAir() || tc.isRadio()) {
+			p = this;
+		}else{
+			p = opponent;
+		}
+		removeTrickFromHand(cv);
+		cv.setFaceUp(true);
+		if(CardGameConstants.DEBUG_MODE) {
+			System.out.println("Going to play " + cv.getCard() + " on the deck with teammate " + move.getDeck().getTeammateCard().getCard() + " causing damage " + move.getDamage());
+		}
+		p.addToPlayDeck(move.getDeck(), cv, cvOwner);
+	}
+	
+	public int totalTeammates() {
+		int score = 0;
+		for(int i = 0; i < decks.size(); i++) {
+			PlayDeck curDeck = decks.get(i).getPlayDeck();
+			score += curDeck.calculateDeck();
+		}
+		return score;
+	}
+	
+	public int numRadiosInHand() {
+		return PlayDeck.numRadios(PlayDeck.convertListToTrickCards(trickHand));
+	}
+	
+	protected ArrayList<CardView> getTrickHand() {
+		return trickHand;
+	}
+	
+	protected ArrayList<DeckView> getAllDecks() {
+		return decks;
+	}
+	
+	public void updatePoints(int p) {
+		setPoints(points + p);
+	}
+	
+	public int getPoints() {
+		return points;
+	}
+	
+	public void setPoints(int p) {
+		points = p;
+		firePlayerScoreChanged();
+	}
+
+	public PlayDeck getPlayDeck(int i) {
+		if(i < 0 || i > decks.size()-1) {
+			return null;
+		}
+		return decks.get(i).getPlayDeck();
+	}
+	
+	public int numPlayDecks() {
+		return decks.size();
+	}
+	
+	/* My current debate is whether or not to pass in the trick card so that I know exactly what to add or remove
+	 * I feel like usually in mvc, we just want to call it and have the whole thing update itself, but maybe
+	 * that's not really what we want in this case.  Passing it in would allow you to have it be quicker, but 
+	 * it wouldn't be in the spirit of MVC, since you are telling it exactly what to remove or add.  You need to look at CardView
+	 * to see what it does to make your decision.
+	 */
+	
+	private void firePlayDeckChanged() {
+		for(PlayerListener l:listeners) {
+			l.playDeckChanged(this);
+		}
+	}
+	
+	private void fireTrickHandChanged() {
+		for(PlayerListener l:listeners) {
+			l.trickDeckChanged(this);
+		}
+	}
+	
+	private void fireTrickCardAddedToHand(CardView cv) {
+		for(PlayerListener l:listeners) {
+			l.trickCardAdded(this, cv);
+		}
+	}
+	
+	private void fireTrickCardRemovedFromHand(CardView cv) {
+		for(PlayerListener l:listeners) {
+			l.trickCardRemoved(this, cv);
+		}
+	}
+	
+	private void fireTrickCardsTossed() {
+		for(PlayerListener l:listeners) {
+			l.trickCardsThrownAway(this);
+		}
+	}
+	
+	private void firePlayDeckAdded(DeckView p) {
+		for(PlayerListener l:listeners) {
+			l.playDeckAdded(this, p);
+		}
+	}
+	
+	private void firePlayDeckRemoved(DeckView p) {
+		for(PlayerListener l:listeners) {
+			l.playDeckRemoved(this, p);
+		}
+	}
+	
+	private void firePlayDecksTossed() {
+		for(PlayerListener l:listeners) {
+			l.playDecksTossed(this);
+		}
+	}
+	
+	private void fireIceCreamTruckPlayed(DeckView p, Player cvOwner) {
+		assert(cvOwner != this);
+		for(PlayerListener l:listeners) {
+			l.iceCreamPlayed(this, p, cvOwner);
+		}
+	}
+	
+	private void fireAirFreshenerPlayed(DeckView p, Player cvOwner) {
+		assert(cvOwner == this);
+		for(PlayerListener l:listeners) {
+			l.airFreshenerPlayed(this, p, cvOwner);
+		}
+	}
+	
+	private void fireStinkBombPlayed(DeckView p, Player cvOwner) {
+		assert(cvOwner != this);
+		for(PlayerListener l:listeners) {
+			l.stinkBombPlayed(this, p, cvOwner);
+		}
+	}
+	
+	private void firePlayerScoreChanged() {
+		for(PlayerListener l:listeners) {
+			l.scoreUpdated(this);
+		}
+	}
+	
+	protected void fireCardAnimation(PossibleMove cMove, Player opponent) {
+		for(PlayerListener l:listeners) {
+			l.cardAnimationLaunched(cMove, this, opponent);
+		}
+	}
+}
