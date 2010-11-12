@@ -13,14 +13,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import javax.swing.UIManager;
-
-import cards.TeammateCard;
-import cards.TrickCard;
 import deck.DeckView;
-import deck.PlayDeck;
 
 public class PebbleFrame extends JFrame {
 	/**
@@ -49,8 +43,8 @@ public class PebbleFrame extends JFrame {
 		add(manBox, BorderLayout.CENTER);
 		
 		JPanel box = new JPanel();
-		box.setLayout(new BoxLayout(box, BoxLayout.Y_AXIS));
-		add(box, BorderLayout.WEST);
+		box.setLayout(new BoxLayout(box, BoxLayout.X_AXIS));
+		add(box, BorderLayout.NORTH);
         
 		JPanel statusBox = new JPanel();
 		statusBox.setLayout(new BoxLayout(statusBox, BoxLayout.X_AXIS));

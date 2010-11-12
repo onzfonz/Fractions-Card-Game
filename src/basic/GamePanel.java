@@ -28,15 +28,19 @@ import manipulatives.ManFrame;
 import manipulatives.ManListener;
 import pebblebag.BagListener;
 import pebblebag.PebbleFrame;
-import cards.CardGameConstants;
 import cards.CardView;
 import cards.TeammateCard;
 import cards.TrickCard;
+
+import combo.ComboFrame;
+import combo.ComboListener;
+
 import deck.DeckView;
 import deck.PlayDeck;
+import extras.Debug;
 import extras.PanelListener;
 
-public class GamePanel extends JPanel implements PlayerListener, ComponentListener, BagListener, ManListener {
+public class GamePanel extends JPanel implements PlayerListener, ComponentListener, BagListener, ManListener, ComboListener {
 
 	/* Panel will have
 	 * opponent's decks in play up top
@@ -57,6 +61,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	private CardView bigCard;
 	private CardView cardHidden;
 	private CardView cardUsed;
+	private TrickCard origComboTrick;
 	private int cardUsedX;
 	private int cardUsedY;
 	private DeckView deckUsed;
@@ -68,6 +73,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	private int origY;
 	private boolean dragging;
 	private boolean userCanInteract;
+	private int numRadiosInPlay;
 	private JLabel status;
 	private PebbleFrame pebbleWindow;
 	private PanelListener panel;
@@ -77,14 +83,11 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 
 
 	//Different booleans for maybe future settable options
-	private boolean notCoolMan;
-
-	public GamePanel(int w, int h, PanelListener ls, boolean ncl) {
+	public GamePanel(int w, int h, PanelListener ls) {
 		setPreferredSize(new Dimension(w, h));
 		setOpaque(true);
 		setBackground(Color.gray);
 		setLayout(new BorderLayout(10, 10));
-		notCoolMan = ncl;
 		panel = ls;
 
 		resetPanel();
@@ -104,47 +107,19 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 				}else{
 					bigCard = null;
 				}
-				//				if (print) System.out.println("press:" + e.getX() + " " + e.getY());
-				//
-				//				ManModel dotModel = findDot(e.getX(), e.getY());
-				//				if (dotModel == null) {	// make a dot if nothing there
-				//					dotModel = doAdd(e.getX(), e.getY());
-				//				}
-				//
-				//				// invariant -- dotModel var is now set,
-				//				// one way or another
-				//
-				//				// Note the starting setup to compute deltas later
-				//				lastDot = dotModel;
-				//				lastX = e.getX();
-				//				lastY = e.getY();
-				//
-				//				// Change color of dot in some cases
-				//				// shift -> change to black
-				//				// double-click -> change to red
-				//				if (e.isShiftDown()) {
-				//					doSetColor(dotModel, Color.BLACK);
-				//				}
-				//				else if (e.getClickCount() == 2) {
-				//					doSetColor(dotModel, Color.RED);
-				//				}
-
 			}
 
 			public void mouseReleased(MouseEvent e) {
 				//				repaintCard(findCardView(e.getX(), e.getY()));
 				if(currentCard != null) {
+					//have a function that gives the user a chance to select which side of the card...
+					
 					if(currentDeck != null && isInTrickHand(currentCard) && canInteract()) {
-						if(CardGameConstants.ASK_USERS_FRACTION_QS && notCoolMan && (currentCard.isAir() || currentCard.isStink())) {
-							launchManipWindow(currentDeck, currentCard);
-							cardUsed = currentCard;
-							deckUsed = currentDeck;
-							cardUsedX = origX;
-							cardUsedY = origY;
-							repaint();
-						}else{
-							updateViewWithMove(currentDeck, currentCard);
+						if(currentCard.isCombo()) {
+							launchComboFrame(currentCard);
+							return;
 						}
+						launchWindowOrTryToPlaceCard();
 					}else{
 						sendCardBack(currentCard);
 						if(!isInTrickHand(currentCard)) {
@@ -152,18 +127,12 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 						}
 					}
 				}
-				makeSelectedDeck(null, false);
-				origX = origY = lastX = lastY = 0;
-				dragging = false;
-				repaint(0, 0, getWidth(), getHeight());
+				resetToZero();
 			}
 		});
 
 		addMouseMotionListener( new MouseMotionAdapter() {
 			public void mouseDragged(MouseEvent e) {
-				if(CardGameConstants.DEBUG_MODE){
-					System.out.println("mouse dragged");
-				}
 				dragging = true;
 				if (currentCard != null && isInTrickHand(currentCard)) {
 					// compute delta from last point
@@ -176,8 +145,19 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 					moveCard(currentCard, dx, dy);
 					DeckView dv = findDeckView(lastX, lastY);
 					boolean add = false;
-					if(dv != null && !notCoolMan) {
-						add = dv.getPlayer().couldAddToPlayDeck(dv, currentCard, currentGame.getHumanPlayer());
+					if(dv != null && !Constants.REGULAR_MODE) {  //This is for calculating the green squares
+						if(currentCard.isCombo()) { //Since it's a green...Just have it try to be added on both choices
+							ArrayList<TrickCard> options = currentCard.getCards();
+							Player curHuman = currentGame.getHumanPlayer();
+							for(TrickCard option:options) {
+								add = dv.getPlayer().couldAddToPlayDeck(dv, option, curHuman);
+								if(add) {
+									break;
+								}
+							}
+						} else {
+							add = dv.getPlayer().couldAddToPlayDeck(dv, currentCard, currentGame.getHumanPlayer());
+						}
 					}
 					makeSelectedDeck(dv, add);
 				}
@@ -188,9 +168,52 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			}
 		});
 	}
+	
+	private void resetToZero() {
+		makeSelectedDeck(null, false);
+		origX = origY = lastX = lastY = 0;
+		dragging = false;
+		repaint(0, 0, getWidth(), getHeight());
+	}
+	
+	private void launchWindowOrTryToPlaceCard() {
+		if(Constants.ASK_USERS_FRACTION_QS && (currentCard.isAir() || currentCard.isStink())) {
+			launchManipWindow(currentDeck, currentCard);
+			cardUsed = currentCard;
+			deckUsed = currentDeck;
+			cardUsedX = origX;
+			cardUsedY = origY;
+			repaint();
+		}else{
+			tryAndPlaceCardOnDeck(currentDeck, currentCard);
+		}
+	}
+	
+	private void tryAndPlaceCardOnDeck(DeckView dv, CardView cv) {
+		Player p = dv.getPlayer();
+		String textToShow = "";
+		String msgText = status.getText();
+		if(p.addToPlayDeck(dv, cv, currentGame.getHumanPlayer())) {
+			CardView oldCard = cv;
+			makeSelectedCard(null);
+			if(isInTrickHand(oldCard)) {
+				p = currentGame.getHumanPlayer();
+				p.removeTrickFromHand(oldCard);
+			}
+			textToShow = status.getText();
+			if(msgText.equals(textToShow)) {
+				textToShow = generateSuccessMessage(cv, dv, p);
+			}
+		}else{
+			textToShow = generateErrorMessage(cv, dv, p);
+			sendCardBack(cv);
+		}
+		status.setText(textToShow);
+	}
 
 	public void startGame() {
 		resetPanel();
+		status.setText(Constants.STATUS_YOUR_TURN);
 		currentGame = new Game(this, this);
 		recomputeAllByForce(getPanelSize());
 	}
@@ -219,6 +242,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	}
 
 	public void newRound() {
+		status.setText(Constants.STATUS_NEW_ROUND);
 		currentGame.playOneRound();
 	}
 
@@ -235,7 +259,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	public void setTrickHandDebug(boolean isForPlayer) {
 		Player p = getCorrectPlayer(isForPlayer);
 		p.clearTrickHand();
-		TrickCard t1 = new TrickCard("cards_stink.jpg", 1, 2, "Stink");
+		TrickCard t1 = new TrickCard(Constants.HALF_STINK_FILENAME, 1, 2, "Stink");
 		for(int i = 0; i < 4; i++) {
 			p.addTrickCardToHand(t1);
 		}
@@ -244,7 +268,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	public void setTrickHandToAirs(boolean isForPlayer) {
 		Player p = getCorrectPlayer(isForPlayer);
 		p.clearTrickHand();
-		TrickCard t1 = new TrickCard("cards_air_3qtrs.jpg", 3, 4, "Air");
+		TrickCard t1 = new TrickCard(Constants.THREE_QTRS_AIR_FILENAME, 3, 4, "Air");
 		for(int i = 0; i < 4; i++) {
 			p.addTrickCardToHand(t1);
 		}
@@ -387,9 +411,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	}
 
 	private void makeSelectedCard(CardView cv) {
-		if(CardGameConstants.DEBUG_MODE) {
-			System.out.println("CardView " + cv + " selectable? " + isSelectable(cv));
-		}
+		Debug.println("CardView " + cv + " selectable? " + isSelectable(cv));
 		if(isSelectable(cv)) {
 			if(cv != currentCard && currentCard != null) {
 				unSelectCard(currentCard);
@@ -523,7 +545,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			}else{
 				cv.setLocation(x, 0/*(int)-h/2*/);
 			}
-			//System.out.println(cv.getX() + ", " + cv.getY());
+			//Debug.println(cv.getX() + ", " + cv.getY());
 		}
 	}
 
@@ -539,9 +561,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			Dimension d = getPanelSize();
 			//double maxDeckHeight = d.getHeight()-(2*teamCardHeightPlusMargin(decks))-oppoTrickHeight(); 
 			double maxDeckHeight = deckHeight();
-			if(CardGameConstants.DEBUG_MODE) {
-				System.out.println("maxDeckHeight: " + maxDeckHeight + ", teamCardNMargin: " + teamCardHeightPlusMargin(decks) + ", totalHeight: " + getPanelSize().getHeight() + ", oppoTrickCard: " + oppoTrickHeight() + ", trickCard: " + playerTrickHeight());
-			}
+			Debug.println("maxDeckHeight: " + maxDeckHeight + ", teamCardNMargin: " + teamCardHeightPlusMargin(decks) + ", totalHeight: " + getPanelSize().getHeight() + ", oppoTrickCard: " + oppoTrickHeight() + ", trickCard: " + playerTrickHeight());
 			d.setSize(d.getWidth(), maxDeckHeight);
 			int numDecks = decks.size();
 			int numDecksHuman = 0;
@@ -601,7 +621,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	private int calculateXCoord(Dimension d, int pos, int numObjects, CardView cv) {
 		int margin = (int) (d.getWidth()/numObjects);
 		//return Math.max((pos * margin) + (margin/2-cv.getWidth()/2), 0);
-		return (pos * margin) + (margin/2-cv.getWidth());
+		return (pos * margin) + (margin/2-cv.getWidth()/2);
 	}
 
 	private int numPlayersDecks(ArrayList<DeckView> decks, Player p) {
@@ -652,17 +672,17 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		Dimension firstCard = hand.get(0).getSize();
 		double width = firstCard.getWidth();
 		if((int) d.getWidth() != (int) (width*numCards)) {
-			Dimension newD = new Dimension(Math.min((int) d.getWidth()/numCards, CardGameConstants.MAX_CARD_WIDTH), (int) d.getHeight());
-			//System.out.println("returning the new dimension" + d);
+			Dimension newD = new Dimension(Math.min((int) d.getWidth()/numCards, Constants.MAX_CARD_WIDTH), (int) d.getHeight());
+			//Debug.println("returning the new dimension" + d);
 			return newD;
 		}
-		//System.out.println("returning the old preferred size" + firstCard + ", with d being " + d);
+		//Debug.println("returning the old preferred size" + firstCard + ", with d being " + d);
 		return firstCard;
 	}
 
 	private Dimension getPanelSize() {
 		Dimension d = getSize();
-		d.setSize(d.getWidth()-CardGameConstants.HUGE_CARD_WIDTH, d.getHeight());
+		d.setSize(d.getWidth()-Constants.HUGE_CARD_WIDTH, d.getHeight());
 		return d;
 	}
 
@@ -677,7 +697,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			double dHeight = deckHeight();
 			double desiredDifference = numCards*(cardHeight/10);
 			double desiredHeight = dHeight - desiredDifference;
-			//System.out.println("cards being resized for height: " + desiredHeight + "current height is: " + cardHeight);
+			//Debug.println("cards being resized for height: " + desiredHeight + "current height is: " + cardHeight);
 			d.setSize(d.getWidth(), desiredHeight);
 			firstCard = d;
 		}
@@ -752,18 +772,18 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		int y = 0;
 		for(DeckView dv:decksInPlay) {
 			if(dv.getPlayer().isHuman()) {
-				y = dv.getY()-CardGameConstants.LINE_THICKNESS;
+				y = dv.getY()-Constants.LINE_THICKNESS;
 				break;
 			}
 		}
-		drawDashedLine(g, 0, getWidth()-CardGameConstants.HUGE_CARD_WIDTH, y);
+		drawDashedLine(g, 0, getWidth()-Constants.HUGE_CARD_WIDTH, y);
 	}
 	
 	private void drawDashedLine(Graphics g, int x1, int x2, int y) {
-		int dashLength = (x2-x1)/(CardGameConstants.NUM_DASHES*2);
-		for(int i = 0; i < CardGameConstants.NUM_DASHES*2; i++) {
+		int dashLength = (x2-x1)/(Constants.NUM_DASHES*2);
+		for(int i = 0; i < Constants.NUM_DASHES*2; i++) {
 			if(i%2 == 0) {
-				for(int j = -CardGameConstants.LINE_THICKNESS/2; j <= CardGameConstants.LINE_THICKNESS; j++) {
+				for(int j = -Constants.LINE_THICKNESS/2; j <= Constants.LINE_THICKNESS; j++) {
 					g.drawLine(i*dashLength, y+j, (i+1)*dashLength, y+j);
 				}
 			}
@@ -783,7 +803,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		}else{
 			opponentsTrickCards.add(cv);
 			opponentsTrickCardsLeft.add(cv);
-			cv.setFaceUp(CardGameConstants.SHOW_COMPUTER_CARDS);
+			cv.setFaceUp(Constants.SHOW_COMPUTER_CARDS);
 		}
 		trickDeckChanged(p);
 	}
@@ -814,15 +834,23 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		playDeckChanged(p);
 	}
 
-	public void cardAnimationLaunched(PossibleMove cMove, Player computer, Player opponent) {
+	public void cardAnimationLaunched(PossibleMove cMove, Player computer, Player opponent, String message) {
+		String prefix = "";
+		if(isOurUser(computer)) {
+			prefix = "You are ";
+		}else{
+			prefix = "The computer is ";
+			panel.computerTurn();
+		}
+		status.setText(prefix + message);
+		repaint();
 		disableUser();
-		status.setText("The computer is thinking about where to move");
-		CardView cv = cMove.getTrickCard();
+		CardView cv = cMove.getCardView();
 		cv.setFaceUp(true);
 		DeckView dv = cMove.getDeck();
 		CardMover cm = new CardMover(this, cMove, computer, opponent, cv, dv);
 		Timer cardTimer = new Timer(20, cm);
-		cardTimer.setInitialDelay(CardGameConstants.BETWEEN_GAME_PAUSE);
+		cardTimer.setInitialDelay(Constants.BETWEEN_GAME_PAUSE);
 		cm.setTimer(cardTimer);
 		cardTimer.start();
 	}
@@ -837,12 +865,15 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		}
 	}
 
-	public void computerMove() {
+	public boolean computerMove() {
+		boolean computerHadMove = true;
 		Player p = currentGame.getHumanPlayer();
 		ComputerPlayer oppo = (ComputerPlayer) currentGame.getOpposingPlayer();
 		if(!oppo.chooseTrickCardToPlay(p)) {
-			status.setText("The computer doesn't have any cards they want to play");
+			status.setText(Constants.STATUS_OPPO_NO_MOVES);
+			computerHadMove = false;
 		}
+		return computerHadMove;
 	}
 
 	public void playDeckRemoved(Player p, DeckView pd) {
@@ -895,10 +926,21 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 				askForRadios(p, dv);
 			}else{
 				ComputerPlayer cp = (ComputerPlayer) p;
+				numRadiosInPlay = 1;
 				cp.playARadio(dv);
 			}
+		}else{
+			launchPebbleBagView(dv);
 		}
-		launchPebbleBagView(dv);
+	}
+	
+	public void radioPlayed(Player p, DeckView dv, Player cvOwner) {
+		numRadiosInPlay--;
+		if(numRadiosInPlay <= 0) {
+			launchPebbleBagView(dv);
+		}else{
+			cvOwner.playARadio(dv);
+		}
 	}
 
 	public void stinkBombPlayed(Player p, DeckView dv, Player cvOwner) {
@@ -916,13 +958,15 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			launchManipWindow(tc.getDescription(), dv, null);
 		}
 	}
-
+	
 	private void decideToLaunch(DeckView dv, Player cvOwner) {
-		if(!notCoolMan) {
-			launchManipWindow(dv, notCoolMan);
-		}else if(!isOurUser(cvOwner)) {  //Launching Manip Window for Computer
+		if(!isOurUser(cvOwner)) {  //Launching Manip Window for Computer
 			launchCompManipWindow(dv);
 		}
+	}
+	
+	private void decideToLaunchPebbleBag(DeckView dv) {
+		
 	}
 
 	public boolean isOurUser(Player p) {
@@ -935,23 +979,43 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		for(int i = 0; i < oneRadioOptions.length; i++) {
 			oneRadioOptions[i] = options[i];
 		}
-		String message = "An Ice Cream Has Been Played, How many Radios would you like to play?";
+		String message = Constants.ASK_FOR_RADIOS;
 		int n = 0;
 		if(p.numRadiosInHand() > 1) {
 			n = JOptionPane.showOptionDialog(this, message, "", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
 		}else{
 			n = JOptionPane.showOptionDialog(this, message, "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, oneRadioOptions, oneRadioOptions[1]);
 		}
-		n = Math.min(n, p.numRadiosInHand());
-		for(int i = 0; i < n; i++) {
+		numRadiosInPlay = Math.min(n, p.numRadiosInHand());
+		if(n > 0) {
 			p.playARadio(dv);
+		}else{
+			launchPebbleBagView(dv);
 		}
 	}
 
 	private void launchPebbleBagView(DeckView dv) {
-		pebbleWindow = new PebbleFrame(dv); //Still needs more work
-		pebbleWindow.addBagListener(this);
 		disableUser();
+		String subject = "their";
+		if(dv.getPlayer().isHuman()) {
+			subject = "your";
+		}
+		status.setText("Let's figure out if " + subject + " teammates will fall for the "+Constants.ICE_CREAM_NAME+" fib!");
+		PebbleFrameLauncher pfl = new PebbleFrameLauncher(this, dv);
+		Timer t = new Timer(0, pfl);
+		t.setInitialDelay(Constants.BETWEEN_GAME_PAUSE);
+		pfl.setTimer(t);
+		t.start();
+	}
+	
+	private void launchComboFrame(CardView cv) {
+		disableUser();
+		ComboFrame combo = new ComboFrame(cv);
+		combo.addListener(this);
+	}
+	
+	public void setPebbleWindow(PebbleFrame pebWin) {
+		pebbleWindow = pebWin;
 	}
 	
 	private void launchCompManipWindow(DeckView dv) {
@@ -981,12 +1045,13 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	}
 
 	private void launchManipWindow(String question, DeckView dv, CardView cv) {
-		if(CardGameConstants.ASK_USERS_FRACTION_QS) {
+		if(Constants.ASK_USERS_FRACTION_QS) {
 			disableUser();
 			//Need to setup a Timer here;
+			status.setText(Constants.STATUS_CALC_FRACTION);
 			ManFrameLauncher mfl = new ManFrameLauncher(this, question, manWindows, dv, cv);
 			Timer t = new Timer(0, mfl);
-			t.setInitialDelay(CardGameConstants.BETWEEN_GAME_PAUSE);
+			t.setInitialDelay(Constants.BETWEEN_GAME_PAUSE);
 			mfl.setTimer(t);
 			t.start();
 		}else{
@@ -995,7 +1060,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	}
 
 	private void launchManipWindow(DeckView dv, CardView cv) {
-		launchManipWindow(dv, cv, notCoolMan);
+		launchManipWindow(dv, cv, true);
 	}
 
 	private void addStatusBox() {
@@ -1003,6 +1068,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		box.setLayout(new BoxLayout(box, BoxLayout.X_AXIS));
 		add(box, BorderLayout.SOUTH);
 		status = new JLabel(" ");
+		status.setFont(Constants.FONT_TINY);
 		box.add(status);
 	}
 
@@ -1017,22 +1083,22 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 				//More analysis could be done here.
 				suffix += dv.getPlayDeck().getErrorMsg();
 			}else{
-				suffix += "You would be hurting yourself!";
+				suffix += Constants.ERROR_HURTING_YOURSELF;
 			}
 		}else{
 			temp += "opponent's deck";
 			if(tc.isDefense()) {
-				suffix += "You would be protecting your opponent!";
+				suffix += Constants.ERROR_PROTECT_OTHER;
 			}else{
 				suffix += dv.getPlayDeck().getErrorMsg();
 			}
 		}
-		String prefix = "Sorry but you can't place " + cv + " on your " + temp;
+		String prefix = "Sorry, but you can't place " + cv + " on " + temp;
 		return prefix + suffix;
 	}
 
 	private String generateSuccessMessage(CardView cv, DeckView dv, Player p) {
-		return "Nice Move!";
+		return Constants.STATUS_NICE_MOVE;
 	}
 
 	private void clearCardList(ArrayList<CardView> hand) {
@@ -1070,26 +1136,12 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		return userCanInteract;
 	}
 
-	private void updateViewWithMove(DeckView dv, CardView cv) {
-		Player p = dv.getPlayer();
-		String textToShow = "";
-		if(p.addToPlayDeck(dv, cv, currentGame.getHumanPlayer())) {
-			CardView oldCard = cv;
-			makeSelectedCard(null);
-			if(isInTrickHand(oldCard)) {
-				p = currentGame.getHumanPlayer();
-				p.removeTrickFromHand(oldCard);
-			}
-			textToShow = generateSuccessMessage(cv, dv, p);
-		}else{
-			textToShow = generateErrorMessage(cv, dv, p);
-			sendCardBack(cv);
-		}
-		status.setText(textToShow);
-	}
-
 	private void sendCardBack(CardView cv) {
 		repaintCard(cv);
+		if(origComboTrick != null && cv.isCombo() && isInTrickHand(cv)) {
+			cv.setCard(origComboTrick);
+			origComboTrick = null;
+		}
 		cv.setLocation(origX, origY);
 		//setComponentZOrder(currentSelection, currentSelection.getZOrder());
 		repaintCard(cv);
@@ -1130,7 +1182,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	}
 
 	private int teamCardHeightPlusMargin(ArrayList<DeckView> decks) {
-		return currentCardHeight(decks)+CardGameConstants.BOARD_MARGIN;
+		return currentCardHeight(decks)+Constants.BOARD_MARGIN;
 	}
 
 	//Might not be used since we have cardImages, though this should give us all of the players and such.
@@ -1154,7 +1206,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		JComponent cont = (JComponent) f.getContentPane();
 		cont.setLayout(new BorderLayout());
 
-		GamePanel gp = new GamePanel(600, 950, null, false);
+		GamePanel gp = new GamePanel(600, 950, null);
 		cont.add(gp, BorderLayout.CENTER);
 		f.pack();
 		f.setVisible(true);
@@ -1163,25 +1215,25 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		gp.startGame();
 	}
 
-	@Override
+	//@Override
 	public void componentHidden(ComponentEvent arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+	//@Override
 	public void componentMoved(ComponentEvent arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+	//@Override
 	public void componentResized(ComponentEvent arg0) {
 		// TODO Auto-generated method stub
 		if(decksInPlay.size() > 0) {
 			makeSelectedCard(null);
 			Dimension d = arg0.getComponent().getSize();
-			d.setSize(d.getWidth()-CardGameConstants.HUGE_CARD_WIDTH, d.getHeight());
+			d.setSize(d.getWidth()-Constants.HUGE_CARD_WIDTH, d.getHeight());
 			recomputeAllToDimension(d);
 		}
 	}
@@ -1194,7 +1246,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	}
 
 	private void recomputeAllToDimension(Dimension d) {
-		if(d.getWidth() > (100 + CardGameConstants.HUGE_CARD_WIDTH) && d.getHeight() > (100 + CardGameConstants.HUGE_CARD_HEIGHT)) {
+		if(d.getWidth() > (100 + Constants.HUGE_CARD_WIDTH) && d.getHeight() > (100 + Constants.HUGE_CARD_HEIGHT)) {
 			Dimension ourSize = getPreferredSize();
 			if(Math.abs(d.getWidth()-ourSize.getWidth()) > 25 || Math.abs(d.getHeight() - ourSize.getHeight()) > 25) {
 				recomputeAllByForce(d);
@@ -1213,43 +1265,67 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		recomputeAllByForce(getPanelSize());
 	}
 
-	@Override
+	//@Override
 	public void componentShown(ComponentEvent arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+	//@Override
 	public void iceCreamTruckDone(DeckView dv, boolean didKidsRunToTruck) {
 		pebbleWindow.dispose();
 		enableUser();
+		String msg = "";
 		if(didKidsRunToTruck) {
 			removeTeam(dv);
+			msg = "fell";
 		}else{
 			removeIceRadiosFromDeck(dv);
+			msg = "didn't fall";
 		}
+		status.setText("They " + msg + " for the " + Constants.ICE_CREAM_NAME + " fib!");
 		repaint();
 	}
 
-	@Override
+	//@Override
 	public void manipWindowDone(DeckView dv, ManFrame mf) {
 		mf.dispose();
 		manWindows.remove(mf);
 		makeSuccessfulDragChanges();
 		if(manWindows.size() == 0) {
 			enableUser();
+			if(status != null && (status.getText().length() < 5 || !status.getText().substring(0, 5).equals("Sorry"))) {
+				status.setText(Constants.STATUS_RIGHT_YOUR_TURN);
+			}
 		}
 		repaint();
 	}
+	
+	public void comboCardDone(CardView cv, int option) {
+		ArrayList<TrickCard> optList = cv.getCards();
+//		int option = JOptionPane.showOptionDialog(getTopLevelAncestor(), "Which Part of the Combo Card would you like?", "", 0, 0, null, options, options[0]);
+		cv.setOptionChosen(option);
+		TrickCard cardSelected = optList.get(option);
+		origComboTrick = (TrickCard) cv.getCard();
+		currentCard.setCard(cardSelected);
+		launchWindowOrTryToPlaceCard();
+		resetToZero();
+		enableUser();
+	}
 
 	private void makeSuccessfulDragChanges() {
-		if(notCoolMan && cardUsed != null) {
+		if(/*notCoolMan && */cardUsed != null) {
 			makeSelectedCard(cardUsed);
 			origX = cardUsedX;
 			origY = cardUsedY;
-			updateViewWithMove(deckUsed, currentCard);
+			tryAndPlaceCardOnDeck(deckUsed, currentCard);
 			deckUsed = null;
 			cardUsed = null;
 		}
+	}
+
+	public void handleNetworkMove(String cardIndex, int deckIndex) {
+		Player p = getCorrectPlayer(false);
+		p.assembleMove(cardIndex, deckIndex, getCorrectPlayer(true));
 	}
 }

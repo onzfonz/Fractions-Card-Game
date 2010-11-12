@@ -9,12 +9,13 @@ package deck;
  * Twins The Twins Have Joined Your Team recruits6.jpg 2 6
  */
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import cards.CardFrame;
 import cards.TeammateCard;
 
 public class TeammatesDeck extends Deck {
@@ -26,12 +27,10 @@ public class TeammatesDeck extends Deck {
 	
 	public TeammatesDeck(String aFileName) {
 		BufferedReader bf = null;
-		try {
-			File aFile = new File(aFileName);
-			bf = new BufferedReader(new FileReader(aFile));
-		}catch (IOException e) {
-			e.printStackTrace();
-		}
+		//File aFile = new File(aFileName);
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		InputStream is = cl.getResourceAsStream(aFileName);
+		bf = new BufferedReader(new InputStreamReader(is));
 		cards = new ArrayList<TeammateCard>();
 		processLineByLine(bf);
 		createBackup();

@@ -5,10 +5,11 @@ package test;
  * This is a Junit testing file for the PlayDeck class
  */
 
+import junit.framework.TestCase;
+import basic.Constants;
 import cards.TeammateCard;
 import cards.TrickCard;
 import deck.PlayDeck;
-import junit.framework.TestCase;
 
 
 public class PlayDeckTest extends TestCase {
@@ -51,24 +52,24 @@ public class PlayDeckTest extends TestCase {
 		p6 = new PlayDeck(new TeammateCard("", "1st Graders", "", 4));
 		p7 = new PlayDeck(new TeammateCard("", "Johnson Family", "", 8));
 		
-		halfStink = new TrickCard("cards_stink.jpg", 1, 2, "Stink");
-		qtrStink = new TrickCard("cards_stink.jpg", 1, 4, "Stink");
-		threeQtrStink = new TrickCard("cards_stink.jpg", 3, 4, "Stink");
-		twoThirdStink = new TrickCard("cards_stink.jpg", 2, 3, "Stink");
-		thirdStink = new TrickCard("cards_stink.jpg", 1, 3, "Stink");
+		halfStink = new TrickCard(Constants.HALF_STINK_FILENAME, 1, 2, "Stink");
+		qtrStink = new TrickCard(Constants.HALF_STINK_FILENAME, 1, 4, "Stink");
+		threeQtrStink = new TrickCard(Constants.HALF_STINK_FILENAME, 3, 4, "Stink");
+		twoThirdStink = new TrickCard(Constants.HALF_STINK_FILENAME, 2, 3, "Stink");
+		thirdStink = new TrickCard(Constants.HALF_STINK_FILENAME, 1, 3, "Stink");
 		
-		halfAir = new TrickCard("cards_air.jpg", 1, 2, "Air");
-		qtrAir = new TrickCard("cards_air.jpg", 1, 4, "Air");
-		threeQtrAir = new TrickCard("cards_air.jpg", 3, 4, "Air");
-		twoThirdAir = new TrickCard("cards_air.jpg", 2, 3, "Air");
-		thirdAir = new TrickCard("cards_air.jpg", 1, 3, "Air");
-		fifthAir = new TrickCard("cards_air.jpg", 1, 5, "Air");
+		halfAir = new TrickCard(Constants.HALF_AIR_FILENAME, 1, 2, "Air");
+		qtrAir = new TrickCard(Constants.HALF_AIR_FILENAME, 1, 4, "Air");
+		threeQtrAir = new TrickCard(Constants.HALF_AIR_FILENAME, 3, 4, "Air");
+		twoThirdAir = new TrickCard(Constants.HALF_AIR_FILENAME, 2, 3, "Air");
+		thirdAir = new TrickCard(Constants.HALF_AIR_FILENAME, 1, 3, "Air");
+		fifthAir = new TrickCard(Constants.HALF_AIR_FILENAME, 1, 5, "Air");
 		
-		two2Ice = new TrickCard("cards_ice.jpg", 2, 2, "Ice");
-		one2Ice = new TrickCard("cards_ice.jpg", 1, 2, "Ice");
-		one9Ice = new TrickCard("cards_ice.jpg", 1, 9, "Ice");
-		thirteen11Ice = new TrickCard("cards_ice.jpg", 13, 11, "Ice");
-		one5Ice = new TrickCard("cards_ice.jpg", 1, 5, "Ice");
+		two2Ice = new TrickCard(Constants.TWO_TWO_ICE_FILENAME, 2, 2, "Ice");
+		one2Ice = new TrickCard(Constants.TWO_TWO_ICE_FILENAME, 1, 2, "Ice");
+		one9Ice = new TrickCard(Constants.TWO_TWO_ICE_FILENAME, 1, 9, "Ice");
+		thirteen11Ice = new TrickCard(Constants.TWO_TWO_ICE_FILENAME, 13, 11, "Ice");
+		one5Ice = new TrickCard(Constants.TWO_TWO_ICE_FILENAME, 1, 5, "Ice");
 	}
 	
 	protected void setupStinks() {

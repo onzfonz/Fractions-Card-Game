@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import javax.swing.Timer;
 
 import manipulatives.ManFrame;
-import cards.CardGameConstants;
 import cards.CardView;
 import deck.DeckView;
+import extras.Debug;
 
 public class ManFrameLauncher implements ActionListener {
 	private String question;
@@ -36,21 +36,15 @@ public class ManFrameLauncher implements ActionListener {
 		timer = t;
 	}
 	
-	@Override
+	//@Override
 	public void actionPerformed(ActionEvent e) {
 		if(numTimesMoved == 0) {
-			if(CardGameConstants.DEBUG_MODE) {
-				System.out.println("Launching Manipulation Window");
-			}
+			Debug.println("Launching Manipulation Window");
 		}
-		if(CardGameConstants.DEBUG_MODE) {
-			System.out.println("numTimesMoved is: " + numTimesMoved);
-		}
+		Debug.println("numTimesMoved is: " + numTimesMoved);
 		numTimesMoved++;
 		if(numTimesMoved >= MAX_MOVES) {
-			if(CardGameConstants.DEBUG_MODE) {
-				System.out.println("Manipulation Window Finished");
-			}
+			Debug.println("Manipulation Window Finished");
 			gPanel.repaint();
 			numTimesMoved = 0;
 			//stuff to have it finish completely
@@ -67,7 +61,7 @@ public class ManFrameLauncher implements ActionListener {
 	}
 	
 	private void restartTimer() {
-		timer.setInitialDelay(CardGameConstants.BETWEEN_GAME_PAUSE/2);
+		timer.setInitialDelay(Constants.BETWEEN_GAME_PAUSE/2);
 		timer.start();
 	}
 	

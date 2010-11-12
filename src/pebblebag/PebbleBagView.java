@@ -5,10 +5,10 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
-import acm.util.RandomGenerator;
+import basic.Constants;
 import basic.PebbleBag;
-import cards.CardGameConstants;
 import cards.TrickCard;
+import extras.RandomGenerator;
 
 public class PebbleBagView {
 	private PebbleBag bag;
@@ -128,7 +128,7 @@ public class PebbleBagView {
 	public boolean didIceCreamTruckWork() {
 		boolean didRun = true;
 		for(PebbleView pv:pebbles) {
-			//System.out.println("Pebble: " + pv.kidsAreSafe());
+			//Debug.println("Pebble: " + pv.kidsAreSafe());
 			if(pv.kidsAreSafe()) {
 				didRun = false;
 			}
@@ -166,9 +166,9 @@ public class PebbleBagView {
 	
 	public int getFutureX(JPanel p) {
 		if(inLeftHalf(p)) {
-			return x + getWidth() + CardGameConstants.PEBBLE_BAG_MARGIN;
+			return x + getWidth() + Constants.PEBBLE_BAG_MARGIN;
 		}else{
-			return x - CardGameConstants.PEBBLE_SIZE - CardGameConstants.PEBBLE_BAG_MARGIN;
+			return x - Constants.PEBBLE_SIZE - Constants.PEBBLE_BAG_MARGIN;
 		}
 	}
 	
@@ -179,14 +179,14 @@ public class PebbleBagView {
 	public int getFutureY(JPanel p, int xCoord) {
 		int potY = 0;
 		if(inTopHalf(p)) {
-			potY = y + getHeight() + CardGameConstants.PEBBLE_BAG_MARGIN;
+			potY = y + getHeight() + Constants.PEBBLE_BAG_MARGIN;
 			while(findPebble(xCoord + 5, potY + 5) != null) {
-				potY += CardGameConstants.PEBBLE_SIZE + CardGameConstants.PEBBLE_BAG_MARGIN;
+				potY += Constants.PEBBLE_SIZE + Constants.PEBBLE_BAG_MARGIN;
 			}
 		}else{
-			potY = y /*- CardGameConstants.PEBBLE_SIZE*/ - CardGameConstants.PEBBLE_BAG_MARGIN;
+			potY = y /*- Constants.PEBBLE_SIZE*/ - Constants.PEBBLE_BAG_MARGIN;
 			while(findPebble(xCoord + 5, potY + 5) != null) {
-				potY -= (CardGameConstants.PEBBLE_SIZE + CardGameConstants.PEBBLE_BAG_MARGIN);
+				potY -= (Constants.PEBBLE_SIZE + Constants.PEBBLE_BAG_MARGIN);
 			}
 		}
 		return potY;
@@ -213,11 +213,11 @@ public class PebbleBagView {
 	}
 	
 	public int getWidth() {
-		return CardGameConstants.PEBBLE_BAG_SIZE;
+		return Constants.PEBBLE_BAG_SIZE;
 	}
 	
 	public int getHeight() {
-		return CardGameConstants.PEBBLE_BAG_SIZE;
+		return Constants.PEBBLE_BAG_SIZE;
 	}
 	
 	private void movePebblesRandomly() {
@@ -298,7 +298,7 @@ public class PebbleBagView {
 	}
 	
 	public static boolean shouldResize(ArrayList<PebbleView> allPebbles) {
-		if(allPebbles.size() > CardGameConstants.MAX_PEBBLES_FOR_RESIZING) {
+		if(allPebbles.size() > Constants.MAX_PEBBLES_FOR_RESIZING) {
 			return false;
 		}
 		return true;

@@ -32,7 +32,6 @@ package tutorial;
 
 import javax.swing.ImageIcon;
 import javax.swing.JApplet;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -134,7 +133,7 @@ public class TumbleItem extends JApplet
 
     //Background task for loading images.
     SwingWorker worker = new SwingWorker<ImageIcon[], Void>() {
-        @Override
+        //@Override
         public ImageIcon[] doInBackground() {
             final ImageIcon[] innerImgs = new ImageIcon[nimgs];
             for (int i = 0; i < nimgs; i++) {
@@ -143,7 +142,7 @@ public class TumbleItem extends JApplet
             return innerImgs;
         }
 
-        @Override
+        //@Override
         public void done() {
             //Remove the "Loading images" label.
             animator.removeAll();

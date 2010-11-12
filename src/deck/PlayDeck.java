@@ -7,9 +7,9 @@ package deck;
  * It also has the logic that applies based on what trick cards are applied to a deck.
  */
 
-import java.awt.Image;
 import java.util.ArrayList;
 
+import basic.Constants;
 import basic.PebbleBag;
 
 import cards.Card;
@@ -18,7 +18,7 @@ import cards.TeammateCard;
 import cards.TrickCard;
 
 
-import acm.util.RandomGenerator;
+import extras.*;
 
 public class PlayDeck extends Deck {
 	private TeammateCard team;
@@ -57,7 +57,7 @@ public class PlayDeck extends Deck {
 					return true;
 				}
 			}
-			errorMsg = "You need to have Ice Cream Cards on this Deck to use radios";
+			errorMsg = Constants.ERROR_PLACING_RADIO;
 			noRemainder = false;
 		}
 		return noRemainder;
@@ -186,12 +186,12 @@ public class PlayDeck extends Deck {
 		boolean isDivisible = team.getValue() % c.getDenominator() == 0;
 		boolean someStinkies = (team.getValue() - calculateStinksAndAirs()) > 0;
 		if(!isDivisible) {
-			errorMsg = "A " + c + " card has to be evenly divisible to be used on the " + team;
+			errorMsg = "An " + c + " card has to be evenly divisible to be used on the " + team;
 		}else if(!someStinkies) {
 			if(numStinks() > 0) {
-				errorMsg = "A " + c + " card has to have some stinky teammates before you can use it";
+				errorMsg = "An " + c + " card has to have some stinky teammates before you can use it";
 			}else{
-				errorMsg = "There must be a stink card placed on this deck before you can use a" + c + "card";
+				errorMsg = "There must be a stink card placed on this deck before you can use an " + c + "card";
 			}
 		}
 		return (isDivisible && someStinkies);
@@ -428,7 +428,7 @@ public class PlayDeck extends Deck {
 
 	public static void main(String[] args) {
 		//quick test of the next boolean stuff
-		TrickCard ice = new TrickCard("cards_ice.jpg", 1, 2, "ice");
+		TrickCard ice = new TrickCard(Constants.TWO_TWO_ICE_FILENAME, 1, 2, "ice");
 		RandomGenerator rgen = RandomGenerator.getInstance();
 		int count = 0;
 		for(int i = 0; i < 1000; i++) {

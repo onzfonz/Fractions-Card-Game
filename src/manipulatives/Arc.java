@@ -1,7 +1,5 @@
 package manipulatives;
 
-import java.awt.Point;
-
 public class Arc {
 	private DoublePoint startPoint;
 	private DoublePoint endPoint;

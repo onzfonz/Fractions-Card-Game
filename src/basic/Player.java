@@ -6,13 +6,20 @@ package basic;
  * Each player will hold an ArrayList of PlayerDecks
  */
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Scanner;
 
-import cards.*;
-import deck.*;
+import cards.Card;
+import cards.CardView;
+import cards.CardViewFactory;
+import cards.TeammateCard;
+import cards.TrickCard;
+import deck.DeckView;
+import deck.PlayDeck;
+import extras.Debug;
 
 
-public class Player implements CardGameConstants{
+public class Player {
 	protected ArrayList<CardView> trickHand;
 	protected ArrayList<DeckView> decks;
 	protected Dealer d;
@@ -59,9 +66,9 @@ public class Player implements CardGameConstants{
 	public void addTrickCardToHand(TrickCard t) {
 		CardView ct = null;
 		if(isHuman()) {
-			ct = new CardView(t);
+			ct = CardViewFactory.createCard(t);
 		}else{
-			ct = new CardView(t, false);
+			ct = CardViewFactory.createCard(t, false);
 		}
 		trickHand.add(ct);
 		fireTrickCardAddedToHand(ct);
@@ -69,7 +76,6 @@ public class Player implements CardGameConstants{
 	
 	public void addTeammateCard(TeammateCard t) {
 		PlayDeck newDeck = new PlayDeck(t);
-		CardView ct = new CardView(t);
 		DeckView newDeckView = new DeckView(newDeck, this);
 		decks.add(newDeckView);
 		firePlayDeckAdded(newDeckView);
@@ -111,6 +117,10 @@ public class Player implements CardGameConstants{
 		return dv.couldAddTrickCard(cv);
 	}
 	
+	private boolean couldAddToPlayDeck(DeckView dv, TrickCard tc) {
+		return dv.couldAddTrickCard(tc);
+	}
+	
 	public boolean addToPlayDeck(DeckView dv, CardView cv, Player cvOwner) {
 		TrickCard tc = (TrickCard) cv.getCard();
 		if(cvOwner == this) {
@@ -118,6 +128,8 @@ public class Player implements CardGameConstants{
 				boolean addSuccessful = addToPlayDeck(dv, cv);
 				if(addSuccessful && tc.isAir()) {
 					fireAirFreshenerPlayed(dv, cvOwner);
+				}else if(addSuccessful && tc.isRadio()) {
+					fireRadioPlayed(dv, cvOwner);
 				}
 				return addSuccessful;
 			}
@@ -138,15 +150,19 @@ public class Player implements CardGameConstants{
 	
 	public boolean couldAddToPlayDeck(DeckView dv, CardView cv, Player cvOwner) {
 		TrickCard tc = (TrickCard) cv.getCard();
+		return couldAddToPlayDeck(dv, tc, cvOwner);
+	}
+	
+	public boolean couldAddToPlayDeck(DeckView dv, TrickCard tc, Player cvOwner) {
 		Player p = dv.getPlayer();
 		if(cvOwner == this) {
 			if(tc.isDefense()) {
-				return couldAddToPlayDeck(dv, cv);
+				return couldAddToPlayDeck(dv, tc);
 			}
 			return false;
 		}else{
 			if(!tc.isDefense()) {
-				return couldAddToPlayDeck(dv, cv);
+				return couldAddToPlayDeck(dv, tc);
 			}
 			return false;
 		}
@@ -202,14 +218,14 @@ public class Player implements CardGameConstants{
 	
 	public void replenishTrickHand() {
 		clearTrickHand();
-		while(numTrickCards() < TRICK_HAND_SIZE) {
+		while(numTrickCards() < Constants.TRICK_HAND_SIZE) {
 			addExtraTrickToHand();
 		}
 	}
 	
 	public void replenishTeamHand() {
 		clearDecks();
-		for(int i = 0; i < TEAM_HAND_SIZE; i++) {
+		for(int i = 0; i < Constants.TEAM_HAND_SIZE; i++) {
 			addExtraTeammate();
 		}
 	}
@@ -281,11 +297,22 @@ public class Player implements CardGameConstants{
 		return null;
 	}
 	
-	protected ArrayList<PossibleMove> buildPossibleMoves(CardView cv, ArrayList<DeckView> dvs) {
+	protected void buildCardMoves(ArrayList<PossibleMove> movesSoFar, CardView cv, TrickCard tc, Player opponent) {
+		ArrayList<DeckView> oppoDecks = opponent.getAllDecks();
+		ArrayList<PossibleMove> someMoves = null;
+		if(tc.isAir() || tc.isRadio()) {
+			someMoves = buildPossibleMoves(cv, tc, decks);
+		}else{
+			someMoves = buildPossibleMoves(cv, tc, oppoDecks);
+		}
+		movesSoFar.addAll(someMoves);
+	}
+	
+	protected ArrayList<PossibleMove> buildPossibleMoves(CardView cv, TrickCard tc, ArrayList<DeckView> dvs) {
 		ArrayList<PossibleMove> moves = new ArrayList<PossibleMove>();
 		for(int i = 0; i < dvs.size(); i++) {
 			DeckView dv = dvs.get(i);
-			PossibleMove m = couldBePlayed(dv, cv);
+			PossibleMove m = couldBePlayed(dv, cv, tc);
 			if(m != null) {
 				moves.add(m);
 			}
@@ -297,23 +324,55 @@ public class Player implements CardGameConstants{
 	public void playARadio(DeckView dv) {
 		CardView radio = getARadio();
 		PossibleMove move = couldBePlayed(dv, radio);
-		performMove(move, null);
+		if(move != null) {
+			fireCardAnimation(move, null, "playing a radio to defend against the stink bomb!");
+		}
 	}
 	
 	//Want something that would check to see if it was possible to add the card
 	protected PossibleMove couldBePlayed(DeckView dv, CardView cv) {
+		return couldBePlayed(dv, cv, (TrickCard) cv.getCard());
+	}
+	
+	protected PossibleMove couldBePlayed(DeckView dv, CardView cv, TrickCard tc) {
 		PossibleMove move = null;
-		if(dv.getPlayer().couldAddToPlayDeck(dv, cv, this)) {
+		if(dv.getPlayer().couldAddToPlayDeck(dv, tc, this)) {
 			int difference = dv.getPotentialScoreChange(cv);
-			move = new PossibleMove(dv, cv, difference);
+			move = new PossibleMove(dv, cv, tc, difference);
 		}
 		return move;
 	}
 	
+	public void assembleMove(String cardIndex, int deckIndex, Player opponent) {
+		CardView cv = extractCard(cardIndex);
+		TrickCard tc = extractTrick(cv, cardIndex);
+		Player p = opponent;
+		if(tc.isDefense()) {
+			p = this;
+		}
+	}
+	
+	private CardView extractCard(String cardIndex) {
+		int commaPos = cardIndex.indexOf("c");
+		if(commaPos != -1) {
+			cardIndex = cardIndex.substring(0, commaPos);
+		}
+		return trickHand.get(Integer.parseInt(cardIndex));
+	}
+	
+	private TrickCard extractTrick(CardView cv, String cardIndex) {
+		if(!cv.isCombo()) {
+			return (TrickCard) cv.getCard();
+		}
+		int commaPos = cardIndex.indexOf("c");
+		int option = Integer.parseInt(cardIndex.substring(commaPos+1));
+		return cv.setOptionChosen(option);
+	}
+	
 	//Assumes move and player are both non-null;
 	protected void performMove(PossibleMove move, Player opponent) {
-		CardView cv = move.getTrickCard();
-		TrickCard tc = (TrickCard) cv.getCard();
+		CardView cv = move.getCardView();
+		TrickCard tc = move.getTrickCard();
 		Player p = null;
 		Player cvOwner = this;
 		if(tc.isAir() || tc.isRadio()) {
@@ -323,10 +382,24 @@ public class Player implements CardGameConstants{
 		}
 		removeTrickFromHand(cv);
 		cv.setFaceUp(true);
-		if(CardGameConstants.DEBUG_MODE) {
-			System.out.println("Going to play " + cv.getCard() + " on the deck with teammate " + move.getDeck().getTeammateCard().getCard() + " causing damage " + move.getDamage());
+		Debug.println("Going to play " + cv.getCard() + " on the deck with teammate " + move.getDeck().getTeammateCard().getCard() + " causing damage " + move.getDamage());
+		if(cv.isCombo()) {
+			cv.setOptionChosen(extractOption(cv, tc));
 		}
+		cv.setCard(tc);  //need to set the card now that it's been picked as the real TrickCard
 		p.addToPlayDeck(move.getDeck(), cv, cvOwner);
+	}
+	
+	private int extractOption(CardView cv, TrickCard tc) {
+		TrickCard oldCard = (TrickCard) cv.getCard();
+		String oldType = oldCard.getType();
+		String newType = tc.getType();
+		int colonPos = oldType.indexOf(";");
+		int typePos = oldType.indexOf(newType);
+		if(colonPos > typePos) {
+			return 0;
+		}
+		return 1;
 	}
 	
 	public int totalTeammates() {
@@ -450,15 +523,22 @@ public class Player implements CardGameConstants{
 		}
 	}
 	
+	private void fireRadioPlayed(DeckView p, Player cvOwner) {
+		assert(cvOwner == this);
+		for(PlayerListener l:listeners) {
+			l.radioPlayed(this, p, cvOwner);
+		}
+	}
+	
 	private void firePlayerScoreChanged() {
 		for(PlayerListener l:listeners) {
 			l.scoreUpdated(this);
 		}
 	}
 	
-	protected void fireCardAnimation(PossibleMove cMove, Player opponent) {
+	protected void fireCardAnimation(PossibleMove cMove, Player opponent, String message) {
 		for(PlayerListener l:listeners) {
-			l.cardAnimationLaunched(cMove, this, opponent);
+			l.cardAnimationLaunched(cMove, this, opponent, message);
 		}
 	}
 }

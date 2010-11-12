@@ -6,13 +6,14 @@ package basic;
  * Each player will hold an ArrayList of PlayerDecks
  */
 
-import java.util.*;
+import java.util.ArrayList;
 
-import cards.*;
-import deck.*;
+import cards.CardView;
+import cards.TrickCard;
+import extras.Debug;
 
 
-public class ComputerPlayer extends Player implements CardGameConstants{
+public class ComputerPlayer extends Player {
 	public ComputerPlayer(Dealer dlr) {
 		super(dlr);
 	}
@@ -39,12 +40,10 @@ public class ComputerPlayer extends Player implements CardGameConstants{
 		PossibleMove computerMove = chooseMoveToMake(allMoves);
 		boolean couldMakeMove = computerMove != null;
 		if(couldMakeMove) {
-			fireCardAnimation(computerMove, opponent);
+			fireCardAnimation(computerMove, opponent, "thinking about where to move.");
 			//performMove(computerMove, opponent);
 		}else{
-			if(CardGameConstants.DEBUG_MODE) {
-				System.out.println("Couldn't make a turn");
-			}
+			Debug.println("Couldn't make a turn");
 		}
 		return couldMakeMove;
 	}
@@ -58,21 +57,17 @@ public class ComputerPlayer extends Player implements CardGameConstants{
 	}
 	
 	protected ArrayList<PossibleMove> getAllPossibleMoves(Player opponent) {
-		ArrayList<DeckView> oppoDecks = opponent.getAllDecks();
 		ArrayList<PossibleMove> allMoves = new ArrayList<PossibleMove>();
 		for(CardView cv:trickHand) {
 			TrickCard tc = (TrickCard) cv.getCard();
-			ArrayList<PossibleMove> someMoves = null;
-			if(tc.isAir() || tc.isRadio()) {
-				someMoves = buildPossibleMoves(cv, decks);
+			if(tc.isCombo()) {
+				buildCardMoves(allMoves, cv, tc.getFirstCard(), opponent);
+				buildCardMoves(allMoves, cv, tc.getSecondCard(), opponent);
 			}else{
-				someMoves = buildPossibleMoves(cv, oppoDecks);
+				buildCardMoves(allMoves, cv, tc, opponent);
 			}
-			allMoves.addAll(someMoves);
 		}
-		if(CardGameConstants.DEBUG_MODE){
-			System.out.println("Generated " + allMoves.size() + " moves for Computer's Hand");
-		}
+		Debug.println("Generated " + allMoves.size() + " moves for Computer's Hand");
 		return allMoves;
 	}	
 }

@@ -4,8 +4,9 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import acm.util.RandomGenerator;
-import cards.CardGameConstants;
+import basic.Constants;
+
+import extras.RandomGenerator;
 
 public class PebbleView {
 	private boolean kidsRunToTruck;
@@ -89,7 +90,7 @@ public class PebbleView {
 	}
 	
 	public static boolean pebbleOverlapsDistance(int distX, int distY) {
-		return (distX < CardGameConstants.PEBBLE_SIZE && distX >= 0) && (distY < CardGameConstants.PEBBLE_SIZE && distY >= 0);
+		return (distX < Constants.PEBBLE_SIZE && distX >= 0) && (distY < Constants.PEBBLE_SIZE && distY >= 0);
 	}
 	
 	public boolean contains(int x2, int y2) {
@@ -118,19 +119,19 @@ public class PebbleView {
 	}
 	
 	private int maxXCoord() {
-		return CardGameConstants.PEBBLE_BAG_SIZE-CardGameConstants.PEBBLE_SIZE-CardGameConstants.PEBBLE_BAG_MARGIN;
+		return Constants.PEBBLE_BAG_SIZE-Constants.PEBBLE_SIZE-Constants.PEBBLE_BAG_MARGIN;
 	}
 	
 	private int maxYCoord() {
-		return CardGameConstants.PEBBLE_BAG_SIZE-CardGameConstants.PEBBLE_SIZE-CardGameConstants.PEBBLE_BAG_MARGIN;
+		return Constants.PEBBLE_BAG_SIZE-Constants.PEBBLE_SIZE-Constants.PEBBLE_BAG_MARGIN;
 	}
 	
 	private int minYCoord() {
-		return CardGameConstants.PEBBLE_BAG_THRESHOLD;
+		return Constants.PEBBLE_BAG_THRESHOLD;
 	}
 	
 	private int minXCoord() {
-		return CardGameConstants.PEBBLE_BAG_MARGIN;
+		return Constants.PEBBLE_BAG_MARGIN;
 	}
 	
 	public boolean insideOfBag() {
@@ -138,10 +139,10 @@ public class PebbleView {
 	}
 	
 	public boolean completelyOutsideOfBag() {
-		int minX = minXCoord()-CardGameConstants.PEBBLE_SIZE;
-		int maxX = maxXCoord()+CardGameConstants.PEBBLE_SIZE;
-		int minY = minYCoord()-CardGameConstants.PEBBLE_SIZE;
-		int maxY = maxYCoord()+CardGameConstants.PEBBLE_SIZE;
+		int minX = minXCoord()-Constants.PEBBLE_SIZE;
+		int maxX = maxXCoord()+Constants.PEBBLE_SIZE;
+		int minY = minYCoord()-Constants.PEBBLE_SIZE;
+		int maxY = maxYCoord()+Constants.PEBBLE_SIZE;
 		
 		boolean in = insideOfRange(getX(), getY(), minX, maxX, minY, maxY);
 		return !in;

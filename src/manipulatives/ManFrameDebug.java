@@ -6,7 +6,6 @@ package manipulatives;
  */
 
 import java.awt.BorderLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -23,8 +22,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 
-import acm.util.RandomGenerator;
-import cards.CardGameConstants;
+import basic.Constants;
+import extras.Debug;
+import extras.RandomGenerator;
 
 public class ManFrameDebug extends JFrame {
 	/**
@@ -132,11 +132,11 @@ public class ManFrameDebug extends JFrame {
 		questionBox.setLayout(new BorderLayout());
 
 		JLabel questionLabel = new JLabel(question, JLabel.CENTER);
-		questionLabel.setFont(CardGameConstants.DEFAULT_FONT);
+		questionLabel.setFont(Constants.FONT_REG);
 		questionBox.add(questionLabel, BorderLayout.WEST);
 
 		final JTextField questionAnswer = new JTextField(3);
-		questionAnswer.setFont(CardGameConstants.DEFAULT_FONT);
+		questionAnswer.setFont(Constants.FONT_REG);
 		questionAnswer.setHorizontalAlignment(JTextField.CENTER);
 		questionBox.add(questionAnswer, BorderLayout.CENTER);
 
@@ -144,7 +144,7 @@ public class ManFrameDebug extends JFrame {
 		questionButtons.setLayout(new BoxLayout(questionButtons, BoxLayout.X_AXIS));
 		
 		JButton questionBtn = new JButton("Answer");
-		questionBtn.setFont(CardGameConstants.DEFAULT_FONT);
+		questionBtn.setFont(Constants.FONT_REG);
 		questionButtons.add(questionBtn);
 		questionBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -164,7 +164,7 @@ public class ManFrameDebug extends JFrame {
 		});
 		
 		JButton notCoolManBtn = new JButton("Not Cool Man!");
-		notCoolManBtn.setFont(CardGameConstants.DEFAULT_FONT);
+		notCoolManBtn.setFont(Constants.FONT_REG);
 		questionButtons.add(notCoolManBtn);
 		notCoolManBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -188,7 +188,7 @@ public class ManFrameDebug extends JFrame {
 					ne.printStackTrace();
 				}
 				for(int i = 0; i < numMen; i++) {
-					manPanel.doAdd(rgen.nextInt(CardGameConstants.MAN_WIDTH/2, manPanel.getWidth()-CardGameConstants.MAN_WIDTH/2), rgen.nextInt(CardGameConstants.MAN_HEIGHT/2, manPanel.getHeight()-CardGameConstants.MAN_HEIGHT/2));
+					manPanel.doAdd(rgen.nextInt(Constants.MAN_WIDTH/2, manPanel.getWidth()-Constants.MAN_WIDTH/2), rgen.nextInt(Constants.MAN_HEIGHT/2, manPanel.getHeight()-Constants.MAN_HEIGHT/2));
 				}
 			}
 		});
@@ -290,7 +290,7 @@ public class ManFrameDebug extends JFrame {
 		int num = extractNumerator();
 		int den = extractDenominator();
 		int ppl = extractPeople();
-		System.out.println("num is " + num + ", den is " + den + ", and ppl are " + ppl);
+		Debug.println("num is " + num + ", den is " + den + ", and ppl are " + ppl);
 		manPanel.launchDividingAnimation(den, ppl, num, solution);
 		//manPanel.launchPeopleAddAnimation(ppl, den, num, solution);
 		//populateWithNPeople(ppl, den);
@@ -309,7 +309,7 @@ public class ManFrameDebug extends JFrame {
 	
 	private void circleNGroups(int num, int den, int answer) {
 		if(answer == -1) {
-			String s = "There aren't an equal number of groups...Not Cool Man!";
+			String s = Constants.MAN_MSG_NOT_COOL_MAN;
 			drawMessage(s);
 			return;
 		}

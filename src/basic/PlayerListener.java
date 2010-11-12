@@ -19,7 +19,8 @@ public interface PlayerListener {
 	public void playDecksTossed(Player p);
 	public void iceCreamPlayed(Player player, DeckView p, Player cvOwner);
 	public void airFreshenerPlayed(Player player, DeckView p, Player cvOwner);
+	public void radioPlayed(Player player, DeckView p, Player cvOwner);
 	public void stinkBombPlayed(Player player, DeckView p, Player cvOwner);
 	public void scoreUpdated(Player p);
-	public void cardAnimationLaunched(PossibleMove cMove, Player computer, Player opponent);
+	public void cardAnimationLaunched(PossibleMove cMove, Player computer, Player opponent, String message);
 }

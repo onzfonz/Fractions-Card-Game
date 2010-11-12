@@ -5,13 +5,6 @@ import javax.swing.*;
 
 import deck.PlayDeck;
 
-
-import java.util.*;
-import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.beans.*;
-import java.io.*;
-
 public class BoardPanel extends JPanel {
 	private Game game;
 	

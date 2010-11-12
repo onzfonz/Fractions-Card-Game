@@ -13,10 +13,10 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 
+import basic.Constants;
 import cards.TeammateCard;
 import cards.TrickCard;
 import deck.PlayDeck;
@@ -39,9 +39,9 @@ public class PebbleFrameDebug extends JFrame {
 		
 		/* To delete later */
 		PlayDeck p1 = new PlayDeck(new TeammateCard("", "Johnson Family", "", 8));
-		TrickCard two2Ice = new TrickCard("cards_ice.jpg", 2, 2, "Ice");
-		TrickCard radio = new TrickCard("cards_radio.jpg", 1, 1, "Radio");
-		TrickCard one2Ice = new TrickCard("cards_ice.jpg", 1, 2, "Ice");
+		TrickCard two2Ice = new TrickCard(Constants.TWO_TWO_ICE_FILENAME, 2, 2, "Ice");
+		TrickCard radio = new TrickCard(Constants.RADIO_FILENAME, 1, 1, "Radio");
+		TrickCard one2Ice = new TrickCard(Constants.TWO_TWO_ICE_FILENAME, 1, 2, "Ice");
 		p1.addTrickCard(two2Ice);
 		p1.addTrickCard(one2Ice);
 		p1.addTrickCard(radio);

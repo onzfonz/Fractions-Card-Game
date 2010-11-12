@@ -6,8 +6,6 @@ package manipulatives;
  Has a zero-arg constructor.
 */
 
-import java.awt.Color;
-
 public class ManModel {
 	private int x;
 	private int y;

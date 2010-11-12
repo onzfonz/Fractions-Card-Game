@@ -35,7 +35,7 @@ public class TeammateCard extends Card {
 		return name.equalsIgnoreCase("Shadow Players");
 	}
 	
-	@Override
+	//@Override
 	public Object getTransferData(DataFlavor arg0)
 			throws UnsupportedFlavorException, IOException {
 		// TODO Auto-generated method stub
@@ -45,7 +45,7 @@ public class TeammateCard extends Card {
 		return null;
 	}
 
-	@Override
+	//@Override
 	public DataFlavor[] getTransferDataFlavors() {
 		// TODO Auto-generated method stub
 		DataFlavor[] flavas = new DataFlavor[1];
@@ -53,7 +53,7 @@ public class TeammateCard extends Card {
 		return flavas;
 	}
 
-	@Override
+	//@Override
 	public boolean isDataFlavorSupported(DataFlavor flavor) {
 		// TODO Auto-generated method stub
 		if(flavor.getDefaultRepresentationClass() == TeammateCard.class) {

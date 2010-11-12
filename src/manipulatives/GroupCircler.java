@@ -1,13 +1,11 @@
 package manipulatives;
 
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-
 import javax.swing.Timer;
 
-import cards.CardGameConstants;
+import basic.Constants;
+
 
 public class GroupCircler implements ActionListener {
 	private ManPanel mPanel;
@@ -34,14 +32,14 @@ public class GroupCircler implements ActionListener {
 		timer = t;
 	}
 	
-	@Override
+	//@Override
 	public void actionPerformed(ActionEvent e) {
 		if(numShapesAdded == 0) {
 			center = mPanel.getCenter();
 			r = mPanel.calculateLineLength();
 			theta = mPanel.calculateTheta(sections);
 			if(answer == -1) {
-				completelyFinishTimer();
+				completelyFinishTimer(false);
 				return;
 			}
 		}
@@ -49,19 +47,22 @@ public class GroupCircler implements ActionListener {
 		mPanel.repaint();
 		numShapesAdded++;
 		if(numShapesAdded >= numShapesNeeded) {
-			completelyFinishTimer();
+			completelyFinishTimer(true);
 		}
 	}
 	
-	private void completelyFinishTimer() {
+	private void completelyFinishTimer(boolean gaveAnswer) {
 		numShapesAdded = 0;
 		timer.stop();
+		if(gaveAnswer) {
+			mPanel.displayMessage(Constants.MAN_MSG_HOW_MANY);
+		}
 		mPanel.repaint();
 		mPanel.enableControls();
 	}
 	
 	private void restartTimer() {
-		timer.setInitialDelay(CardGameConstants.MINI_GAME_PAUSE);
+		timer.setInitialDelay(Constants.MINI_GAME_PAUSE);
 		timer.start();
 	}
 }

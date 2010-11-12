@@ -8,10 +8,8 @@ package manipulatives;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -25,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
@@ -33,10 +32,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import pebblebag.BagShaker;
-
-import acm.util.RandomGenerator;
-import cards.CardGameConstants;
+import basic.Constants;
+import extras.Debug;
+import extras.RandomGenerator;
 
 public class ManPanel extends JPanel  {
 	/**
@@ -67,7 +65,7 @@ public class ManPanel extends JPanel  {
 	private boolean smartRepaint;
 	private boolean oldRepaint;
 	private boolean redPaint;
-	private boolean pencilMode;
+	private int pencilMode;
 	private int buttonPressed;
 	private Image img;
 	private JLabel numberMen;
@@ -95,23 +93,25 @@ public class ManPanel extends JPanel  {
 		arcs = new ArrayList<Arc>();
 		clear();
 
-		try {
-			img = ImageIO.read(new File(CardGameConstants.MAN_IMG_PATH));
-		} catch (IOException e) {
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		InputStream imageURL = cl.getResourceAsStream(Constants.MAN_IMG_PATH);
+		try{
+			img = ImageIO.read(imageURL);
+		}catch(IOException e) {
 			e.printStackTrace();
 		}
 		// Controls for debugging options
-		print = CardGameConstants.DEBUG_MODE;
+		print = Constants.DEBUG_MODE;
 		smartRepaint = true;
 		oldRepaint = true;
 		redPaint = false;
-		pencilMode = false;
+		pencilMode = Constants.LINE_MODE;
 		origPoint = null;
 		newLine = null;
 		numberMen = new JLabel("0");
 		message = new JLabel("");
-		numberMen.setFont(new Font("Sans-serif", Font.BOLD, 48));
-		message.setFont(new Font("Sans-serif", Font.BOLD, 48));
+		numberMen.setFont(Constants.FONT_LARGE);
+		message.setFont(Constants.FONT_LARGE);
 		message.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 		setLayout(new BorderLayout());
 		add(numberMen, BorderLayout.SOUTH);
@@ -221,7 +221,7 @@ public class ManPanel extends JPanel  {
 
 			private void leftDrag(MouseEvent e, DoublePoint latestPoint) {
 				if(lastDot == null) {
-					if(pencilMode) {
+					if(pencilMode == 1) {
 						if(newLine == null) {
 							createLine(origPoint, latestPoint);
 							return;
@@ -232,7 +232,7 @@ public class ManPanel extends JPanel  {
 						}else{
 							//changeLine(newLine, latestPoint);
 						}
-					}else{
+					}else if(pencilMode == 0){
 						if(newLine != null) {
 							changeLine(newLine, latestPoint);
 						}else if(origPoint.distance(latestPoint) > DRAG_VS_CLICK && newLine == null) {
@@ -357,7 +357,7 @@ public class ManPanel extends JPanel  {
 	 by smart repaint when dragging a dot.
 	 */
 	private void repaintDot(ManModel dot) {
-		repaint(dot.getX()-CardGameConstants.MAN_WIDTH/2, dot.getY()-CardGameConstants.MAN_HEIGHT/2, CardGameConstants.MAN_WIDTH+1, CardGameConstants.MAN_HEIGHT+1);
+		repaint(dot.getX()-Constants.MAN_WIDTH/2, dot.getY()-Constants.MAN_HEIGHT/2, Constants.MAN_WIDTH+1, Constants.MAN_HEIGHT+1);
 	}
 
 	private void repaintLine(Line l) {
@@ -394,7 +394,7 @@ public class ManPanel extends JPanel  {
 	public ManModel doAdd(int x, int y) {
 		ManModel dotModel = new ManModel();
 		dotModel.setXY(x, y);
-		//		System.out.println("MAN_WIDTH is " + MAN_WIDTH + "  and MAN_HEIGHT is " + MAN_HEIGHT);
+		//		Debug.println("MAN_WIDTH is " + MAN_WIDTH + "  and MAN_HEIGHT is " + MAN_HEIGHT);
 		doAdd(dotModel);
 		return dotModel;
 	}
@@ -447,7 +447,7 @@ public class ManPanel extends JPanel  {
 			// figure x-squared + y-squared, see if it's
 			// less than radius squared.
 			// trick: don't need to take square root this way
-			if(x > (centerX - CardGameConstants.MAN_WIDTH/2) && x < (centerX + CardGameConstants.MAN_WIDTH/2) && y > (centerY - CardGameConstants.MAN_HEIGHT/2) && y < (centerY + CardGameConstants.MAN_HEIGHT/2)){
+			if(x > (centerX - Constants.MAN_WIDTH/2) && x < (centerX + Constants.MAN_WIDTH/2) && y > (centerY - Constants.MAN_HEIGHT/2) && y < (centerY + Constants.MAN_HEIGHT/2)){
 				return dotModel;
 			}
 		}
@@ -462,7 +462,7 @@ public class ManPanel extends JPanel  {
 		// As a JPanel subclass we need call super.paintComponent()
 		// so JPanel will draw the white background for us.
 		super.paintComponent(g);
-
+		Color origColor = g.getColor();
 		for (Line l:lines) {
 			if(l.isPencil()) {
 				g.setColor(Color.RED);
@@ -471,11 +471,12 @@ public class ManPanel extends JPanel  {
 			}
 			g.drawLine((int) l.getX1(), (int) l.getY1(), (int) l.getX2(), (int) l.getY2());
 		}
+		g.setColor(origColor);
 
 		// Go through all the dots, drawing a circle for each
 		for (ManModel dotModel : dots) {
 			//g.drawImage(img, dotModel.getX() - MAN_WIDTH/2, dotModel.getY() - MAN_HEIGHT/2, MAN_WIDTH, MAN_HEIGHT, null);
-			g.drawImage(img, dotModel.getX()-CardGameConstants.MAN_WIDTH/2, dotModel.getY()-CardGameConstants.MAN_HEIGHT/2, null);
+			g.drawImage(img, dotModel.getX()-Constants.MAN_WIDTH/2, dotModel.getY()-Constants.MAN_HEIGHT/2, null);
 		}
 
 		numberMen.setText(""+dots.size());
@@ -487,10 +488,11 @@ public class ManPanel extends JPanel  {
 			if (clip != null) {
 				g.setColor(Color.red);
 				g.drawRect(clip.x, clip.y, clip.width-1, clip.height-1);
+				g.setColor(origColor);
 			}
 		}
 		
-		g.setColor(Color.GREEN);
+		g.setColor(Color.RED);
 		for(Line l:circles) {
 			g.drawLine((int) l.getX1(), (int) l.getY1(), (int) l.getX2(), (int) l.getY2());
 		}
@@ -536,11 +538,11 @@ public class ManPanel extends JPanel  {
 
 	public void shuffle() {
 		for(ManModel man:dots) {
-			int randX = rgen.nextInt(CardGameConstants.MAN_WIDTH/2, getWidth() - CardGameConstants.MAN_WIDTH/2);
-			int randY = rgen.nextInt(CardGameConstants.MAN_HEIGHT/2, getHeight() - CardGameConstants.MAN_HEIGHT/2);
+			int randX = rgen.nextInt(Constants.MAN_WIDTH/2, getWidth() - Constants.MAN_WIDTH/2);
+			int randY = rgen.nextInt(Constants.MAN_HEIGHT/2, getHeight() - Constants.MAN_HEIGHT/2);
 			man.setXY(randX, randY);
-			//			System.out.println(randX + ", " + randY);
-			//			System.out.println("width" + getWidth() + ": height" + getHeight());
+			//			Debug.println(randX + ", " + randY);
+			//			Debug.println("width" + getWidth() + ": height" + getHeight());
 		}
 		repaint();
 	}
@@ -550,7 +552,19 @@ public class ManPanel extends JPanel  {
 	}
 
 	public void setPencilMode(boolean actAsPencil) {
-		pencilMode = actAsPencil;
+		int mode = Constants.LINE_MODE;
+		if(actAsPencil) {
+			mode = Constants.PENCIL_MODE;
+		}
+		pencilMode = mode;
+	}
+	
+	public void setPplMode(boolean drawMen) {
+		if(drawMen) {
+			pencilMode = Constants.PPL_MODE;
+		}else{
+			pencilMode = Constants.LINE_MODE;
+		}
 	}
 	
 	public void enableControls() {
@@ -584,7 +598,7 @@ public class ManPanel extends JPanel  {
 		GroupCircler gCir = new GroupCircler(this, ppl, den, numer, ans);
 		Timer manipTimer = new Timer(1000, gCir);
 		if(ans == -1) {
-			displayMessage("The Groups aren't equal!  Not Cool Man!");
+			displayMessage(Constants.MAN_MSG_GROUPS_NOT_EQUAL);
 		}else{
 			displayMessage("Circle " + numer + " group" + ((numer==1)?"":"s") + ".");
 		}
@@ -608,10 +622,10 @@ public class ManPanel extends JPanel  {
 		double theta = calculateTheta(divs);
 		double r = calculateLineLength();
 		DoublePoint center = getCenter();
-		System.out.println("Center pt:" + center);
+		Debug.println("Center pt:" + center);
 		for(int i = 0; i < n; i++) {
 			DoublePoint offShoot = getPolarProjectedPoint(center, r, theta*i);
-			System.out.println("offshoot" + i + ": " + offShoot + " theta: " + theta*i);
+			Debug.println("offshoot" + i + ": " + offShoot + " theta: " + theta*i);
 			addLine(center, offShoot, list);
 		}
 	}
@@ -699,26 +713,59 @@ public class ManPanel extends JPanel  {
 			Line nextLine = circles.get((i + 1) % circles.size());
 			DoublePoint start = circles.get(i).getEnd();
 			Arc temp = new Arc(new DoublePoint(0, 0), new DoublePoint(getWidth(), getHeight()), -90 + (int) (i*theta), (int) theta+5);
-			System.out.println(start + ", " + nextLine.getEnd() + "start: " + (i*theta) + ", with sweep: " + theta);
+			Debug.println(start + ", " + nextLine.getEnd() + "start: " + (i*theta) + ", with sweep: " + theta);
 			arcs.add(temp);
 		}
 	}
 	
 	private ManModel findDotArea(int x, int y) {
-		if(CardGameConstants.MANIPS_OVERLAP) {
+		return findOverlap(x, y);
+//		if(Constants.MANIPS_OVERLAP) {
+//			return null;
+//		}
+//		if(findDot(x, y) != null) {
+//			return findDot(x, y);
+//		}
+//		double manW = Constants.MAN_WIDTH/2;
+//		double manH = Constants.MAN_HEIGHT/2;
+//		double[] xS = {x - manW, x - manW, x + manW, x + manW};
+//		double[] yS = {y - manH, y + manH, y - manH, y + manH};
+//		for(int i = 0; i < xS.length; i++) {
+//			ManModel m = findDot((int) xS[i], (int) yS[i]);
+//			if(m != null) {
+//				return m;
+//			}
+//		}
+//		return null;
+	}
+	
+	//new model based on web search for rectangle overlap.
+	private ManModel findOverlap(int x, int y) {
+		if(Constants.MANIPS_OVERLAP) {
 			return null;
 		}
 		if(findDot(x, y) != null) {
 			return findDot(x, y);
 		}
-		double manW = CardGameConstants.MAN_WIDTH/2;
-		double manH = CardGameConstants.MAN_HEIGHT/2;
-		double[] xS = {x - manW, x - manW, x + manW, x + manW};
-		double[] yS = {y - manH, y + manH, y - manH, y + manH};
-		for(int i = 0; i < xS.length; i++) {
-			ManModel m = findDot((int) xS[i], (int) yS[i]);
-			if(m != null) {
-				return m;
+		double manW = Constants.MAN_WIDTH/2;
+		double manH = Constants.MAN_HEIGHT/2;
+		double pLeftX = x - manW;
+		double pRightX = x + manW;
+		double pTopY = y - manH;
+		double pBotY = y + manH;
+		return findOverlap(pLeftX, pTopY, pRightX, pBotY);
+	}
+	
+	private ManModel findOverlap(double x1, double y1, double x2, double y2) {
+		double manW = Constants.MAN_WIDTH/2;
+		double manH = Constants.MAN_HEIGHT/2;
+		for(ManModel dot:dots) {
+			double leftX = dot.getX()-manW;
+			double topY = dot.getY()-manH;
+			double rightX = dot.getX()+manW;
+			double botY = dot.getY()+manH;
+			if(x1 < rightX && y1 < botY && x2 > leftX && y2 > topY) {
+				return dot;
 			}
 		}
 		return null;
@@ -734,7 +781,7 @@ public class ManPanel extends JPanel  {
 	}
 	
 	private double calculatePersonDistance(double sep) {
-		return CardGameConstants.MAN_HEIGHT + sep * CardGameConstants.MAN_HEIGHT;
+		return Constants.MAN_HEIGHT + sep * Constants.MAN_HEIGHT;
 	}
 	
 	private double calculateOffsetAngle(double wideAngle) {
@@ -743,7 +790,7 @@ public class ManPanel extends JPanel  {
 	}
 	
 	private double calculatePersonDistance2(int sep) {
-		return CardGameConstants.MAN_HEIGHT + rgen.nextDouble(0, Math.min(getHeight()/2-CardGameConstants.MAN_HEIGHT, sep * CardGameConstants.MAN_HEIGHT));
+		return Constants.MAN_HEIGHT + rgen.nextDouble(0, Math.min(getHeight()/2-Constants.MAN_HEIGHT, sep * Constants.MAN_HEIGHT));
 	}
 	
 	public DoublePoint getCenter() {

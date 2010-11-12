@@ -1,13 +1,13 @@
 package pebblebag;
 
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 import javax.swing.Timer;
 
-import cards.CardGameConstants;
+import basic.Constants;
+import extras.Debug;
+
 
 public class BagInserter implements ActionListener {
 	private PebblePanel pPanel;
@@ -28,14 +28,11 @@ public class BagInserter implements ActionListener {
 		timer = t;
 	}
 	
-	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(numTimesMoved == 0) {
 			desiredX = pPanel.getInsideBagX();
 			desiredY = pPanel.getInsideBagY();
-			if(CardGameConstants.DEBUG_MODE) {
-				System.out.println("Moving to: " + desiredX + ", " + desiredY);
-			}
+			Debug.println("Moving to: " + desiredX + ", " + desiredY);
 			pPanel.makeAnOutsidePebbleCurrent();
 		}
 		double curPebX = pPanel.getPebbleX();
@@ -44,9 +41,7 @@ public class BagInserter implements ActionListener {
 		pPanel.repaint();
 		numTimesMoved++;
 		if(numTimesMoved >= MAX_MOVES) {
-			if(CardGameConstants.DEBUG_MODE) {
-				System.out.println("pebble ended at " + curPebX + ", " + curPebY);
-			}
+			Debug.println("pebble ended at " + curPebX + ", " + curPebY);
 			pPanel.repaint();
 			numTimesMoved = 0;
 			//stuff to have it finish completely
@@ -66,7 +61,7 @@ public class BagInserter implements ActionListener {
 	}
 	
 	private void restartTimer() {
-		timer.setInitialDelay(CardGameConstants.MINI_GAME_PAUSE);
+		timer.setInitialDelay(Constants.MINI_GAME_PAUSE);
 		timer.start();
 	}
 	

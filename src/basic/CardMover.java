@@ -5,9 +5,9 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Timer;
 
-import cards.CardGameConstants;
 import cards.CardView;
 import deck.DeckView;
+import extras.Debug;
 
 public class CardMover implements ActionListener {
 	private GamePanel gPanel;
@@ -38,15 +38,13 @@ public class CardMover implements ActionListener {
 		timer = t;
 	}
 	
-	@Override
+	//@Override
 	public void actionPerformed(ActionEvent e) {
 		if(numTimesMoved == 0) {
 			//gPanel.disableUser();
 			desiredX = chosenDeck.getCenterX();
 			desiredY = chosenDeck.getCenterY();
-			if(CardGameConstants.DEBUG_MODE) {
-				System.out.println("Moving to: " + desiredX + ", " + desiredY);
-			}
+			Debug.println("Moving to: " + desiredX + ", " + desiredY);
 		}
 		double curCardX = chosenCard.getX();
 		double curCardY = chosenCard.getY();
@@ -54,9 +52,7 @@ public class CardMover implements ActionListener {
 		gPanel.repaint();
 		numTimesMoved++;
 		if(numTimesMoved >= MAX_MOVES) {
-			if(CardGameConstants.DEBUG_MODE) {
-				System.out.println("pebble ended at " + curCardX + ", " + curCardY);
-			}
+			Debug.println("pebble ended at " + curCardX + ", " + curCardY);
 			gPanel.repaint();
 			numTimesMoved = 0;
 			//stuff to have it finish completely
@@ -71,7 +67,7 @@ public class CardMover implements ActionListener {
 	}
 	
 	private void restartTimer() {
-		timer.setInitialDelay(CardGameConstants.BETWEEN_GAME_PAUSE/2);
+		timer.setInitialDelay(Constants.BETWEEN_GAME_PAUSE/2);
 		timer.start();
 	}
 	

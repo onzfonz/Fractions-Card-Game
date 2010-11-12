@@ -5,7 +5,9 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Timer;
 
-import cards.CardGameConstants;
+import basic.Constants;
+import extras.Debug;
+
 
 public class PebbleMover implements ActionListener {
 	private PebblePanel pPanel;
@@ -27,16 +29,14 @@ public class PebbleMover implements ActionListener {
 		timer = t;
 	}
 	
-	@Override
+	//@Override
 	public void actionPerformed(ActionEvent e) {
 		if(numTimesMoved == 0) {
 			pPanel.doneShakingTheBag(true);
 			chosenPebble = pPanel.compSelectPebble();
 			desiredX = pPanel.getFuturePebbleX();
 			desiredY = pPanel.getFuturePebbleY(desiredX);
-			if(CardGameConstants.DEBUG_MODE) {
-				System.out.println("Moving to: " + desiredX + ", " + desiredY);
-			}
+			Debug.println("Moving to: " + desiredX + ", " + desiredY);
 		}
 		double curPebX = pPanel.getPebbleX();
 		double curPebY = pPanel.getPebbleY();
@@ -44,9 +44,7 @@ public class PebbleMover implements ActionListener {
 		pPanel.repaint();
 		numTimesMoved++;
 		if(numTimesMoved >= MAX_MOVES) {
-			if(CardGameConstants.DEBUG_MODE) {
-				System.out.println("pebble ended at " + curPebX + ", " + curPebY);
-			}
+			Debug.println("pebble ended at " + curPebX + ", " + curPebY);
 			pPanel.revealPebble(chosenPebble);
 			pPanel.repaint();
 			numTimesMoved = 0;
@@ -65,7 +63,7 @@ public class PebbleMover implements ActionListener {
 	}
 	
 	private void restartTimer() {
-		timer.setInitialDelay(CardGameConstants.BETWEEN_GAME_PAUSE/2);
+		timer.setInitialDelay(Constants.BETWEEN_GAME_PAUSE/2);
 		timer.start();
 	}
 	

@@ -21,7 +21,7 @@ public class BagShaker implements ActionListener {
 		timer = t;
 	}
 	
-	@Override
+	//@Override
 	public void actionPerformed(ActionEvent e) {
 		if(numShakes == 0) {
 			pPanel.setChooseCoords();

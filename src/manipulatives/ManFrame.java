@@ -15,20 +15,23 @@ import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 
-import acm.util.RandomGenerator;
-import cards.CardGameConstants;
+import basic.Constants;
 import cards.CardView;
 import deck.DeckView;
+import extras.Debug;
+import extras.RandomGenerator;
 
 public class ManFrame extends JFrame implements KeyListener {
 	/**
@@ -62,11 +65,11 @@ public class ManFrame extends JFrame implements KeyListener {
 
 	private ManPanel manPanel;
 	private File saveFile; // the last place we saved, or null
-	
+
 	public ManFrame(String q, int answer, DeckView dv, CardView cv) {
 		this(q, answer, null, dv, cv);
 	}
-	
+
 	public ManFrame(String q, DeckView dv, CardView cv) {
 		this(q, 0, dv, cv);
 	}
@@ -110,39 +113,39 @@ public class ManFrame extends JFrame implements KeyListener {
 		JPanel questionBox = new JPanel();
 		questionBox.setLayout(new BorderLayout());
 
-		JLabel questionLabel = new JLabel(question, JLabel.CENTER);
-		questionLabel.setFont(CardGameConstants.DEFAULT_FONT);
+		JLabel questionLabel = new JLabel(stripQuestion(question), JLabel.CENTER);
+		questionLabel.setFont(Constants.FONT_REG);
 		questionBox.add(questionLabel, BorderLayout.WEST);
 
 		questionAnswer = new JTextField(3);
-		questionAnswer.setFont(CardGameConstants.DEFAULT_FONT);
+		questionAnswer.setFont(Constants.FONT_REG);
 		questionAnswer.setHorizontalAlignment(JTextField.CENTER);
 		questionAnswer.addKeyListener(this);
 		questionAnswer.requestFocusInWindow();
 		questionBox.add(questionAnswer, BorderLayout.CENTER);
 		controls.add(questionBox);
-		
+
 		JPanel questionButtons = new JPanel();
 		questionButtons.setLayout(new BoxLayout(questionButtons, BoxLayout.X_AXIS));
-		
+
 		JButton questionBtn = new JButton("Answer");
-		questionBtn.setFont(CardGameConstants.DEFAULT_FONT);
+		questionBtn.setFont(Constants.FONT_REG);
 		questionButtons.add(questionBtn);
 		controls.add(questionBtn);
 		questionBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-					checkUserAnswer();
+				checkUserAnswer();
 			}
 		});
-		
-		JButton notCoolManBtn = new JButton(CardGameConstants.MAN_FRAME_NO_ANSWER_BTN_TEXT);
-		notCoolManBtn.setFont(CardGameConstants.DEFAULT_FONT);
+
+		JButton notCoolManBtn = new JButton(Constants.MAN_FRAME_NO_ANSWER_BTN_TEXT);
+		notCoolManBtn.setFont(Constants.FONT_REG);
 		questionButtons.add(notCoolManBtn);
 		controls.add(notCoolManBtn);
 		notCoolManBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				compareToAnswer(-1);
-				
+
 			}
 		});
 		questionBox.add(questionButtons, BorderLayout.EAST);
@@ -151,7 +154,7 @@ public class ManFrame extends JFrame implements KeyListener {
 		final JTextField addMany = new JTextField("");
 		statusBox.add(addMany);
 		controls.add(addMany);
-		
+
 		JButton addButton = new JButton("Add to Screen");
 		statusBox.add(addButton);
 		controls.add(addButton);
@@ -164,19 +167,19 @@ public class ManFrame extends JFrame implements KeyListener {
 					ne.printStackTrace();
 				}
 				for(int i = 0; i < numMen; i++) {
-					manPanel.doAdd(rgen.nextInt(CardGameConstants.MAN_WIDTH/2, manPanel.getWidth()-CardGameConstants.MAN_WIDTH/2), rgen.nextInt(CardGameConstants.MAN_HEIGHT/2, manPanel.getHeight()-CardGameConstants.MAN_HEIGHT/2));
+					manPanel.doAdd(rgen.nextInt(Constants.MAN_WIDTH/2, manPanel.getWidth()-Constants.MAN_WIDTH/2), rgen.nextInt(Constants.MAN_HEIGHT/2, manPanel.getHeight()-Constants.MAN_HEIGHT/2));
 				}
 			}
 		});
 
-		JButton shufButton = new JButton("Shuffle Objects");
-		box.add(shufButton);
-		controls.add(shufButton);
-		shufButton.addActionListener( new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				manPanel.shuffle();
-			}
-		});
+		//		JButton shufButton = new JButton("Shuffle Objects");
+		//		box.add(shufButton);
+		//		controls.add(shufButton);
+		//		shufButton.addActionListener( new ActionListener() {
+		//			public void actionPerformed(ActionEvent e) {
+		//				manPanel.shuffle();
+		//			}
+		//		});
 
 		JButton splitButton = new JButton("Clear Screen");
 		box.add(splitButton);
@@ -186,7 +189,7 @@ public class ManFrame extends JFrame implements KeyListener {
 				manPanel.clearAll();
 			}
 		});
-		
+
 		JButton launchDemo = new JButton("Show Me How");
 		box.add(launchDemo);
 		controls.add(launchDemo);
@@ -196,19 +199,40 @@ public class ManFrame extends JFrame implements KeyListener {
 				launchManipSimulation();
 			}
 		});
+		
+		ButtonGroup tools = new ButtonGroup();
+		
+		ImageIcon lineIcon = new ImageIcon(Constants.PEN_ICON_IMG_PATH);
+		ImageIcon pencilIcon = new ImageIcon(Constants.LINE_ICON_IMG_PATH);
+		ImageIcon pplIcon = new ImageIcon(Constants.PPL_ICON_IMG_PATH);
+		ImageIcon lineIconUn = new ImageIcon(addUnselectedPath(Constants.PEN_ICON_IMG_PATH));
+		ImageIcon pencilIconUn = new ImageIcon(addUnselectedPath(Constants.LINE_ICON_IMG_PATH));
+		ImageIcon pplIconUn = new ImageIcon(addUnselectedPath(Constants.PPL_ICON_IMG_PATH));
 
-		final JCheckBox lineVsPencil = new JCheckBox("Act as a Pencil?");
-		lineVsPencil.setSelected(false);
-		controls.add(lineVsPencil);
-		box.add(lineVsPencil);
-		lineVsPencil.addActionListener( new ActionListener() {
+		JRadioButton drawLines = createRadioButton(lineIcon, lineIconUn, box, tools);
+		drawLines.setSelected(true);
+		drawLines.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				manPanel.setPencilMode(lineVsPencil.isSelected());
+				manPanel.setPencilMode(false);
 			}
 		});
 		
+		JRadioButton drawFreely = createRadioButton(pencilIcon, pencilIconUn, box, tools);
+		drawFreely.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				manPanel.setPencilMode(true);
+			}
+		});
+		
+		JRadioButton makePpl = createRadioButton(pplIcon, pplIconUn, box, tools);
+		makePpl.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				manPanel.setPplMode(true);
+			}
+		});
+
 		DeckViewPanel deckViewShown = new DeckViewPanel(dv, cv);
-		deckViewShown.setPreferredSize(new Dimension(CardGameConstants.ORIG_CARD_WIDTH, getHeight()));
+		deckViewShown.setPreferredSize(new Dimension(Constants.ORIG_CARD_WIDTH, getHeight()));
 		add(deckViewShown, BorderLayout.EAST);
 
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -216,34 +240,49 @@ public class ManFrame extends JFrame implements KeyListener {
 		pack();
 		setVisible(true);
 	}
-	
+
 	public void disableControls() {
 		userCanEdit = false;
 		for(JComponent jc:controls) {
 			jc.setEnabled(false);
 		}
 	}
-	
+
 	public void enableControls() {
 		userCanEdit = true;
 		for(JComponent jc:controls) {
 			jc.setEnabled(true);
 		}
 	}
-	
+
+	public String stripQuestion(String q) {
+		int leftPar = q.indexOf("(");
+		int rightPar = q.indexOf(")");
+		if(leftPar == -1 || rightPar == -1) {
+			return q;
+		}
+		String leftPart = q.substring(0, leftPar-1);
+		String rightPart = q.substring(rightPar+2);
+		String decimal = q.substring(leftPar+1, rightPar);
+		int num = extractNumerator();
+		int numPos = q.indexOf(""+num);
+		int denPos = q.indexOf(" of ");
+		leftPart = q.substring(0, numPos);
+		rightPart = q.substring(denPos);
+		return leftPart+decimal+rightPart;
+	}
+
 	private void launchManipSimulation() {
 		int num = extractNumerator();
 		int den = extractDenominator();
 		int ppl = extractPeople();
-		if(CardGameConstants.DEBUG_MODE) {
-			System.out.println("num is " + num + ", den is " + den + ", and ppl are " + ppl);
-		}
+		Debug.println("num is " + num + ", den is " + den + ", and ppl are " + ppl);
 		manPanel.launchDividingAnimation(den, ppl, num, solution);
 		//manPanel.launchPeopleAddAnimation(ppl, den, num, solution);
 		//populateWithNPeople(ppl, den);
 		//circleNGroups(num, den, solution);
 	}
-	
+
 	private int generateAnswer(String question) {
 		int num = extractNumerator();
 		int den = extractDenominator();
@@ -253,16 +292,16 @@ public class ManFrame extends JFrame implements KeyListener {
 		}
 		return (ppl / den) * num;
 	}
-	
+
 	private void populateWithNPeople(int ppl, int den) {
 		String s = "Place " + ppl + " people going in a circle.";
 		manPanel.drawPeople(ppl, den);
 		drawMessage(s);
 	}
-	
+
 	private void circleNGroups(int num, int den, int answer) {
 		if(answer == -1) {
-			String s = "There aren't an equal number of groups...Not Cool Man!";
+			String s = Constants.MAN_MSG_NOT_COOL_MAN;
 			drawMessage(s);
 			return;
 		}
@@ -270,11 +309,11 @@ public class ManFrame extends JFrame implements KeyListener {
 		drawMessage(s);
 		manPanel.drawOvals(num, den);
 	}
-	
+
 	private void drawMessage(String s) {
 		manPanel.displayMessage(s);
 	}
-	
+
 	/* Assumes that there is only one forward slash and that the
 	 * numbers needed are:  num/den of ppl?
 	 */
@@ -286,7 +325,7 @@ public class ManFrame extends JFrame implements KeyListener {
 		}
 		return Integer.parseInt(question.substring(spacePos+1, pos));
 	}
-	
+
 	private int extractDenominator() {
 		int pos = question.indexOf("/");
 		int spacePos = question.indexOf(" ", pos);
@@ -295,7 +334,7 @@ public class ManFrame extends JFrame implements KeyListener {
 		}
 		return Integer.parseInt(question.substring(pos+1, spacePos));
 	}
-	
+
 	private int extractPeople() {
 		int pos = question.indexOf("?");
 		int spacePos = question.lastIndexOf(" ", pos);
@@ -304,59 +343,75 @@ public class ManFrame extends JFrame implements KeyListener {
 		}
 		return Integer.parseInt(question.substring(spacePos+1, pos));
 	}
-	
+
 	private void checkUserAnswer() {
 		int num = 0;
 		try{
-			num = Integer.parseInt(questionAnswer.getText());
+			String s = questionAnswer.getText().trim();
+			num = Integer.parseInt(s);
 		}catch(NumberFormatException ex) {
 			JOptionPane.showMessageDialog(myFrame,
-				    "Please Enter a Whole Number",
-				    "Not an Integer",
-				    JOptionPane.ERROR_MESSAGE);
+					Constants.ERROR_INPUT_NO_INT,
+					"Not an Integer",
+					JOptionPane.ERROR_MESSAGE);
 			questionAnswer.setText("");
 			return;
 		}
 		compareToAnswer(num);
 	}
-	
+
 	private void compareToAnswer(int num) {
 		if(num == solution) {
+			manPanel.displayMessage(Constants.CORRECT);
 			fireWindowDone();
 		}else{
-			String response = "That is not the right answer, it is " + solution;
+			String response = Constants.ERROR_WRONG_ANSWER+"Please try again.";
 			if(solution == -1) {
-				response = "That is not the right answer, Are you making equal groups?";
+				response = Constants.ERROR_WRONG_ANSWER+"Try again.";
 			}
 			JOptionPane.showMessageDialog(myFrame,
-				    response,
-				    "Nope!",
-				    JOptionPane.ERROR_MESSAGE);
+					response,
+					"Not Quite!",
+					JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
+	private JRadioButton createRadioButton(ImageIcon selected, ImageIcon unselected, JPanel box, ButtonGroup tools) {
+		JRadioButton temp = new JRadioButton(unselected);
+		tools.add(temp);
+		temp.setSelectedIcon(selected);
+		controls.add(temp);
+		box.add(temp);
+		return temp;
+	}
+
 	private void fireWindowDone() {
 		for(ManListener l:listeners) {
 			l.manipWindowDone(null, this);
 		}
 	}
 	
+	private String addUnselectedPath(String s) {
+		int pos = s.indexOf(".png");
+		return s.substring(0, pos) + "unselected" + s.substring(pos);
+	}
+
 	public void addManListener(ManListener l) {
 		listeners.add(l);
 	}
 
-	@Override
+	//@Override
 	public void keyPressed(KeyEvent arg0) {
 		if(arg0.getKeyCode() == KeyEvent.VK_ENTER) {
 			checkUserAnswer();
 		}
 	}
 
-	@Override
+	//@Override
 	public void keyReleased(KeyEvent arg0) {
 	}
 
-	@Override
+	//@Override
 	public void keyTyped(KeyEvent arg0) {
 	}
 }

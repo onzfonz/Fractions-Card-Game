@@ -7,13 +7,6 @@ package basic;
  * Another file asks the dealer to deal or draw a card from one of the two decks.
  */
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Scanner;
-
 import cards.Card;
 import cards.TeammateCard;
 import cards.TrickCard;

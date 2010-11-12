@@ -9,21 +9,31 @@ import cards.*;
 
 public class PossibleMove {
 	private DeckView deckToPlaceOn;
-	private CardView cardThatWillWork;
+	private CardView viewThatWillWork;
+	private TrickCard underlyingCard;
 	private int potentialDamage;
 	
-	public PossibleMove(DeckView dv, CardView tc, int damage) {
+	public PossibleMove(DeckView dv, CardView cv, int damage) {
+		this(dv, cv, (TrickCard) cv.getCard(), damage);
+	}
+	
+	public PossibleMove(DeckView dv, CardView cv, TrickCard tc, int damage) {
 		deckToPlaceOn = dv;
-		cardThatWillWork = tc;
+		viewThatWillWork = cv;
 		potentialDamage = damage;
+		underlyingCard = tc;
 	}
 
 	public DeckView getDeck() {
 		return deckToPlaceOn;
 	}
 
-	public CardView getTrickCard() {
-		return cardThatWillWork;
+	public CardView getCardView() {
+		return viewThatWillWork;
+	}
+	
+	public TrickCard getTrickCard() {
+		return underlyingCard;
 	}
 
 	public int getDamage() {

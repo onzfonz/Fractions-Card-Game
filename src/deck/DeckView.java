@@ -7,12 +7,15 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import pebblebag.PebbleImages;
+import basic.Constants;
 import basic.Player;
 import cards.Card;
-import cards.CardGameConstants;
 import cards.CardView;
+import cards.CardViewFactory;
+import cards.ShadowCardView;
 import cards.TeammateCard;
 import cards.TrickCard;
+import extras.Debug;
 
 /* This will be a delegation style class
  * that will have a playdeck and all that it entails,
@@ -31,7 +34,10 @@ public class DeckView {
 
 	public DeckView(TeammateCard c, Player p) {
 		player = p;
-		teammateCard = new CardView(c);
+		teammateCard = CardViewFactory.createCard(c);
+		if(c.isShadowPlayer()) {
+			teammateCard = new ShadowCardView(c);
+		}
 		cardsPlayed = new ArrayList<CardView>();
 		deck = new PlayDeck(c);
 		highlighted = false;
@@ -43,7 +49,7 @@ public class DeckView {
 		ArrayList<Card> cards = pd.getAllCards();
 		for(int i = 1; i < cards.size(); i++) {
 			Card c = cards.get(i);
-			CardView cv = new CardView(c);
+			CardView cv = CardViewFactory.createCard(c);
 			cardsPlayed.add(cv);
 		}
 	}
@@ -57,14 +63,18 @@ public class DeckView {
 	public boolean addTrickCard(TrickCard c) {
 		boolean couldAddCard = deck.addTrickCard(c);
 		if(couldAddCard) {
-			CardView cv = new CardView(c);
+			CardView cv = CardViewFactory.createCard(c);
 			cardsPlayed.add(cv);
 		}
 		return couldAddCard;
 	}
 
 	public boolean addTrickCard(CardView cv) {
-		boolean couldAddCard = deck.addTrickCard((TrickCard) cv.getCard());
+		return addTrickCard(cv, (TrickCard) cv.getCard());
+	}
+	
+	public boolean addTrickCard(CardView cv, TrickCard tc) {
+		boolean couldAddCard = deck.addTrickCard(tc);
 		if(couldAddCard) {
 			cardsPlayed.add(cv);
 		}
@@ -80,7 +90,11 @@ public class DeckView {
 	}
 
 	public boolean couldAddTrickCard(CardView cv) {
-		return deck.couldAddTrickCard((TrickCard) cv.getCard());
+		return couldAddTrickCard((TrickCard) cv.getCard());
+	}
+	
+	public boolean couldAddTrickCard(TrickCard tc) {
+		return deck.couldAddTrickCard(tc);
 	}
 
 	/* Right now it will not draw all cards itself
@@ -108,10 +122,10 @@ public class DeckView {
 			}
 			drawDeckRectangle(g, rectColor);
 		}
-		if(labelShown && CardGameConstants.SHOW_DECK_MANIPS) {
+		if(labelShown && Constants.SHOW_DECK_MANIPS) {
 			drawManipulatives(g);
 		}
-		if(labelShown && CardGameConstants.SHOW_DECK_LABEL_NUMBER) {
+		if(labelShown && Constants.SHOW_DECK_LABEL_NUMBER) {
 			drawDeckNumber(g);
 		}
 	}
@@ -119,20 +133,20 @@ public class DeckView {
 	public void drawAbsoluteDeck(Graphics g, CardView cardPlayed, double height) {
 		String message = "";
 		if(getPlayer().isHuman()) {
-			message = "Your Deck";
+			message = Constants.MAN_FRAME_YOUR_DECK_TEXT;
 		}else{
-			message = "Their Deck";
+			message = Constants.MAN_FRAME_THEIR_DECK_TEXT;
 		}
 		Font origFont = g.getFont();
-		g.setFont(CardGameConstants.DEFAULT_SMALL_FONT);
-		g.drawString(message, CardGameConstants.DECK_VIEW_MARGIN, (int) height-CardGameConstants.DECK_VIEW_MARGIN);
+		g.setFont(Constants.FONT_SMALL);
+		g.drawString(message, Constants.DECK_VIEW_MARGIN, (int) height-Constants.DECK_VIEW_MARGIN);
 		g.setFont(origFont);
 		ArrayList<CardView> allCards = getAllCards();
 		if(cardPlayed != null) {
 			allCards.add(cardPlayed);
 		}
 		double cardDelta = height/(allCards.size());
-		cardDelta = Math.min(cardDelta, CardGameConstants.ORIG_CARD_HEIGHT);
+		cardDelta = Math.min(cardDelta, Constants.ORIG_CARD_HEIGHT);
 		for(int i = 0; i < allCards.size(); i++) {
 			CardView cv = allCards.get(i);
 			cv.drawCard(g, 0, (int) (i*cardDelta), false);
@@ -171,7 +185,7 @@ public class DeckView {
 		BufferedImage manip = PebbleImages.getMan();
 		BufferedImage stinkManip = PebbleImages.getStinkyMan();
 		BufferedImage freshManip = PebbleImages.getFreshenedMan();
-		if(CardGameConstants.DEBUG_MODE) {
+		if(Constants.DEBUG_MODE) {
 			System.out.println("getCardWidth is: " + getCardWidth() + ", while manip width is " + manip.getWidth());
 		}
 		int numOnSide = getCardWidth()/manip.getWidth();
@@ -196,9 +210,7 @@ public class DeckView {
 	private void drawOneMan(Graphics g, int x, int y, int numSoFar, int numOnSide, BufferedImage manImage) {
 		int manX = x + (numSoFar%numOnSide)*manImage.getWidth();
 		int manY = y + (numSoFar/numOnSide)*manImage.getHeight();
-		if(CardGameConstants.DEBUG_MODE) {
-			System.out.println("Drawing men at " + manX + ", " + manY + "with dimensions: " + manImage.getWidth() + ", " + manImage.getHeight());
-		}
+		//Debug.println("Drawing men at " + manX + ", " + manY + "with dimensions: " + manImage.getWidth() + ", " + manImage.getHeight());
 		g.drawImage(manImage, manX, manY, null);
 	}
 

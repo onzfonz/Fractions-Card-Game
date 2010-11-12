@@ -31,17 +31,16 @@ import java.util.ArrayList;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import acm.util.RandomGenerator;
-import basic.Player;
-import cards.CardGameConstants;
+import basic.Constants;
+
 import cards.TeammateCard;
 import cards.TrickCard;
 import deck.DeckView;
 import deck.PlayDeck;
+import extras.RandomGenerator;
 
 public class PebblePanel extends JPanel{
 	/**
@@ -93,11 +92,11 @@ public class PebblePanel extends JPanel{
 		southBox.setLayout(new BoxLayout(southBox, BoxLayout.Y_AXIS));
 		add(southBox, BorderLayout.SOUTH);
 		statusLine1 = new JLabel(" ");
-		statusLine1.setFont(new Font("Sans-serif", Font.BOLD, 24));
+		statusLine1.setFont(Constants.FONT_SMALL);
 		southBox.add(statusLine1);
 
 		statusLine2 = new JLabel(" ");
-		statusLine2.setFont(new Font("Sans-serif", Font.BOLD, 24));
+		statusLine2.setFont(Constants.FONT_SMALL);
 		southBox.add(statusLine2);
 
 		setPreferredSize(new Dimension(w, h));
@@ -197,7 +196,7 @@ public class PebblePanel extends JPanel{
 	}
 
 	private void createPebbleModel(TrickCard tc, int numRs, int pWidth, int pHeight) {
-		PebbleBagView pm = new PebbleBagView(tc, numRs, pWidth/2-CardGameConstants.PEBBLE_BAG_SIZE/2, pHeight/2-CardGameConstants.PEBBLE_BAG_SIZE/2, this);
+		PebbleBagView pm = new PebbleBagView(tc, numRs, pWidth/2-Constants.PEBBLE_BAG_SIZE/2, pHeight/2-Constants.PEBBLE_BAG_SIZE/2, this);
 		plays.add(pm);
 	}
 
@@ -245,12 +244,12 @@ public class PebblePanel extends JPanel{
 
 	public int getInsideBagX() {
 		PebbleBagView pbv = getCurrentPebbleBag();
-		return pbv.getX() + pbv.getWidth()/2 - CardGameConstants.PEBBLE_SIZE/2;
+		return pbv.getX() + pbv.getWidth()/2 - Constants.PEBBLE_SIZE/2;
 	}
 
 	public int getInsideBagY() {
 		PebbleBagView pbv = getCurrentPebbleBag();
-		return pbv.getY() + pbv.getHeight()/2 - CardGameConstants.PEBBLE_SIZE/2;
+		return pbv.getY() + pbv.getHeight()/2 - Constants.PEBBLE_SIZE/2;
 	}
 
 	public void setChooseCoords() {
@@ -270,7 +269,7 @@ public class PebblePanel extends JPanel{
 	public void beginShakingAnimation() {
 		BagShaker bagS = new BagShaker(this);
 		Timer bagTimer = new Timer(20, bagS);
-		bagTimer.setInitialDelay(CardGameConstants.BETWEEN_GAME_PAUSE);
+		bagTimer.setInitialDelay(Constants.BETWEEN_GAME_PAUSE);
 		bagS.setTimer(bagTimer);
 		bagTimer.start();
 	}
@@ -305,7 +304,7 @@ public class PebblePanel extends JPanel{
 		Point curP = new Point(x, y);
 		Point lastP = new Point(lastX, lastY);
 		double distance = curP.distance(lastP);
-		//System.out.println(distance);
+		//Debug.println(distance);
 		int dragX = (x - lastX)/5;
 		int dragY = (y - lastY)/5;
 		getCurrentPebbleBag().moveBy(dragX, dragY);
@@ -403,19 +402,19 @@ public class PebblePanel extends JPanel{
 			pebbleBagWindowDone(kidsRan);
 		}else if(pbv != null && pbv.bagNeedsShaking()) {
 			if(isPlayersTurn) {
-				s2 += "Please shake the bag";
+				s2 += "Please shake the bag.";
 			}else{
-				s2 += "Opponent shakes the Bag";
+				s2 += "Opponent shakes the bag.";
 			}
 		}else if(pbv != null) {
 			if(isPlayersTurn) {
-				s2 += "Please take a chip out";
+				s2 += "Please take a chip out.";
 			}else{
-				s2 += "Opponent takes a chip";
+				s2 += "Opponent takes a chip.";
 			}
 		}
 		if(plays.size() == 0) {
-			s1 = "No Ice Cream Trucks";
+			s1 = "No Ice Cream Trucks.";
 		}
 		statusLine1.setText(s1);
 		statusLine2.setText(s2);
@@ -427,7 +426,7 @@ public class PebblePanel extends JPanel{
 		PebbleCloser pc = new PebbleCloser(this, deckPlayedOn, kidsRan);
 		Timer t = new Timer(20, pc);
 		t.setRepeats(false);
-		t.setInitialDelay(CardGameConstants.BETWEEN_GAME_PAUSE);
+		t.setInitialDelay(Constants.BETWEEN_GAME_PAUSE);
 		t.start();
 	}
 
@@ -468,7 +467,7 @@ public class PebblePanel extends JPanel{
 	}
 
 	private void repaintPebble(PebbleView pv) {
-		repaint(pv.getX(), pv.getY(), CardGameConstants.PEBBLE_BAG_SIZE, CardGameConstants.PEBBLE_BAG_SIZE);
+		repaint(pv.getX(), pv.getY(), Constants.PEBBLE_BAG_SIZE, Constants.PEBBLE_BAG_SIZE);
 	}
 
 	public void fireIceCreamTruckDone(DeckView dv, boolean didKidsRunToTruck) {
@@ -482,27 +481,27 @@ public class PebblePanel extends JPanel{
 
 		PlayDeck p1 = new PlayDeck(new TeammateCard("", "Johnson Family", "", 8));
 
-		TrickCard halfStink = new TrickCard("cards_stink.jpg", 1, 2, "Stink");
-		TrickCard qtrStink = new TrickCard("cards_stink.jpg", 1, 4, "Stink");
-		TrickCard threeQtrStink = new TrickCard("cards_stink.jpg", 3, 4, "Stink");
-		TrickCard twoThirdStink = new TrickCard("cards_stink.jpg", 2, 3, "Stink");
-		TrickCard thirdStink = new TrickCard("cards_stink.jpg", 1, 3, "Stink");
+		TrickCard halfStink = new TrickCard(Constants.HALF_STINK_FILENAME, 1, 2, "Stink");
+		TrickCard qtrStink = new TrickCard(Constants.HALF_STINK_FILENAME, 1, 4, "Stink");
+		TrickCard threeQtrStink = new TrickCard(Constants.HALF_STINK_FILENAME, 3, 4, "Stink");
+		TrickCard twoThirdStink = new TrickCard(Constants.HALF_STINK_FILENAME, 2, 3, "Stink");
+		TrickCard thirdStink = new TrickCard(Constants.HALF_STINK_FILENAME, 1, 3, "Stink");
 
-		TrickCard halfAir = new TrickCard("cards_air.jpg", 1, 2, "Air");
-		TrickCard qtrAir = new TrickCard("cards_air.jpg", 1, 4, "Air");
-		TrickCard threeQtrAir = new TrickCard("cards_air.jpg", 3, 4, "Air");
-		TrickCard twoThirdAir = new TrickCard("cards_air.jpg", 2, 3, "Air");
-		TrickCard thirdAir = new TrickCard("cards_air.jpg", 1, 3, "Air");
-		TrickCard fifthAir = new TrickCard("cards_air.jpg", 1, 5, "Air");
+		TrickCard halfAir = new TrickCard(Constants.HALF_AIR_FILENAME, 1, 2, "Air");
+		TrickCard qtrAir = new TrickCard(Constants.HALF_AIR_FILENAME, 1, 4, "Air");
+		TrickCard threeQtrAir = new TrickCard(Constants.HALF_AIR_FILENAME, 3, 4, "Air");
+		TrickCard twoThirdAir = new TrickCard(Constants.HALF_AIR_FILENAME, 2, 3, "Air");
+		TrickCard thirdAir = new TrickCard(Constants.HALF_AIR_FILENAME, 1, 3, "Air");
+		TrickCard fifthAir = new TrickCard(Constants.HALF_AIR_FILENAME, 1, 5, "Air");
 
-		TrickCard two2Ice = new TrickCard("cards_ice.jpg", 2, 2, "Ice");
-		TrickCard one2Ice = new TrickCard("cards_ice.jpg", 1, 2, "Ice");
-		TrickCard one9Ice = new TrickCard("cards_ice.jpg", 1, 9, "Ice");
-		TrickCard thirteen11Ice = new TrickCard("cards_ice.jpg", 13, 11, "Ice");
-		TrickCard one5Ice = new TrickCard("cards_ice.jpg", 1, 5, "Ice");
-		TrickCard five1Ice = new TrickCard("cards_ice.jpg", 5, 1, "Ice");
+		TrickCard two2Ice = new TrickCard(Constants.TWO_TWO_ICE_FILENAME, 2, 2, "Ice");
+		TrickCard one2Ice = new TrickCard(Constants.TWO_TWO_ICE_FILENAME, 1, 2, "Ice");
+		TrickCard one9Ice = new TrickCard(Constants.TWO_TWO_ICE_FILENAME, 1, 9, "Ice");
+		TrickCard thirteen11Ice = new TrickCard(Constants.TWO_TWO_ICE_FILENAME, 13, 11, "Ice");
+		TrickCard one5Ice = new TrickCard(Constants.TWO_TWO_ICE_FILENAME, 1, 5, "Ice");
+		TrickCard five1Ice = new TrickCard(Constants.TWO_TWO_ICE_FILENAME, 5, 1, "Ice");
 
-		TrickCard radio = new TrickCard("cards_radio.jpg", 1, 1, "Radio");
+		TrickCard radio = new TrickCard(Constants.RADIO_FILENAME, 1, 1, "Radio");
 		//p1.addTrickCard(halfStink);
 		p1.addTrickCard(one2Ice);
 		p1.addTrickCard(radio);

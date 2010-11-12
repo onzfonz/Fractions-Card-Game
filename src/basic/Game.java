@@ -8,8 +8,6 @@ package basic;
  */
 
 
-import javax.swing.JPanel;
-
 import cards.TrickCard;
 
 public class Game {
@@ -63,19 +61,22 @@ public class Game {
 		int difference = Math.abs(p1Score-p2Score);
 		String prefix = "";
 		String suffix = "";
-		String message = "had " + difference + " more teammate" + ((difference == 1)?"":"s") + " than ";
+		String postsuffix = "";
+		String message = " had " + difference + " more teammate" + ((difference == 1)?"":"s") + " than ";
 		if(p1Score > p2Score) {
 			p1.updatePoints(difference);
-			prefix = "You ";
+			prefix = "You";
 			suffix = "your opponent.";
+			postsuffix = prefix;
 		}else if(p2Score > p1Score) {
 			opponent.updatePoints(difference);
-			prefix = "Your opponent ";
+			prefix = "Your opponent";
 			suffix = "you.";
+			postsuffix = "They";
 		}else{
-			message = "You tied that round";
+			return "You tied that round.  No points were handed out. Let's go to the next one.";
 		}
-		return prefix + message + suffix;
+		return prefix + message + suffix + "  " + postsuffix + " scored " + difference + " point" + ((difference == 1)?"":"s") + "!  Let's start the next round!";
 	}
 	
 	private TrickCard playTrickCard(Player p, Player otherP) {

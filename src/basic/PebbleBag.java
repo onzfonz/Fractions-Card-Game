@@ -9,7 +9,7 @@ package basic;
  */
 
 
-import acm.util.*;
+import extras.*;
 
 import java.util.*;
 
@@ -60,7 +60,7 @@ public class PebbleBag {
 	}
 	
 	public static void main (String args[]) {
-		PebbleBag bag = new PebbleBag(new TrickCard("cards_ice.jpg", 2, 2, "ice"));
+		PebbleBag bag = new PebbleBag(new TrickCard(Constants.TWO_TWO_ICE_FILENAME, 2, 2, "ice"));
 		int count = 0;
 		for(int i = 0; i < 1000; i++) {
 			if(bag.drawPebble()&&bag.drawPebble()) {

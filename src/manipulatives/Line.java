@@ -1,16 +1,16 @@
 package manipulatives;
 
-import java.awt.Point;
+import basic.Constants;
 
 public class Line {
 	private DoublePoint startPoint;
 	private DoublePoint endPoint;
-	private boolean isPencil;
+	private int isPencil;
 	
 	public Line(DoublePoint start, DoublePoint end) {
 		startPoint = start;
 		endPoint = end;
-		isPencil = false;
+		isPencil = Constants.LINE_MODE;
 	}
 	
 	public DoublePoint getStart() {
@@ -47,11 +47,11 @@ public class Line {
 		endPoint.setLocation(endPoint.getX()+dx, endPoint.getY()+dy);
 	}
 	
-	public void setPencil(boolean isP) {
+	public void setPencil(int isP) {
 		isPencil = isP;
 	}
 	
 	public boolean isPencil() {
-		return isPencil;
+		return isPencil == Constants.PENCIL_MODE;
 	}
 }

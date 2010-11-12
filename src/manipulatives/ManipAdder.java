@@ -1,13 +1,11 @@
 package manipulatives;
 
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-
 import javax.swing.Timer;
 
-import cards.CardGameConstants;
+import basic.Constants;
+
 
 public class ManipAdder implements ActionListener {
 	private ManPanel mPanel;
@@ -33,7 +31,7 @@ public class ManipAdder implements ActionListener {
 		timer = t;
 	}
 	
-	@Override
+	//@Override
 	public void actionPerformed(ActionEvent e) {
 		if(numPeopleAdded == 0) {
 			center = mPanel.getCenter();
@@ -59,7 +57,7 @@ public class ManipAdder implements ActionListener {
 	}
 	
 	private void restartTimer() {
-		timer.setInitialDelay(CardGameConstants.MINI_GAME_PAUSE);
+		timer.setInitialDelay(Constants.MINI_GAME_PAUSE);
 		timer.start();
 	}
 }
