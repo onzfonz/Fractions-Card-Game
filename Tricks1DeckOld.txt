@@ -1,0 +1,12 @@
+type, img, numerator, denominator, quantity
+stink, cards_stink.jpg, 1, 2, 6
+stink, cards_stink_qtr.jpg, 1, 4, 3
+stink, cards_stink_3qtrs.jpg, 3, 4, 3
+air, cards_air.jpg, 1, 2, 6
+air, cards_air_qtr.jpg, 1, 4, 3
+air, cards_air_3qtrs.jpg, 3, 4, 3
+ice, cards_icecream.jpg, 2, 2, 6
+ice, cards_icecream_qtr.jpg, 1, 3, 3
+ice, cards_icecream_3qtrs.jpg, 3, 1, 3
+radio, cards_radio.jpg, 1, 1, 4
+
