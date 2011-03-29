@@ -295,6 +295,6 @@ public class Constants {
 	public static boolean TEXT_AS_IMAGES = true;  //Need to change ComboCardView superclass if you change this
 	public static boolean ASK_USERS_FRACTION_QS = false;
 	public static boolean MANIPS_OVERLAP = true;
-	public static boolean DEBUG_MODE = true;
+	public static boolean DEBUG_MODE = false;
 	public static boolean NETWORK_MODE = true;
 }
