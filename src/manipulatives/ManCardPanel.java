@@ -35,19 +35,20 @@ import extras.CardGameUtils;
 import extras.Debug;
 import extras.RandomGenerator;
 
-public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
+public class ManCardPanel extends JPanel implements KeyListener, ManPanelListener {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -36920913712532509L;
 	private static RandomGenerator rgen = RandomGenerator.getInstance();
-	private ManFrame myFrame;
+	private ManCardPanel myFrame;
 	private int solution;
 	private ArrayList<ManListener> listeners;
 	private String question;
 	private boolean userCanEdit;
 	private ArrayList<JComponent> controls;
 	private JTextField questionAnswer;
+	private boolean isPlaying;
 
 	public static void main(String[] args) {
 		try {
@@ -61,29 +62,33 @@ public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
 			fileToOpen = new File(args[0]);
 		}
 
-		new ManFrame(fileToOpen);
+		new ManCardPanel(fileToOpen);
 
 	}
 
 	private ManPanel manPanel;
 	private File saveFile; // the last place we saved, or null
+	
+	public ManCardPanel() {
+		this(Constants.MAN_FRAME_DEFAULT_PLAY, null, null);
+	}
 
-	public ManFrame(String q, int answer, DeckView dv, CardView cv) {
+	public ManCardPanel(String q, int answer, DeckView dv, CardView cv) {
 		this(q, answer, null, dv, cv);
 	}
 
-	public ManFrame(String q, DeckView dv, CardView cv) {
+	public ManCardPanel(String q, DeckView dv, CardView cv) {
 		this(q, 0, dv, cv);
 	}
 
-	public ManFrame(File file) {
+	public ManCardPanel(File file) {
 		this("1/3 of 51?", null, null);
 	}
 
 	// Creates a new ManFrame
 	// If passed a non-null file, opens that file
-	public ManFrame(String q, int answer, File file, DeckView dv, CardView cv) {
-		setTitle("Manipulatives");
+	public ManCardPanel(String q, int answer, File file, DeckView dv, CardView cv) {
+		setLayout(new BorderLayout());
 		myFrame = this;
 		//solution = answer;
 		question = q;
@@ -131,27 +136,36 @@ public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
 
 		JPanel questionButtons = new JPanel();
 		questionButtons.setLayout(new BoxLayout(questionButtons, BoxLayout.X_AXIS));
-
-		JButton questionBtn = new JButton(Constants.BTN_MAN_ANSWER);
+		
+		String buttonTxt = Constants.BTN_MAN_ANSWER;
+		isPlaying = question.equals(Constants.MAN_FRAME_DEFAULT_PLAY);
+		if(isPlaying) {
+			buttonTxt = Constants.BTN_BACK_TO_GAME;
+		}
+		JButton questionBtn = new JButton(buttonTxt);
 		questionBtn.setToolTipText(Constants.TIP_ANSWER);
 		questionBtn.setFont(Constants.FONT_REG);
 		questionButtons.add(questionBtn);
 		controls.add(questionBtn);
 		questionBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				checkUserAnswer();
+				if(!isPlaying) {
+					checkUserAnswer();
+				}else{
+					fireToggleManip();
+				}
 			}
 		});
 
 		JButton notCoolManBtn = new JButton(Constants.MAN_FRAME_NO_ANSWER_BTN_TEXT);
 		notCoolManBtn.setToolTipText(Constants.TIP_NOT_WHOLE);
 		notCoolManBtn.setFont(Constants.FONT_REG);
+		notCoolManBtn.setVisible(!isPlaying);
 		questionButtons.add(notCoolManBtn);
 		controls.add(notCoolManBtn);
 		notCoolManBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				compareToAnswer(-1);
-
 			}
 		});
 		questionBox.add(questionButtons, BorderLayout.EAST);
@@ -201,6 +215,7 @@ public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
 		JButton launchDemo = new JButton(Constants.BTN_MAN_HELP);
 		launchDemo.setToolTipText(Constants.TIP_SHOW);
 		launchDemo.setFont(Constants.FONT_SMALL);
+		launchDemo.setVisible(!isPlaying);
 		box.add(launchDemo);
 		controls.add(launchDemo);
 		launchDemo.addActionListener( new ActionListener() {
@@ -245,9 +260,6 @@ public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
 		deckViewShown.setPreferredSize(new Dimension(Constants.ORIG_CARD_WIDTH, getHeight()));
 		add(deckViewShown, BorderLayout.EAST);
 
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-
-		pack();
 		setVisible(true);
 	}
 
@@ -403,8 +415,18 @@ public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
 
 	private void fireWindowDone() {
 		for(ManListener l:listeners) {
-			l.manipWindowDone(null, this);
+			l.manipPanelClosed(this);
 		}
+	}
+	
+	private void fireToggleManip() {
+		for(ManListener l:listeners) {
+			l.toggleManipView();
+		}
+	}
+	
+	public String getQuestion() {
+		return question;
 	}
 	
 	private String addUnselectedPath(String s) {

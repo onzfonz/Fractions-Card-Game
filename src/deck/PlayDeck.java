@@ -174,9 +174,11 @@ public class PlayDeck extends Deck {
 		boolean isDivisible = numStillLeft % c.getDenominator() == 0;
 		if(!isDivisible) {
 			if(numStinks() > 0) {
-				errorMsg = "You cannot use this " + c + "card because this deck now only has " + numStillLeft + " teammate" + ((numStillLeft != 1)? "s":"");
+				//errorMsg = "You cannot use this " + c + "card because this deck now only has " + numStillLeft + " teammate" + ((numStillLeft != 1)? "s":"");
+				errorMsg = Constants.ERROR_STINKS_LEFT_DIV;
 			}else{
-				errorMsg = "A " + c + " card has to be evenly divisible to be used on the " + team;
+				//errorMsg = "A " + c + " card has to be evenly divisible to be used on the " + team;
+				errorMsg = Constants.ERROR_NOT_WHOLE_NUM;
 			}
 		}
 		return isDivisible;
@@ -186,12 +188,15 @@ public class PlayDeck extends Deck {
 		boolean isDivisible = team.getValue() % c.getDenominator() == 0;
 		boolean someStinkies = (team.getValue() - calculateStinksAndAirs()) > 0;
 		if(!isDivisible) {
-			errorMsg = "An " + c + " card has to be evenly divisible to be used on the " + team;
+			//errorMsg = "An " + c + " card has to be evenly divisible to be used on the " + team;
+			errorMsg = Constants.ERROR_NOT_WHOLE_NUM;
 		}else if(!someStinkies) {
 			if(numStinks() > 0) {
-				errorMsg = "An " + c + " card has to have some stinky teammates before you can use it";
+				//errorMsg = "An " + c + " card has to have some stinky teammates before you can use it";
+				errorMsg = Constants.ERROR_NO_STINKERS_LEFT;
 			}else{
-				errorMsg = "There must be a stink card placed on this deck before you can use an " + c + "card";
+				//errorMsg = "There must be a stink card placed on this deck before you can use an " + c + "card";
+				errorMsg = Constants.ERROR_NO_STINK_CARDS;
 			}
 		}
 		return (isDivisible && someStinkies);

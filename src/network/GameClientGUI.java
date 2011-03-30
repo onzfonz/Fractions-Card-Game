@@ -7,11 +7,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -34,7 +35,7 @@ import basic.FYIMessage;
 import cards.CardGamePanel;
 import extras.Debug;
 
-public class GameClientGUI extends JFrame implements GClientInterface, KeyListener, NetDelegate {
+public class GameClientGUI extends JFrame implements GClientInterface, KeyListener, NetDelegate, WindowListener {
 	private Socket socket = null;
     private PrintWriter out = null;
     private BufferedReader read = null;
@@ -211,7 +212,8 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
                 myName = getTitle();
     			pack();
     			setVisible(true);
-    			setDefaultCloseOperation(EXIT_ON_CLOSE);
+    			addWindowListener(this);
+    			setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     		}else{
     			askNamesAndSend("Names are taken! Please choose other names");
     			return;
@@ -346,5 +348,44 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 	
 	public String getFrameTitle() {
 		return getTitle();
+	}
+
+	public void windowActivated(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void windowClosed(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void windowClosing(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		int option = JOptionPane.showConfirmDialog(this, "You are about to close the game...are you sure?", "Exit?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+		Debug.println(option);
+		if(option == 0) {
+			System.exit(0);
+		}
+	}
+
+	public void windowDeactivated(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void windowDeiconified(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void windowIconified(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void windowOpened(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }

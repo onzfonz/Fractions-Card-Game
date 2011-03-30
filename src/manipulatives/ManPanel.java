@@ -70,7 +70,7 @@ public class ManPanel extends JPanel  {
 	private Image img;
 	private JLabel numberMen;
 	private JLabel message;
-	private ManFrame frame;
+	private ManPanelListener frame;
 	
 	// dirty bit = changed from disk version
 	private boolean dirty;
@@ -78,7 +78,7 @@ public class ManPanel extends JPanel  {
 	/**
 	 Creates an empty ManPanel.
 	 */
-	public ManPanel(int width, int height, ManFrame f) {
+	public ManPanel(int width, int height, ManPanelListener f) {
 		setPreferredSize(new Dimension(width, height));
 
 		// Subclasing off JPanel, these things work

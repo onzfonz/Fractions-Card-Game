@@ -6,14 +6,16 @@ import java.util.ArrayList;
 
 import javax.swing.Timer;
 
+import manipulatives.ManCardPanel;
 import manipulatives.ManFrame;
 import cards.CardView;
 import deck.DeckView;
 import extras.Debug;
+import extras.PanelListener;
 
 public class ManFrameLauncher implements ActionListener {
 	private String question;
-	private ArrayList<ManFrame> frameList;
+	private ArrayList<ManCardPanel> frameList;
 	private int numTimesMoved = 0;
 	private GamePanel gPanel;
 	private Timer timer;
@@ -23,7 +25,7 @@ public class ManFrameLauncher implements ActionListener {
 	public static final int VELOCITY = 0;
 	public static final int MAX_MOVES = 0;
 	
-	public ManFrameLauncher(GamePanel gP, String q, ArrayList<ManFrame> manWindows, DeckView dv, CardView cv) {
+	public ManFrameLauncher(GamePanel gP, String q, ArrayList<ManCardPanel> manWindows, DeckView dv, CardView cv) {
 		question = q;
 		frameList = manWindows;
 		frameList.add(null);
@@ -55,8 +57,9 @@ public class ManFrameLauncher implements ActionListener {
 	}
 	
 	private void completelyFinishTimer() {
-		ManFrame manWindow = new ManFrame(question, view, card);
-		manWindow.requestFocus();
+		ManCardPanel manWindow = new ManCardPanel(question, view, card);
+		PanelListener pl = gPanel.getPanelListener();
+		pl.manViewCreated(manWindow);
 		frameList.remove(null);
 		frameList.add(manWindow);
 		manWindow.addManListener(gPanel);

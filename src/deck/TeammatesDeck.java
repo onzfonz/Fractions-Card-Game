@@ -15,7 +15,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import cards.CardFrame;
 import cards.TeammateCard;
 
 public class TeammatesDeck extends Deck {

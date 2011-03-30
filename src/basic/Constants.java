@@ -162,6 +162,10 @@ public class Constants {
 	public static final String ERROR_SORRY = "Sorry";
 	public static final String ERROR_CANT_PLACE_PREFIX = ERROR_SORRY + ", but you can't place the ";
 	public static final String ERROR_CANT_PLACE_ON = " on ";
+	public static final String ERROR_NOT_WHOLE_NUM = "It has to be evenly divisible.";
+	public static final String ERROR_NO_STINKERS_LEFT = "There needs to be stinky people left to use it.";
+	public static final String ERROR_NO_STINK_CARDS = "There needs to be a stink bomb card first.";
+	public static final String ERROR_STINKS_LEFT_DIV = "Only the people that are not stinky count.";
 	
 	//Info messages
 	public static final String INFO_SHUFFLING = "Shuffling and dealing cards for the next round...be patient, OK?";
@@ -210,11 +214,12 @@ public class Constants {
 	public static final String BTN_NEW_GAME = "New Game";
 	public static final String BTN_DONE_TURN = "Done with Turn";
 	public static final String BTN_PASS = "Pass";
-	public static final String BTN_LAUNCH_MANIP = "Play with People";
+	public static final String BTN_LAUNCH_MANIP = "People";
 	public static final String BTN_MAN_ANSWER = "Answer";
 	public static final String BTN_MAN_CLEAR = "Clear Screen";
 	public static final String BTN_MAN_HELP = "Show Me How";
 	public static final String BTN_PEBBLE_DONE_SHAKING = "Done Shaking";
+	public static final String BTN_BACK_TO_GAME = "Return to Game";
 	
 	public static final String[] YES_NO = {"Yes", "No"};
 	public static final String[] RADIO_OPTIONS = {"No Radios", "One Radio", "Two Radios"};
@@ -288,13 +293,13 @@ public class Constants {
 	public static boolean REGULAR_MODE = true;  //false gives green rectangle, doesn't have them calculate their mistakes, can be used for easy level
 	public static boolean SHOW_DECK_LABEL_NUMBER = false;
 	public static boolean SHOW_DECK_MANIPS = true;
-	public static boolean HAVE_MANIP_BUTTON = false;
+	public static boolean HAVE_MANIP_BUTTON = true;
 	//Option not implemented yet...Whether or not to construct the question to the user
 	//When they have something like .5 of 12 to have them figure out all the values.
 	public static boolean GIVE_QUESTION_TO_USER = true;
 	public static boolean TEXT_AS_IMAGES = true;  //Need to change ComboCardView superclass if you change this
 	public static boolean ASK_USERS_FRACTION_QS = false;
 	public static boolean MANIPS_OVERLAP = true;
-	public static boolean DEBUG_MODE = false;
+	public static boolean DEBUG_MODE = true;
 	public static boolean NETWORK_MODE = true;
 }

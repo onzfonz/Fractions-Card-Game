@@ -11,7 +11,6 @@ import javax.imageio.ImageIO;
 
 import basic.Constants;
 
-import cards.CardFrame;
 
 
 public final class PebbleImages {

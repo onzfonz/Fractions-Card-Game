@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
 
+import manipulatives.ManCardPanel;
 import manipulatives.ManFrame;
 import manipulatives.ManListener;
 import network.NetDelegate;
@@ -64,7 +65,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	private Game currentGame;
 	private ArrayList<CardView> cardImages;
 	private List<DeckView> decksInPlay;
-	private ArrayList<ManFrame> manWindows;
+	private ArrayList<ManCardPanel> manWindows;
 
 	private CardView currentCard;
 	private CardView bigCard;
@@ -279,7 +280,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		currentTrickCardsLeft = Collections.synchronizedList(new ArrayList<CardView>());
 		opponentsTrickCardsLeft = Collections.synchronizedList(new ArrayList<CardView>());
 		opponentsTrickCards = Collections.synchronizedList(new ArrayList<CardView>());
-		manWindows = new ArrayList<ManFrame>();
+		manWindows = new ArrayList<ManCardPanel>();
 		decksInPlay = Collections.synchronizedList(new ArrayList<DeckView>());
 		currentCard = null;
 		currentDeck = null;
@@ -1240,6 +1241,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 
 	public void enableUser() {
 		if(!myTurn || manWindows.size() > 0) {
+			Debug.println("Returning from enableUser prematurely: myTurn: " + myTurn + ", windowSize " + manWindows.size());
 			return;
 		}
 		showDeckExtras(true);
@@ -1485,24 +1487,43 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		makeSuccessfulDragChanges();
 		if(manWindows.size() == 0) {
 			//TODO: This one is tricky because shadow players trick cards and stink bombs all go through here.
-			boolean shouldChangeText = status != null && (status.getText().length() < 5 || !status.getText().substring(0, Constants.ERROR_SORRY.length()).equals(Constants.ERROR_SORRY));
-			String formerText = status.getText();
-			System.out.println(shouldChangeText + ", " + status.getText());
-			if(isMyTurn()) {
-				enableUser();
-			}
-			if(shouldChangeText) {
-				if(isMyTurn()) {
-					status.setText(Constants.CORRECT + decideTurn(true));
-				}else{
-					status.setText(Constants.STATUS_RIGHT_OPPO_TURN);
-				}
-			}else{
-				status.setText(formerText);
-			}
-			showDeckExtras(true);
+			tidyUpCalculationClosing();
 		}
 		repaint();
+	}
+	
+	public void manipPanelClosed(ManCardPanel mcp) {
+		manWindows.remove(mcp);
+		panel.manViewDone(mcp);
+		makeSuccessfulDragChanges();
+		if(manWindows.size() == 0) {
+			tidyUpCalculationClosing();
+		}
+		repaint();
+	}
+	
+	public void toggleManipView() {
+		panel.toggleManipView();
+	}
+	
+	public void tidyUpCalculationClosing() {
+		boolean shouldChangeText = status != null && (status.getText().length() < 5 || !status.getText().substring(0, Constants.ERROR_SORRY.length()).equals(Constants.ERROR_SORRY));
+		String formerText = status.getText();
+		System.out.println(shouldChangeText + ", " + status.getText());
+		if(isMyTurn()) {
+			enableUser();
+			Debug.println("enabling user");
+		}
+		if(shouldChangeText) {
+			if(isMyTurn()) {
+				status.setText(Constants.CORRECT + decideTurn(true));
+			}else{
+				status.setText(Constants.STATUS_RIGHT_OPPO_TURN);
+			}
+		}else{
+			status.setText(formerText);
+		}
+		showDeckExtras(true);
 	}
 	
 	public boolean isMyTurn() {
@@ -1555,5 +1576,9 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	
 	public void titleUpdated(String s) {
 		title = s;
+	}
+	
+	public PanelListener getPanelListener() {
+		return panel;
 	}
 }

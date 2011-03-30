@@ -1,6 +1,7 @@
 package cards;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -25,6 +26,7 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import manipulatives.ManCardPanel;
 import manipulatives.ManFrame;
 import network.NetDelegate;
 import network.NetHelper;
@@ -49,15 +51,25 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	private JLabel oppoScore;
 	private JTextField textCommands;
 	private ArrayList<JComponent> controls;
+	private ArrayList<String> cardPanelNames;
 	private NetDelegate netRep;
 	private PebbleListener chipObserver;
+	private JPanel gameArea;
+	private ManCardPanel manCardPanel;
 	private FYIMessage shufflin;
+	private String currentLayout;
+	private JButton manipButton;
+	
+	private static final String GAME_PANEL = "Game Panel";
+	private static final String MANIP_PANEL = "Manip Panel";
+	private static final String MANIP_CALC_PANEL = "Manip Calc";
 	
 	public CardGamePanel(NetDelegate nRep) {
 		//setTitle(Constants.WINDOW_TITLE);
 		manipWindow = null;
 		myFrame = this;
 		controls = new ArrayList<JComponent>();
+		cardPanelNames = new ArrayList<String>();
 		netRep = nRep;
 		//if (file != null) boardPanel.open(file);
 		setLayout(new BorderLayout());
@@ -120,23 +132,17 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			}
 		});
 
-		if(Constants.HAVE_MANIP_BUTTON) {
-			newRound = new JButton(Constants.BTN_LAUNCH_MANIP);
-			newRound.setToolTipText(Constants.TIP_MANIP);
-			newRound.setFont(Constants.FONT_TINY);
-			controls.add(newRound);
-			toolbox.add(newRound);
-			newRound.addActionListener( new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					if(manipWindow == null) {
-						manipWindow = new ManFrame(Constants.MAN_FRAME_DEFAULT_PLAY, null, null);
-						manipWindow.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-					}else {
-						manipWindow.setVisible(true);
-					}
-				}
-			});
-		}
+		manipButton = new JButton(Constants.BTN_LAUNCH_MANIP);
+		manipButton.setToolTipText(Constants.TIP_MANIP);
+		manipButton.setFont(Constants.FONT_TINY);
+		manipButton.setVisible(Constants.HAVE_MANIP_BUTTON);
+			//controls.add(newRound);
+		toolbox.add(manipButton);
+		manipButton.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				toggleManipLayout();
+			}
+		});
 
 		/*Debug Controls*/
 
@@ -301,9 +307,14 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			toolbox.add(Box.createVerticalGlue());	
 		}
 
-
+		gameArea = new JPanel(new CardLayout());
+		manCardPanel = new ManCardPanel();
 		gamePanel = new GamePanel(Constants.PANEL_WIDTH, Constants.PANEL_HEIGHT, this, nRep);
-		add(gamePanel, BorderLayout.CENTER);
+		manCardPanel.addManListener(gamePanel);
+		currentLayout = GAME_PANEL;
+		addLayout(gamePanel, GAME_PANEL);
+		addLayout(manCardPanel, MANIP_PANEL);
+		add(gameArea, BorderLayout.CENTER);
 	}
 
 	public void beginGame() {
@@ -481,8 +492,16 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		boolean shouldClear = command.contains(Constants.CMD_PART_CLEAR);
 		decideCommand(command, rest, isForSelf, shouldClear);
 	}
+	
+	private boolean isGamePanelCommand(String command) {
+		return !(command.equals(Constants.CMD_RADIOS) || command.equals(Constants.CMD_SHAKED) ||
+			command.equals(Constants.CMD_CHIP));
+	}
 
 	private void decideCommand(String command, String rest, boolean isForSelf, boolean shouldClear) {
+		if(isGamePanelCommand(command) && currentLayout.equals(MANIP_PANEL)) {
+			showGameLayout();
+		}
 		if(command.equals(Constants.CMD_MOVE)) {
 			parseMove(rest);
 		}else if(command.equals(Constants.CMD_CALC)) {
@@ -573,6 +592,49 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	public void setChipObserver(PebbleListener l) {
 		chipObserver = l;
 	}
+	
+	private void switchToLayout(String layoutName) {
+    	CardLayout cl = (CardLayout) gameArea.getLayout();
+    	cl.show(gameArea, layoutName);
+    	currentLayout = layoutName;
+    	repaint();
+    }
+	
+	private void switchToAskManipLayout() {
+		switchToLayout(cardPanelNames.get(2));
+	}
+	
+	private boolean addLayout(JPanel layout, String name) {
+		if(cardPanelNames.contains(name)) {
+			return false;
+		}
+		gameArea.add(layout, name);
+		cardPanelNames.add(name);
+		return true;
+	}
+	
+	private void removeLayout(JPanel mPanel, String name) {
+		assert(cardPanelNames.contains(name));
+		gameArea.remove(mPanel);
+		cardPanelNames.remove(name);
+	}
+	
+	private void toggleManipLayout() {
+		if(!currentLayout.equals(GAME_PANEL)) {
+			switchToLayout(GAME_PANEL);
+		}else{
+			switchToLayout(MANIP_PANEL);
+		}
+	}
+	
+	private void showGameLayout() {
+		switchToLayout(GAME_PANEL);
+		manipButton.setEnabled(true);
+	}
+	
+	private boolean inLayout(String layoutName) {
+    	return currentLayout.equalsIgnoreCase(layoutName);
+    }
 
 	public void keyReleased(KeyEvent arg0) {
 
@@ -580,5 +642,29 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 
 	public void keyTyped(KeyEvent arg0) {
 
+	}
+
+	public void manViewCreated(ManCardPanel mPanel) {
+		String name = mPanel.getQuestion();
+		addLayout(mPanel, name);
+		manipButton.setEnabled(false);
+		switchToLayout(name);
+	}
+
+	public boolean manViewDone(ManCardPanel mPanel) {
+		String name = mPanel.getQuestion();
+		removeLayout(mPanel, name);
+		//TODO: fix but where it is not showing that it is there. string is not the same
+		if(cardPanelNames.size() > 2) {
+			switchToAskManipLayout();
+		}else{
+			showGameLayout();
+		}
+		return cardPanelNames.size() <= 2;
+	}
+
+	public void toggleManipView() {
+		// TODO Auto-generated method stub
+		toggleManipLayout();
 	}
 }
