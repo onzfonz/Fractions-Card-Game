@@ -174,6 +174,12 @@ public class Constants {
 	public static final String INFO_START_GAME_HELP = "You've started a new game; to play one of your trick cards, drag it onto a teammate card.";
 	public static final String INFO_STARTING = "Starting up the game.  This may take a bit ok?";
 	
+	public static final String OPTION_WEST = "West";
+	public static final String OPTION_EAST = "East";
+	public static final String OPTION_NORTH = "North";
+	public static final String OPTION_SOUTH = "South";
+	public static final String OPTION_CENTER = "Center";
+	
 	//Status messages
 	public static final String STATUS_NEW_ROUND = "A new round has started; choose which tricks you want to play.";
 	public static final String STATUS_OPPO_NO_MOVES = "Your opponent doesn't have any cards they want to play.";
