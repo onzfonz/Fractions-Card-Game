@@ -27,6 +27,7 @@ public class GameServerThread extends Thread {
 			//clientSocket.setSoTimeout(INACTIVE_MS);
 			out = new PrintWriter(clientSocket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			System.out.println("setting up client from: " + client.getInetAddress());
 		}catch (SocketException se) {
 			System.err.println("Unable to set socket option SO_TIMEOUT");
 		}catch (IOException e) {
