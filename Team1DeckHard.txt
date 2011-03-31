@@ -1,0 +1,19 @@
+Name, Description, Image, Value, Quantity
+The Twins,The Twins Have Joined Your Team,The-Twins.png,2,3
+The Pirates,The Pirates Have Joined Your Team,The-Pirates.png,2,3
+The 1st Graders,The 1st Graders Have Joined Your Team,1st-Graders.png,4,5
+The Music Geeks,The Music Geeks Have Joined Your Team,Music-Geeks.png,6,4
+The Johnson Family,The Johnson Family Have Joined Your Team,Johnson-Family.png,8,3
+The Basketball Team,The Basketball Team Have Joined Your Team,Basketball-Team.png,12,2
+Shadow Players,What Is 1/3 of 15?,Shadow-Players.png,5,1
+Shadow Players,What Is 1/3 of 21?,Shadow-Players.png,7,1
+Shadow Players,What Is 3/4 of 12?,Shadow-Players.png,9,1
+Shadow Players,What Is 3/4 of 8?,Shadow-Players.png,6,1
+Shadow Players,What Is 2/3 of 18?,Shadow-Players.png,12,1
+Shadow Players,What Is 2/3 of 15?,Shadow-Players.png,10,1
+Shadow Players,What Is 1/6 of 24?,Shadow-Players.png,4,1
+Shadow Players,What Is 3/5 of 15?,Shadow-Players.png,9,1
+Shadow Players,What Is 4/5 of 10?,Shadow-Players.png,8,1
+Shadow Players,What Is 5/6 of 12?,Shadow-Players.png,10,1
+Shadow Players,What Is 4/7 of 21?,Shadow-Players.png,12,1
+Shadow Players,What Is 3/7 of 14?,Shadow-Players.png,6,1

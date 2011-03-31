@@ -496,7 +496,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	}
 	
 	private boolean isGamePanelCommand(String command) {
-		return !(command.equals(Constants.CMD_RADIOS) || command.equals(Constants.CMD_SHAKED) ||
+		return !(command.equals(Constants.CMD_SHAKED) ||
 			command.equals(Constants.CMD_CHIP));
 	}
 

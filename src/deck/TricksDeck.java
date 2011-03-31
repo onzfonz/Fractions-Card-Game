@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import basic.Constants;
+
 import cards.TeammateCard;
 import cards.TrickCard;
 import extras.StringUtils;
@@ -19,7 +21,7 @@ import extras.StringUtils;
 public class TricksDeck extends Deck {
 	public static void main(String[] args) {
 		System.out.println("creatingTricksDeck");
-		TricksDeck teammates = new TricksDeck("Tricks1Deck.txt");
+		TricksDeck teammates = new TricksDeck(Constants.FNAME_TRICK_DECK);
 		System.out.println(teammates.drawTopCard().getName());
 	}
 	

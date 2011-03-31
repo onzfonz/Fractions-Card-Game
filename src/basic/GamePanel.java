@@ -1260,7 +1260,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	
 	private String decideTurn(boolean ourTurn) {
 		if(!ourTurn) {
-			return Constants.STATUS_OPPO_TURN + Constants.SENTENCE_SEP + parsePlayerName() + ", you're next!";
+			return Constants.STATUS_OPPO_TURN + Constants.SENTENCE_SEP + parsePlayerName() + ", you will be up soon.";
 		}
 		return parsePlayerName() + "'s " + Constants.STATUS_TURN;
 	}

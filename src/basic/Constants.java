@@ -33,6 +33,8 @@ public class Constants {
 	public static final String FNAME_COMBO_REP = FNAME_REP + FNAME_SPACE_SEP + "Combo" + FNAME_SPACE_SEP;
 	public static final String FNAME_SEP = "-";
 	public static final String IMG_EXT = ".png";
+	public static final String FNAME_TEAM_DECK = "Team1DeckOrig.txt";
+	public static final String FNAME_TRICK_DECK = "Tricks1Deck.txt";
 	
 	//Trick Card types
 	public static final String STINK = "stink";
@@ -113,9 +115,9 @@ public class Constants {
 	public static final int PANEL_WIDTH = 1175;
 	public static final int PANEL_HEIGHT = 750;
 	public static final int SOCKET_PORT = 1604;
-//	public static final String SERVER_IP = "128.12.200.60";
+	public static final String SERVER_IP = "128.12.200.60";
 	//older one was 127.0.0.1
-	public static final String SERVER_IP = "10.32.25.19";
+//	public static final String SERVER_IP = "10.32.25.19";
 //	public static final String LOCAL_SERVER_IP = "192.168.1.5";
 	public static final String LOCAL_SERVER_IP = "192.168.0.15";
 	public static final String SERVER_ADDR = "osvi.stanford.edu";

@@ -15,12 +15,14 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import basic.Constants;
+
 import cards.TeammateCard;
 
 public class TeammatesDeck extends Deck {
 	public static void main(String[] args) {
 		System.out.println("creatingTeammatesDeck");
-		TeammatesDeck teammates = new TeammatesDeck("Team1Deck.txt");
+		TeammatesDeck teammates = new TeammatesDeck(Constants.FNAME_TEAM_DECK);
 		System.out.println(teammates.drawTopCard().getName());
 	}
 	

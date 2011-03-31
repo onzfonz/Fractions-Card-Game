@@ -32,7 +32,7 @@ public class BasicDealer implements Dealer{
 	}
 	
 	public BasicDealer() {
-		this("Tricks1Deck.txt", "Team1Deck.txt");
+		this(Constants.FNAME_TRICK_DECK, Constants.FNAME_TEAM_DECK);
 	}
 	
 	public BasicDealer(String tricksName, String teamsName) {
