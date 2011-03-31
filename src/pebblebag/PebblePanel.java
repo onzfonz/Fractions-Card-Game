@@ -68,15 +68,17 @@ public class PebblePanel extends JPanel implements PebbleListener {
 	private Semaphore shakingDone;
 	private Semaphore pebbleMoving;
 	private PebblePanelListener listener;
+	private String participant;
 
 	/* Need to have a good shake pebble method
 	 * that will have the pebbles randomly move in their locations
 	 * yet still stay inside the bag.
 	 */
-	public PebblePanel(DeckView dv, int w, int h, boolean playerStarts, JFrame f, NetDelegate nRep, PebblePanelListener l) {
+	public PebblePanel(DeckView dv, int w, int h, boolean playerStarts, JFrame f, NetDelegate nRep, PebblePanelListener l, String pName) {
 		deckPlayedOn = dv;
 		netRep = nRep;
 		listener = l;
+		participant = pName;
 		shakingDone = new Semaphore(0, true);
 		pebbleMoving = new Semaphore(0, true);
 		PlayDeck pd = dv.getPlayDeck();
@@ -477,14 +479,14 @@ public class PebblePanel extends JPanel implements PebbleListener {
 			pebbleBagWindowDone(kidsRan);
 		}else if(pbv != null && pbv.bagNeedsShaking()) {
 			if(isPlayersTurn) {
-				s2 += "Please shake the bag.";
+				s2 += participant + ", please shake the bag.";
 				listener.bagShakingStarted();
 			}else{
 				s2 += "Opponent shakes the bag.";
 			}
 		}else if(pbv != null) {
 			if(isPlayersTurn) {
-				s2 += "Please take a chip out.";
+				s2 += participant + ", please take a chip out.";
 			}else{
 				s2 += "Opponent takes a chip.";
 			}

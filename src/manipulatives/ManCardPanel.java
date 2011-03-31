@@ -16,6 +16,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -61,6 +62,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 	private JRadioButton drawLines;
 
 	private ManPanel manPanel;
+	private ManDeckViewPanel deckViewShown;
 	private File saveFile; // the last place we saved, or null
 	private JButton clearScreenButton;
 	private JButton launchDemo;
@@ -70,6 +72,8 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 	private JButton notCoolManBtn;
 	private JLabel questionLabel;
 	private JPanel questionBox;
+	
+	private static final int GLUE_NUMS = 10;
 	
 	public static void main(String[] args) {
 		try {
@@ -105,7 +109,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 	}
 
 	public ManCardPanel(File file) {
-		this("1/3 of 51?", null, null);
+		this("Osvaldo, What is 1/3 of 51?", null, null);
 	}
 
 	// Creates a new ManFrame
@@ -142,24 +146,27 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		statusBox.add(addLabel);
 
 		questionBox = new JPanel();
-		questionBox.setLayout(new BorderLayout());
+		questionBox.setLayout(new BoxLayout(questionBox, BoxLayout.X_AXIS));
 
+		createHorizontalGlue(questionBox, GLUE_NUMS);
 		questionLabel = new JLabel(stripQuestion(question), JLabel.CENTER);
 		questionLabel.setFont(Constants.FONT_REG);
-		questionBox.add(questionLabel, BorderLayout.WEST);
-
+		questionBox.add(questionLabel);
+		
+		createHorizontalGlue(questionBox, GLUE_NUMS/3);
+		
 		questionAnswer = new JTextField(3);
 		questionAnswer.setFont(Constants.FONT_REG);
 		questionAnswer.setToolTipText(Constants.TIP_USER_ANSWER);
 		questionAnswer.setHorizontalAlignment(JTextField.CENTER);
+		questionAnswer.setMaximumSize(questionAnswer.getPreferredSize());
 		questionAnswer.addKeyListener(this);
 		questionAnswer.requestFocusInWindow();
-		questionBox.add(questionAnswer, BorderLayout.CENTER);
+		questionBox.add(questionAnswer);
 		controls.add(questionBox);
 
-		JPanel questionButtons = new JPanel();
-		questionButtons.setLayout(new BoxLayout(questionButtons, BoxLayout.X_AXIS));
-		
+		createHorizontalGlue(questionBox, GLUE_NUMS/10);
+
 		String buttonTxt = Constants.BTN_MAN_ANSWER;
 		isPlaying = question.equals(Constants.MAN_FRAME_DEFAULT_PLAY);
 		if(isPlaying) {
@@ -168,7 +175,8 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		questionBtn = new JButton(buttonTxt);
 		questionBtn.setToolTipText(Constants.TIP_ANSWER);
 		questionBtn.setFont(Constants.FONT_REG);
-		questionButtons.add(questionBtn);
+		questionBox.add(questionBtn);
+		createHorizontalGlue(questionBox, GLUE_NUMS/5);
 		controls.add(questionBtn);
 		questionBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -184,14 +192,14 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		notCoolManBtn.setToolTipText(Constants.TIP_NOT_WHOLE);
 		notCoolManBtn.setFont(Constants.FONT_REG);
 		notCoolManBtn.setVisible(!isPlaying);
-		questionButtons.add(notCoolManBtn);
+		questionBox.add(notCoolManBtn);
+		createHorizontalGlue(questionBox, GLUE_NUMS);
 		controls.add(notCoolManBtn);
 		notCoolManBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				compareToAnswer(-1);
 			}
 		});
-		questionBox.add(questionButtons, BorderLayout.EAST);
 		add(questionBox, BorderLayout.NORTH);
 		statusBox.setVisible(Constants.DEBUG_MODE);
 		final JTextField addMany = new JTextField("");
@@ -288,7 +296,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 				int green = curColor.getGreen();
 				Color tempColor = new Color(redSlider.getValue(), green, blue);
 				//gamePanel.setBackground(tempColor);
-				changeElemsToColor(tempColor);
+				changeElemsToColor(tempColor, currentArea);
 				redLabel.setText("" + redSlider.getValue());
 			}
 		});
@@ -302,7 +310,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 				int red = curColor.getRed();
 				Color tempColor = new Color(red, greenSlider.getValue(), blue);
 				//gamePanel.setBackground(tempColor);
-				changeElemsToColor(tempColor);
+				changeElemsToColor(tempColor, currentArea);
 				greenLabel.setText("" + greenSlider.getValue());
 			}
 		});
@@ -316,14 +324,15 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 				int green = curColor.getGreen();
 				Color tempColor = new Color(red, green, blueSlider.getValue());
 				//gamePanel.setBackground(tempColor);
-				changeElemsToColor(tempColor);
+				changeElemsToColor(tempColor, currentArea);
 				blueLabel.setText("" + blueSlider.getValue());
 			}
 		});
 		
 		currentArea = Constants.OPTION_WEST;
-		String[] elems = {Constants.OPTION_WEST, Constants.OPTION_NORTH, Constants.OPTION_CENTER, Constants.OPTION_SOUTH, Constants.OPTION_EAST};
+		String[] elems = {Constants.OPTION_WEST, Constants.OPTION_NORTH, Constants.OPTION_CENTER, Constants.OPTION_SOUTH, Constants.OPTION_EAST, Constants.OPTION_OUTER};
 		final JComboBox areaOption = new JComboBox(elems);
+		areaOption.setVisible(Constants.SHOW_COLOR_SLIDERS);
 		box.add(areaOption);
 		areaOption.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -331,10 +340,14 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 			}
 		});
 
-		ManDeckViewPanel deckViewShown = new ManDeckViewPanel(dv, cv);
+		deckViewShown = new ManDeckViewPanel(dv, cv);
 		deckViewShown.setPreferredSize(new Dimension(Constants.ORIG_CARD_WIDTH, getHeight()));
 		add(deckViewShown, BorderLayout.EAST);
 
+		changeElemsToColor(Constants.COLOR_SKIN_TONE, Constants.OPTION_WEST);
+		changeElemsToColor(Constants.MANIP_CENTER_BACKGROUND, Constants.OPTION_CENTER);
+		changeElemsToColor(Constants.COLOR_SKIN_TONE, Constants.OPTION_NORTH);
+		changeElemsToColor(Constants.COLOR_SKIN_TONE, Constants.OPTION_EAST);
 		setVisible(true);
 	}
 
@@ -342,6 +355,12 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		userCanEdit = false;
 		for(JComponent jc:controls) {
 			jc.setEnabled(false);
+		}
+	}
+	
+	private void createHorizontalGlue(JPanel jp, int numTimes) {
+		for(int i = 0; i < numTimes; i++) {
+			jp.add(Box.createHorizontalGlue());
 		}
 	}
 
@@ -366,40 +385,46 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 			return questionBox.getBackground();
 		}else if(currentArea.equals(Constants.OPTION_CENTER)) {
 			return manPanel.getBackground();
+		}else if(currentArea.equals(Constants.OPTION_EAST)){
+			return deckViewShown.getBackground();
 		}
-		return getBackground();
+		return box.getBackground();
 	}
 	
-	private void changeElemsToColor(Color tempColor) {
-		if(currentArea.equals(Constants.OPTION_WEST)) {
+	private void changeElemsToColor(Color tempColor, String dir) {
+		if(dir.equals(Constants.OPTION_WEST)||dir.equals(Constants.OPTION_OUTER)) {
 			box.setBackground(tempColor);
 			drawLines.setBackground(tempColor);
 			makePpl.setBackground(tempColor);
 			drawFreely.setBackground(tempColor);
 			clearScreenButton.setBackground(tempColor);
 			launchDemo.setBackground(tempColor);
-		}else if(currentArea.equals(Constants.OPTION_NORTH)) {
+		}
+		if(dir.equals(Constants.OPTION_NORTH)||dir.equals(Constants.OPTION_OUTER)) {
 			notCoolManBtn.setBackground(tempColor);
 			questionBtn.setBackground(tempColor);
 			questionBox.setBackground(tempColor);
 			questionLabel.setBackground(tempColor);
 			//questionAnswer.setBackground(tempColor);
-		}else if(currentArea.equals(Constants.OPTION_SOUTH)) {
+		}
+		if(dir.equals(Constants.OPTION_SOUTH)) {
 			
-		}else if(currentArea.equals(Constants.OPTION_CENTER)) {
+		}
+		if(dir.equals(Constants.OPTION_CENTER)) {
 			manPanel.setBackground(tempColor);
-		}else if(currentArea.equals(Constants.OPTION_EAST)) {
-			setBackground(tempColor);
+		}
+		if(dir.equals(Constants.OPTION_EAST)||dir.equals(Constants.OPTION_OUTER)) {
+			deckViewShown.setBackground(tempColor);
 		}
 	}
 	
 	public JSlider createDebugSlider(JPanel b, String title, int low, int high, int reg) {
 		JLabel sliderTitle = new JLabel(title);
-		sliderTitle.setVisible(Constants.DEBUG_MODE);
+		sliderTitle.setVisible(Constants.SHOW_COLOR_SLIDERS);
 		b.add(sliderTitle);
 		JSlider temp = new JSlider(low, high, reg);
 		b.add(temp);
-		temp.setVisible(Constants.DEBUG_MODE);
+		temp.setVisible(Constants.SHOW_COLOR_SLIDERS);
 		return temp;
 	}
 

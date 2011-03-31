@@ -100,6 +100,9 @@ public class Constants {
 	public static final Color TOOLBOX_FOREGROUND_LOUD = new Color(0, 192, 0);
 	public static final Color TOOLBOX_FOREGROUND = new Color(0, 0, 0);
 	public static final Color TOOLBOX_BACKGROUND = new Color(255, 255, 255);
+	public static final Color COLOR_LIGHT_WOOD = new Color(221, 202, 147);
+	public static final Color MANIP_CENTER_BACKGROUND = new Color(197, 241, 186);
+	public static final Color COLOR_SKIN_TONE = new Color(244, 213, 183);
 	public static final String MAN_FRAME_NO_ANSWER_BTN_TEXT = "Not a whole number!";
 	public static final int LINE_THICKNESS = 2;
 	public static final int NUM_DASHES = 20;
@@ -179,6 +182,7 @@ public class Constants {
 	public static final String OPTION_NORTH = "North";
 	public static final String OPTION_SOUTH = "South";
 	public static final String OPTION_CENTER = "Center";
+	public static final String OPTION_OUTER = "Outer";
 	
 	//Status messages
 	public static final String STATUS_NEW_ROUND = "A new round has started; choose which tricks you want to play.";
@@ -187,8 +191,6 @@ public class Constants {
 	public static final String STATUS_TURN = " turn.";
 	public static final String STATUS_YOUR_TURN = "Your" + STATUS_TURN;
 	public static final String STATUS_OPPO_TURN = "Your opponent's" + STATUS_TURN;
-	public static final String STATUS_RIGHT_YOUR_TURN = CORRECT + STATUS_YOUR_TURN;
-	public static final String STATUS_RIGHT_OPPO_TURN = CORRECT + STATUS_OPPO_TURN;
 	public static final String STATUS_NICE_MOVE = "Nice Move!" + SENTENCE_SEP;
 	public static final String STATUS_NO_SUCH_CMD = "Did not find a command in text.";
 	public static final String STATUS_DECIDING_WHOS_FIRST = "Please wait while we figure out who starts.";
@@ -304,8 +306,9 @@ public class Constants {
 	//When they have something like .5 of 12 to have them figure out all the values.
 	public static boolean GIVE_QUESTION_TO_USER = true;
 	public static boolean TEXT_AS_IMAGES = true;  //Need to change ComboCardView superclass if you change this
-	public static boolean ASK_USERS_FRACTION_QS = false;
+	public static boolean ASK_USERS_FRACTION_QS = true;
 	public static boolean MANIPS_OVERLAP = true;
-	public static boolean DEBUG_MODE = true;
+	public static boolean DEBUG_MODE = false;
+	public static boolean SHOW_COLOR_SLIDERS = DEBUG_MODE && false;
 	public static boolean NETWORK_MODE = true;
 }

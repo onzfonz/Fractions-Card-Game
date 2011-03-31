@@ -1081,7 +1081,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		TeammateCard tc = (TeammateCard) dv.getTeammateCard().getCard();
 		if(tc.isShadowPlayer()) {
 			//dv.showLabel(false);
-			launchManipWindow(tc.getDescription(), dv, null);
+			launchManipWindow(parsePlayerName() + ", " + tc.getDescription(), dv, null);
 		}
 	}
 	
@@ -1159,15 +1159,19 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		PlayDeck pd = dv.getPlayDeck();
 		String question = "";
 		if(cv != null) {
-			question = pd.generateQuestion((TrickCard) cv.getCard(), shouldCalcAllCards);
+			question = generateQuestionString(pd, cv, shouldCalcAllCards);
 		}else{
 			ArrayList<CardView> allCards = dv.getAllCards();
 			cv = allCards.get(allCards.size()-1);
-			question = pd.generateQuestion((TrickCard) cv.getCard(), shouldCalcAllCards);
+			question = generateQuestionString(pd, cv, shouldCalcAllCards);
 			cv = null;
 		}
 		//int answer = pd.generateAnswer(tc, shouldCalcAllCards);
 		launchManipWindow(question, dv, cv);
+	}
+	
+	private String generateQuestionString(PlayDeck pd, CardView cv, boolean shouldCalcAllCards) {
+		return parsePlayerName() + ", " + pd.generateQuestion((TrickCard) cv.getCard(), shouldCalcAllCards);
 	}
 
 	private void launchManipWindow(String question, DeckView dv, CardView cv) {
@@ -1256,12 +1260,12 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	
 	private String decideTurn(boolean ourTurn) {
 		if(!ourTurn) {
-			return Constants.STATUS_OPPO_TURN;
+			return Constants.STATUS_OPPO_TURN + Constants.SENTENCE_SEP + parsePlayerName() + ", you're next!";
 		}
 		return parsePlayerName() + "'s " + Constants.STATUS_TURN;
 	}
 	
-	private String parsePlayerName() {
+	public String parsePlayerName() {
 		if(title == null || title.equals("")) {
 			return "Your ";
 		}
@@ -1294,7 +1298,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		}else{
 			disableUser();
 			showDeckExtras(true);
-			status.setText(Constants.STATUS_OPPO_TURN);
+			status.setText(decideTurn(false));
 			panel.opponentTurn();
 		}
 		repaint();
@@ -1515,11 +1519,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			Debug.println("enabling user");
 		}
 		if(shouldChangeText) {
-			if(isMyTurn()) {
-				status.setText(Constants.CORRECT + decideTurn(true));
-			}else{
-				status.setText(Constants.STATUS_RIGHT_OPPO_TURN);
-			}
+			status.setText(Constants.CORRECT + decideTurn(isMyTurn()));
 		}else{
 			status.setText(formerText);
 		}

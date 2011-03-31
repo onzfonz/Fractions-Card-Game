@@ -35,7 +35,7 @@ public class PebbleFrame extends JFrame implements PebblePanelListener {
 	private NetDelegate netRep;
 	private JButton movePebble;
 	
-	public PebbleFrame(DeckView dv, NetDelegate nRep) {
+	public PebbleFrame(DeckView dv, NetDelegate nRep, String p) {
 		setTitle("Ice Cream Truck Test");
 		setLayout(new BorderLayout());
 		
@@ -111,7 +111,7 @@ public class PebbleFrame extends JFrame implements PebblePanelListener {
 //			}
 //		});
 		
-		pPanel = new PebblePanel(dv, 400, 600, !dv.getPlayer().isHuman(), this, nRep, this);
+		pPanel = new PebblePanel(dv, 400, 600, !dv.getPlayer().isHuman(), this, nRep, this, p);
 		netRep = nRep;
 		
 		manBox.add(pPanel, BorderLayout.CENTER);

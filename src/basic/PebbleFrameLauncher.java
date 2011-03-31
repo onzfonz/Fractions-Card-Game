@@ -48,7 +48,7 @@ public class PebbleFrameLauncher implements ActionListener {
 	}
 	
 	private void completelyFinishTimer() {
-		PebbleFrame pebWindow = new PebbleFrame(view, netRep);
+		PebbleFrame pebWindow = new PebbleFrame(view, netRep, gPanel.parsePlayerName());
 		pebWindow.requestFocus();
 		pebWindow.addBagListener(gPanel);
 		gPanel.setPebbleWindow(pebWindow);
