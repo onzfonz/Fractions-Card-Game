@@ -1262,7 +1262,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		if(!ourTurn) {
 			return Constants.STATUS_OPPO_TURN + Constants.SENTENCE_SEP + parsePlayerName() + ", you will be up soon.";
 		}
-		return parsePlayerName() + "'s " + Constants.STATUS_TURN;
+		return parsePlayerName() + "'s" + Constants.STATUS_TURN;
 	}
 	
 	public String parsePlayerName() {
