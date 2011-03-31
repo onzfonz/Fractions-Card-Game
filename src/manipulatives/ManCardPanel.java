@@ -161,7 +161,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		questionAnswer.setHorizontalAlignment(JTextField.CENTER);
 		questionAnswer.setMaximumSize(questionAnswer.getPreferredSize());
 		questionAnswer.addKeyListener(this);
-		questionAnswer.requestFocusInWindow();
+		askForFocus();
 		questionBox.add(questionAnswer);
 		controls.add(questionBox);
 
@@ -578,6 +578,10 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 	
 	public String getQuestion() {
 		return question;
+	}
+	
+	public void askForFocus() {
+		questionAnswer.requestFocusInWindow();
 	}
 	
 	private String addUnselectedPath(String s) {

@@ -10,13 +10,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -52,6 +52,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	private JTextField textCommands;
 	private ArrayList<JComponent> controls;
 	private ArrayList<String> cardPanelNames;
+	private HashMap<String, ManCardPanel> cardMapping;
 	private NetDelegate netRep;
 	private PebbleListener chipObserver;
 	private JPanel gameArea;
@@ -70,6 +71,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		myFrame = this;
 		controls = new ArrayList<JComponent>();
 		cardPanelNames = new ArrayList<String>();
+		cardMapping = new HashMap<String, ManCardPanel>();
 		netRep = nRep;
 		//if (file != null) boardPanel.open(file);
 		setLayout(new BorderLayout());
@@ -601,7 +603,10 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
     }
 	
 	private void switchToAskManipLayout() {
-		switchToLayout(cardPanelNames.get(2));
+		String name = cardPanelNames.get(2);
+		switchToLayout(name);
+		ManCardPanel mcp = cardMapping.get(name);
+		mcp.askForFocus();
 	}
 	
 	private boolean addLayout(JPanel layout, String name) {
@@ -647,6 +652,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	public void manViewCreated(ManCardPanel mPanel) {
 		String name = mPanel.getQuestion();
 		addLayout(mPanel, name);
+		cardMapping.put(name, mPanel);
 		manipButton.setEnabled(false);
 		switchToLayout(name);
 	}
@@ -654,6 +660,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	public boolean manViewDone(ManCardPanel mPanel) {
 		String name = mPanel.getQuestion();
 		removeLayout(mPanel, name);
+		cardMapping.remove(name);
 		//TODO: fix but where it is not showing that it is there. string is not the same
 		if(cardPanelNames.size() > 2) {
 			switchToAskManipLayout();
