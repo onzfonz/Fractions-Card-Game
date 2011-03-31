@@ -162,8 +162,8 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 		try {
 //			InetAddress addr = InetAddress.getByName(Constants.SERVER_ADDR);
 //			socket = new Socket(addr, Constants.SOCKET_PORT);
-//			socket = new Socket(Constants.SERVER_IP, Constants.SOCKET_PORT);
-			socket = new Socket(Constants.LOCALHOST, Constants.SOCKET_PORT);
+			socket = new Socket(Constants.SERVER_IP, Constants.SOCKET_PORT);
+//			socket = new Socket(Constants.LOCALHOST, Constants.SOCKET_PORT);
             out = new PrintWriter(socket.getOutputStream(), true);
             start();
        } catch (UnknownHostException e) {
@@ -271,7 +271,7 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
     	currentLayout = layoutName;
     }
     
-    private boolean inChat() {
+    private boolean inGame() {
     	return inLayout(GAME_PANEL);
     }
     
@@ -361,9 +361,11 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 	}
 
 	public void windowClosing(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		int option = JOptionPane.showConfirmDialog(this, "You are about to close the game...are you sure?", "Exit?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-		Debug.println(option);
+		int option = 0;
+		if(inGame()) {
+			option = JOptionPane.showConfirmDialog(this, "You are about to close the game...are you sure?", "Exit?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+			Debug.println(option);
+		}
 		if(option == 0) {
 			System.exit(0);
 		}

@@ -115,7 +115,7 @@ public class Constants {
 	public static final int SOCKET_PORT = 1604;
 //	public static final String SERVER_IP = "128.12.200.60";
 	//older one was 127.0.0.1
-	public static final String SERVER_IP = "10.32.26.4";
+	public static final String SERVER_IP = "10.32.25.19";
 //	public static final String LOCAL_SERVER_IP = "192.168.1.5";
 	public static final String LOCAL_SERVER_IP = "192.168.0.15";
 	public static final String SERVER_ADDR = "osvi.stanford.edu";
