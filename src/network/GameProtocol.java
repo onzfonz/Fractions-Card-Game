@@ -34,7 +34,7 @@ public class GameProtocol {
 	public String processInput(String theInput) {
 		String theOutput = null;
 		if(theInput != null) {
-			theInput = theInput.toLowerCase();
+			//theInput = theInput.toLowerCase();
 		}
 		if (state == WAITING_FOR_NAME) {
 			synchronized(allSocks) {
