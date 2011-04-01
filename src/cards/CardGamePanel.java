@@ -655,6 +655,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		cardMapping.put(name, mPanel);
 		manipButton.setEnabled(false);
 		switchToLayout(name);
+		mPanel.askForFocus();
 	}
 
 	public boolean manViewDone(ManCardPanel mPanel) {

@@ -116,10 +116,11 @@ public class Constants {
 	public static final int PANEL_HEIGHT = 750;
 	public static final int SOCKET_PORT = 1604;
 	public static final String SERVER_IP = "128.12.200.60";
+	public static final String SERVER_IP_STANFORD = "10.32.26.41";
 	//older one was 127.0.0.1
 //	public static final String SERVER_IP = "10.32.25.19";
-//	public static final String LOCAL_SERVER_IP = "192.168.1.5";
-	public static final String LOCAL_SERVER_IP = "192.168.0.15";
+	public static final String LOCAL_SERVER_IP = "192.168.1.5";
+	public static final String LOCAL_SERVER_IP2 = "192.168.0.15";
 	public static final String SERVER_ADDR = "osvi.stanford.edu";
 	public static final String LOCALHOST = "127.0.0.1";
 	
@@ -224,7 +225,7 @@ public class Constants {
 	public static final String BTN_NEW_GAME = "New Game";
 	public static final String BTN_DONE_TURN = "Done with Turn";
 	public static final String BTN_PASS = "Pass";
-	public static final String BTN_LAUNCH_MANIP = "People";
+	public static final String BTN_LAUNCH_MANIP = "Scratch Paper";
 	public static final String BTN_MAN_ANSWER = "Answer";
 	public static final String BTN_MAN_CLEAR = "Clear Screen";
 	public static final String BTN_MAN_HELP = "Show Me How";
