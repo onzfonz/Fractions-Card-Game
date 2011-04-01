@@ -99,9 +99,11 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 		start.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String challenger = (String) jLobbyPeople.getSelectedValue(); 
-				moveToGame();
-				sendToServer(challenger);
-				lobbyLabel.setText("Please wait while we check with " + challenger);
+				if(challenger != null) {
+					moveToGame();
+					sendToServer(challenger);
+					lobbyLabel.setText("Please wait while we check with " + challenger);
+				}
 			}
 		});
 

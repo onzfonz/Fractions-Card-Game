@@ -268,7 +268,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		ImageIcon pplIconUn = createImageIcon(addUnselectedPath(Constants.PPL_ICON_IMG_PATH));
 
 		drawLines = createRadioButton(lineIcon, lineIconUn, box, tools, Constants.TIP_LINE);
-		drawLines.setSelected(true);
+		//drawLines.setSelected(true);
 		drawLines.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				manPanel.setPencilMode(false);
@@ -276,6 +276,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		});
 		
 		makePpl = createRadioButton(pplIcon, pplIconUn, box, tools, Constants.TIP_PPL);
+		makePpl.setSelected(true);
 		makePpl.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				manPanel.setPplMode(true);
