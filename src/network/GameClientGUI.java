@@ -133,7 +133,7 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 		while(s == null || s.equals("") || containsIllegalThings(s)) {
 			s = (String)JOptionPane.showInputDialog(this, "Please enter an actual name.", "Name", JOptionPane.QUESTION_MESSAGE, null, null, "");
 		}
-		String partner = (String)JOptionPane.showInputDialog(this, "What is your partner's name? (If you don't have one leave this blank)", "Partner", JOptionPane.QUESTION_MESSAGE, null, null, "");
+		String partner = (String)JOptionPane.showInputDialog(this, "What is your partner's name? (If it's just you, click Cancel)", "Partner", JOptionPane.QUESTION_MESSAGE, null, null, "");
 		String id = s + " & " + partner;
 		if(partner == null || partner.equals("")) {
 			id = s;

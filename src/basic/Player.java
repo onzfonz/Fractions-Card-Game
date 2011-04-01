@@ -358,7 +358,7 @@ public class Player {
 		}
 		DeckView dv = p.getDeckView(deckIndex);
 		PossibleMove pm = new PossibleMove(dv, cv, tc, -1);
-		fireCardAnimation(pm, opponent, "deciding on a move!");
+		fireCardAnimation(pm, opponent, "has decided on a move!");
 	}
 	
 	private CardView extractCard(String cardIndex) {
