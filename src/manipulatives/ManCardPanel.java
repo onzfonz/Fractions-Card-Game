@@ -277,6 +277,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		
 		makePpl = createRadioButton(pplIcon, pplIconUn, box, tools, Constants.TIP_PPL);
 		makePpl.setSelected(true);
+		manPanel.setPplMode(true);
 		makePpl.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				manPanel.setPplMode(true);

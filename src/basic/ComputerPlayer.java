@@ -40,7 +40,7 @@ public class ComputerPlayer extends Player {
 		PossibleMove computerMove = chooseMoveToMake(allMoves);
 		boolean couldMakeMove = computerMove != null;
 		if(couldMakeMove) {
-			fireCardAnimation(computerMove, opponent, "thinking about where to move.");
+			fireCardAnimation(computerMove, opponent, "thought about where to move.");
 			//performMove(computerMove, opponent);
 		}else{
 			Debug.println("Couldn't make a turn");

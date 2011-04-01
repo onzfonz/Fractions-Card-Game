@@ -331,7 +331,7 @@ public class Player {
 		CardView radio = getARadio();
 		PossibleMove move = couldBePlayed(dv, radio);
 		if(move != null) {
-			fireCardAnimation(move, null, "playing a radio to defend against the stink bomb!");
+			fireCardAnimation(move, null, "played a radio to defend against the stink bomb!");
 		}
 	}
 	
@@ -358,7 +358,7 @@ public class Player {
 		}
 		DeckView dv = p.getDeckView(deckIndex);
 		PossibleMove pm = new PossibleMove(dv, cv, tc, -1);
-		fireCardAnimation(pm, opponent, "has decided on a move!");
+		fireCardAnimation(pm, opponent, "decided on a move!");
 	}
 	
 	private CardView extractCard(String cardIndex) {

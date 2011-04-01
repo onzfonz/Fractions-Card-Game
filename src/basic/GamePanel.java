@@ -941,7 +941,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		if(isOurUser(computer)) {
 			prefix = Constants.YOU_ARE;
 		}else{
-			prefix = Constants.YOUR_OPPO_IS;
+			prefix = Constants.YOUR_OPPO_HAS;
 			panel.opponentTurn();
 		}
 		status.setText(prefix + message);

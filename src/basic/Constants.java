@@ -113,7 +113,7 @@ public class Constants {
 	public static final int LINE_MODE = 0;
 	public static final int PPL_MODE = -1;
 	public static final int PANEL_WIDTH = 1175;
-	public static final int PANEL_HEIGHT = 750;
+	public static final int PANEL_HEIGHT = 725;
 	public static final int SOCKET_PORT = 1604;
 	public static final String SERVER_IP = "128.12.200.60";
 	public static final String SERVER_IP_STANFORD = "10.32.26.41";
@@ -239,8 +239,8 @@ public class Constants {
 	public static final String WINDOW_TITLE = "Fractions Card Game";
 	public static final String TITLE_COMBO = "Which Card?";
 	public static final String TITLE_ICE = "Ice Cream Truck";
-	public static final String YOU_ARE = "You are ";
-	public static final String YOUR_OPPO_IS = "Your opponent is ";
+	public static final String YOU_ARE = "You have ";
+	public static final String YOUR_OPPO_HAS = "Your opponent has ";
 	
 	public static final String YOUR_INIT_SCORE = "You: ";
 	public static final String THEIR_INIT_SCORE = "Them: ";
