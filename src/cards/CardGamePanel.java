@@ -16,6 +16,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -60,6 +61,8 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	private FYIMessage shufflin;
 	private String currentLayout;
 	private JButton manipButton;
+	private JComboBox sliderOption;
+	private JPanel toolbox;
 	
 	private static final String GAME_PANEL = "Game Panel";
 	private static final String MANIP_PANEL = "Manip Panel";
@@ -75,7 +78,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		netRep = nRep;
 		//if (file != null) boardPanel.open(file);
 		setLayout(new BorderLayout());
-		final JPanel toolbox = new JPanel();
+		toolbox = new JPanel();
 		toolbox.setLayout(new BoxLayout(toolbox, BoxLayout.Y_AXIS));
 		toolbox.setBackground(Constants.TOOLBOX_BACKGROUND);
 		add(toolbox, BorderLayout.WEST);
@@ -212,12 +215,12 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		final JSlider redSlider = createDebugSlider(toolbox, "Red", 0, 255, 128);
 		redSlider.addChangeListener( new ChangeListener() {
 			public void stateChanged(ChangeEvent ce) {
-				Color curColor = toolbox.getBackground();
+				Color curColor = getSliderColor();
 				int blue = curColor.getBlue();
 				int green = curColor.getGreen();
 				Color tempColor = new Color(redSlider.getValue(), green, blue);
 				//gamePanel.setBackground(tempColor);
-				toolbox.setBackground(tempColor);
+				setSliderColor(tempColor);
 				redLabel.setText("" + redSlider.getValue());
 			}
 		});
@@ -226,12 +229,12 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		final JSlider greenSlider = createDebugSlider(toolbox, "Green", 0, 255, 128);
 		greenSlider.addChangeListener( new ChangeListener() {
 			public void stateChanged(ChangeEvent ce) {
-				Color curColor = toolbox.getBackground();
+				Color curColor = getSliderColor();
 				int blue = curColor.getBlue();
 				int red = curColor.getRed();
 				Color tempColor = new Color(red, greenSlider.getValue(), blue);
 				//gamePanel.setBackground(tempColor);
-				toolbox.setBackground(tempColor);
+				setSliderColor(tempColor);
 				greenLabel.setText("" + greenSlider.getValue());
 			}
 		});
@@ -240,16 +243,28 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		final JSlider blueSlider = createDebugSlider(toolbox, "Blue", 0, 255, 128);
 		blueSlider.addChangeListener( new ChangeListener() {
 			public void stateChanged(ChangeEvent ce) {
-				Color curColor = toolbox.getBackground();
+				Color curColor = getSliderColor();
 				int red = curColor.getRed();
 				int green = curColor.getGreen();
 				Color tempColor = new Color(red, green, blueSlider.getValue());
 				//gamePanel.setBackground(tempColor);
-				toolbox.setBackground(tempColor);
+				setSliderColor(tempColor);
 				blueLabel.setText("" + blueSlider.getValue());
 			}
 		});
-
+		
+		String[] colorOpts = {"Left", "Game", "Status-Back", "Status-Fore"};
+		sliderOption = new JComboBox(colorOpts);
+		sliderOption.setVisible(Constants.DEBUG_MODE);
+		toolbox.add(sliderOption);
+		sliderOption.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				Color c = getSliderColor();
+				redSlider.setValue(c.getRed());
+				greenSlider.setValue(c.getGreen());
+				blueSlider.setValue(c.getBlue());
+			}
+		});
 
 		JPanel top = new JPanel();
 		top.setLayout(new BoxLayout(top, BoxLayout.X_AXIS));
@@ -448,11 +463,12 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	}
 
 	private void askToFinishRound() {
-		int option = JOptionPane.showOptionDialog(myFrame, Constants.INFO_NO_MOVES, "", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, Constants.YES_NO, 0);
-		if(option == 0) {
+		String[] optsArray = {"No", "Yes"};
+		int option = JOptionPane.showOptionDialog(myFrame, Constants.INFO_NO_MOVES, "", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, optsArray, 0);
+		if(option == 1) {
 			calculateScore();
 			NetHelper.sendNetCalc(netRep);
-		}else if(option == 1) {
+		}else if(option == 0) {
 			forceUserTurn(true);
 		}
 	}
@@ -674,5 +690,26 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	public void toggleManipView() {
 		// TODO Auto-generated method stub
 		toggleManipLayout();
+	}
+		
+	private Color getSliderColor() {
+		int opt = sliderOption.getSelectedIndex();
+		switch(opt) {
+		case 0: return toolbox.getBackground();
+		case 1: return gamePanel.getBackground();
+		case 2: return gamePanel.getStatusArea().getBackground();
+		case 3: return gamePanel.getStatusBox().getForeground();
+		}
+		return null;
+	}
+	
+	private void setSliderColor(Color c) {
+		int opt = sliderOption.getSelectedIndex();
+		switch(opt) {
+		case 0: toolbox.setBackground(c); break;
+		case 1: gamePanel.setBackground(c); break;
+		case 2: gamePanel.getStatusArea().setBackground(c); break;
+		case 3: gamePanel.getStatusBox().setForeground(c); break;
+		}
 	}
 }

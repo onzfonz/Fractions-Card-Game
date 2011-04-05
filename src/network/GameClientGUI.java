@@ -190,7 +190,7 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 	private Socket getSocketMethod(int timesAttempted) throws IOException {
 		String input;
 		int ind;
-		String[] ipAddrs = { Constants.LOCAL_SERVER_IP2, Constants.SERVER_IP, Constants.SERVER_ADDR, Constants.SERVER_IP_STANFORD};
+		String[] ipAddrs = { Constants.LOCAL_SERVER_IP2, Constants.SERVER_IP, Constants.SERVER_ADDR, Constants.SERVER_IP_STANFORD, Constants.LOCALHOST};
 		switch(timesAttempted) {
 			case 0: return new Socket(Constants.LOCAL_SERVER_IP, Constants.SOCKET_PORT);
 			case 1: ind = JOptionPane.showOptionDialog(this, "Please pick the server location", "IP", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, ipAddrs, Constants.LOCAL_SERVER_IP2);
