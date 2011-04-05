@@ -19,7 +19,7 @@ import cards.TeammateCard;
 import cards.TrickCard;
 import deck.PlayDeck;
 
-public class ComboFrame extends JFrame {
+public class ComboFrame extends JPanel {
 	/**
 	 * 
 	 */
@@ -27,11 +27,10 @@ public class ComboFrame extends JFrame {
 	private ComboPanel pPanel;
 	
 	public ComboFrame(CardView cv) {
-		setTitle(Constants.TITLE_COMBO);
 		setLayout(new BorderLayout());
 		pPanel = new ComboPanel(cv, this);
 	
-		add(pPanel, BorderLayout.CENTER);	
+		add(pPanel, BorderLayout.WEST);	
         
 		JPanel statusBox = new JPanel();
 		statusBox.setLayout(new FlowLayout());
@@ -42,9 +41,7 @@ public class ComboFrame extends JFrame {
 //		setPreferredSize(new Dimension(Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT));
 		
 		add(message, BorderLayout.NORTH);
-		
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		pack();
+
 		setVisible(true);
 	}
 	

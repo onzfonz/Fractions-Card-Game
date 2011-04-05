@@ -1138,6 +1138,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		disableUser();
 		ComboFrame combo = new ComboFrame(cv);
 		combo.addListener(this);
+		panel.comboViewCreated(combo);
 	}
 	
 	public void setPebbleWindow(PebbleFrame pebWin) {
@@ -1530,10 +1531,11 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		return myTurn;
 	}
 	
-	public void comboCardDone(CardView cv, int option) {
+	public void comboCardDone(ComboFrame cf, CardView cv, int option) {
 		ArrayList<TrickCard> optList = cv.getCards();
 //		int option = JOptionPane.showOptionDialog(getTopLevelAncestor(), "Which Part of the Combo Card would you like?", "", 0, 0, null, options, options[0]);
 		cv.setOptionChosen(option);
+		panel.comboViewDone(cf);
 		TrickCard cardSelected = optList.get(option);
 		origComboTrick = (TrickCard) cv.getCard();
 		currentCard.setCard(cardSelected);

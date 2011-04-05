@@ -37,6 +37,9 @@ import basic.FYIMessage;
 import basic.GamePanel;
 import basic.Helpers;
 import basic.Player;
+
+import combo.ComboFrame;
+
 import extras.Debug;
 import extras.PanelListener;
 import extras.StringUtils;
@@ -67,6 +70,8 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	private static final String GAME_PANEL = "Game Panel";
 	private static final String MANIP_PANEL = "Manip Panel";
 	private static final String MANIP_CALC_PANEL = "Manip Calc";
+	private static final String COMBO_NAME = "Combo View";
+	
 	
 	public CardGamePanel(NetDelegate nRep) {
 		//setTitle(Constants.WINDOW_TITLE);
@@ -685,6 +690,18 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			showGameLayout();
 		}
 		return cardPanelNames.size() <= 2;
+	}
+	
+	public void comboViewCreated(ComboFrame cPanel) {
+		addLayout(cPanel, COMBO_NAME);
+		manipButton.setEnabled(false);
+		switchToLayout(COMBO_NAME);
+	}
+	
+	public boolean comboViewDone(ComboFrame cPanel) {
+		removeLayout(cPanel, COMBO_NAME);
+		showGameLayout();
+		return true;
 	}
 
 	public void toggleManipView() {

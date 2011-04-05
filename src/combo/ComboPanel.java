@@ -49,27 +49,26 @@ public class ComboPanel extends JPanel{
 	private JLabel statusLine2;
 	private boolean playerIsShakingBag;
 	private boolean playerShouldStartShaking;
-	private JFrame frame;
 	private CardView comboCard;
 	private ArrayList<ComboListener> listeners;
+	private ComboFrame combo;
 	private int cpOption = -1;
 
 	/* Need to have a good shake pebble method
 	 * that will have the pebbles randomly move in their locations
 	 * yet still stay inside the bag.
 	 */
-	public ComboPanel(CardView cv, JFrame f) {
-		setupPanel(cv, f);
+	public ComboPanel(CardView cv, ComboFrame cf) {
+		setupPanel(cv, cf);
 	}
 
-	private void setupPanel(CardView cv, JFrame f) {
+	private void setupPanel(CardView cv, ComboFrame cf) {
 		comboCard = cv;
-		frame = f;
+		combo = cf;
 		rgen = RandomGenerator.getInstance();
 		listeners = new ArrayList<ComboListener>();
 		chooseX = 0;
 		chooseY = 0;
-		frame = f;
 		setLayout(new BorderLayout());
 
 		setPreferredSize(new Dimension(Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT));
@@ -130,7 +129,8 @@ public class ComboPanel extends JPanel{
 	}
 	
 	public void paintComponent(Graphics g) {
-		comboCard.drawBigCard(g, getWidth(), getHeight());
+		//comboCard.drawBigCard(g, getWidth(), getHeight());
+		comboCard.drawBigCard(g, Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT);
 		if(cpOption >= 0) {
 			ComboCardView.drawACircle(g, getWidth()-Constants.HUGE_CARD_WIDTH, 0, Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT, cpOption);
 		}
@@ -139,8 +139,7 @@ public class ComboPanel extends JPanel{
 	public void fireComboDone(int option) {
 		Debug.println(option);
 		for(ComboListener l:listeners) {
-			l.comboCardDone(comboCard, option);
+			l.comboCardDone(combo, comboCard, option);
 		}
-		frame.dispose();
 	}
 }

@@ -97,7 +97,7 @@ public class Constants {
 	public static final Font FONT_REG = new Font("sans-serif", Font.BOLD, 32);
 	public static final Font FONT_LARGE = new Font("sans-serif", Font.BOLD, 48);
 	public static final Color GAME_BACKGROUND = new Color(80, 100, 60);
-	public static final Color STATUS_BACKGROUND = new Color(220, 0, 0);
+	public static final Color STATUS_BACKGROUND = new Color(200, 0, 0);
 	public static final Color STATUS_FOREGROUND = new Color(255, 255, 255);
 	public static final Color TOOLBOX_FOREGROUND_LOUD = new Color(0, 192, 0);
 	public static final Color TOOLBOX_FOREGROUND = new Color(0, 0, 0);
