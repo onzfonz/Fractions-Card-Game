@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 import javax.swing.Timer;
 
 import network.NetDelegate;
-import pebblebag.PebbleFrame;
+import pebblebag.IceCreamTruckView;
 import deck.DeckView;
 import extras.Debug;
 
@@ -48,10 +48,10 @@ public class PebbleFrameLauncher implements ActionListener {
 	}
 	
 	private void completelyFinishTimer() {
-		PebbleFrame pebWindow = new PebbleFrame(view, netRep, gPanel.parsePlayerName());
-		pebWindow.requestFocus();
+		IceCreamTruckView pebWindow = new IceCreamTruckView(view, netRep, gPanel.parsePlayerName());
 		pebWindow.addBagListener(gPanel);
 		gPanel.setPebbleWindow(pebWindow);
+		gPanel.iceCreamTruckViewStarted(pebWindow);
 	}
 	
 	private void restartTimer() {

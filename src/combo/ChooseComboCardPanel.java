@@ -1,6 +1,6 @@
 package combo;
 /*
- * File: PebbleFrame
+ * File: IceCreamTruckView
  * This will be the container window that will have the buttons
  * and such to help manipulate the pebble window.  It will also have
  * a pebble panel.
@@ -19,14 +19,14 @@ import cards.TeammateCard;
 import cards.TrickCard;
 import deck.PlayDeck;
 
-public class ComboFrame extends JPanel {
+public class ChooseComboCardPanel extends JPanel {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 4850780253187289854L;
 	private ComboPanel pPanel;
 	
-	public ComboFrame(CardView cv) {
+	public ChooseComboCardPanel(CardView cv) {
 		setLayout(new BorderLayout());
 		pPanel = new ComboPanel(cv, this);
 	
@@ -79,7 +79,7 @@ public class ComboFrame extends JPanel {
 		p1.addTrickCard(radio);
 		CardView cView = CardViewFactory.createCard(combo);
 
-		ComboFrame pPanel = new ComboFrame(cView);
+		ChooseComboCardPanel pPanel = new ChooseComboCardPanel(cView);
 	}
 	
 }

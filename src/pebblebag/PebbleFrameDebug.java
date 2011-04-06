@@ -1,6 +1,6 @@
 package pebblebag;
 /*
- * File: PebbleFrame
+ * File: IceCreamTruckView
  * This will be the container window that will have the buttons
  * and such to help manipulate the pebble window.  It will also have
  * a pebble panel.
@@ -47,7 +47,7 @@ public class PebbleFrameDebug extends JFrame {
 		//p1.addTrickCard(radio);
 		
 		/* end of deleting */
-		pPanel = new PebblePanel(p1, 400, 600, true, this);
+		pPanel = new PebblePanel(p1, 400, 600, true, null);
 		
 		bagS = new BagShaker(pPanel);
 		bagTimer = new Timer(20, bagS);

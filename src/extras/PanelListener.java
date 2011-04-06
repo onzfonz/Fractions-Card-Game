@@ -1,9 +1,10 @@
 package extras;
 
 import manipulatives.ManCardPanel;
+import pebblebag.IceCreamTruckView;
 import basic.Player;
 
-import combo.ComboFrame;
+import combo.ChooseComboCardPanel;
 
 public interface PanelListener {
 	public void updateLabels(Player p);
@@ -13,6 +14,8 @@ public interface PanelListener {
 	public void manViewCreated(ManCardPanel mPanel);
 	public boolean manViewDone(ManCardPanel mPanel);
 	public void toggleManipView();
-	public void comboViewCreated(ComboFrame cPanel);
-	public boolean comboViewDone(ComboFrame cPanel);
+	public void comboViewCreated(ChooseComboCardPanel cPanel);
+	public boolean comboViewDone(ChooseComboCardPanel cPanel);
+	public void iceViewCreated(IceCreamTruckView iPanel);
+	public boolean iceViewDone(IceCreamTruckView iPanel);
 }

@@ -51,50 +51,58 @@ public class ComboPanel extends JPanel{
 	private boolean playerShouldStartShaking;
 	private CardView comboCard;
 	private ArrayList<ComboListener> listeners;
-	private ComboFrame combo;
+	private ChooseComboCardPanel combo;
 	private int cpOption = -1;
+	private boolean leftButtonClicked;
 
 	/* Need to have a good shake pebble method
 	 * that will have the pebbles randomly move in their locations
 	 * yet still stay inside the bag.
 	 */
-	public ComboPanel(CardView cv, ComboFrame cf) {
+	public ComboPanel(CardView cv, ChooseComboCardPanel cf) {
 		setupPanel(cv, cf);
 	}
 
-	private void setupPanel(CardView cv, ComboFrame cf) {
+	private void setupPanel(CardView cv, ChooseComboCardPanel cf) {
 		comboCard = cv;
 		combo = cf;
 		rgen = RandomGenerator.getInstance();
 		listeners = new ArrayList<ComboListener>();
 		chooseX = 0;
 		chooseY = 0;
+		leftButtonClicked = false;
 		setLayout(new BorderLayout());
 
 		setPreferredSize(new Dimension(Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT));
 
 		addMouseListener( new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
-				origX = e.getX();
-				origY = e.getY();
+				leftButtonClicked = true;
+				if(e.getButton() == Constants.LEFT_MOUSE_BTN) {
+					origX = e.getX();
+					origY = e.getY();
+				}
 			}
 
 			public void mouseReleased(MouseEvent e) {
-				int lastX = e.getX();
-				int lastY = e.getY();
-				
-				Point p1 = new Point(origX, origY);
-				Point p2 = new Point(lastX, lastY);
-				
-				int comboLineX = (getWidth()-(Constants.HUGE_CARD_WIDTH/2));
-				if(Math.abs(origX - comboLineX) > Constants.DRAG_THRESHOLD/2 && Math.abs(lastX - comboLineX) > Constants.DRAG_THRESHOLD/2) {
-					if(cpOption != -1) {
-						fireComboDone(cpOption);
+				leftButtonClicked = false;
+				if(e.getButton() == Constants.LEFT_MOUSE_BTN) { 
+					int lastX = e.getX();
+					int lastY = e.getY();
+
+					Point p1 = new Point(origX, origY);
+					Point p2 = new Point(lastX, lastY);
+
+					int comboLineX = (getWidth()-(Constants.HUGE_CARD_WIDTH/2));
+					if(Math.abs(origX - comboLineX) > Constants.DRAG_THRESHOLD/2 && Math.abs(lastX - comboLineX) > Constants.DRAG_THRESHOLD/2) {
+						if(cpOption != -1) {
+							fireComboDone(cpOption);
+						}
 					}
 				}
 			}
 		});
-		
+
 		addMouseMotionListener(new MouseMotionAdapter() {
 			public void mouseMoved(MouseEvent e) {
 				int comboLineX = (getWidth()-(Constants.HUGE_CARD_WIDTH/2));
@@ -108,26 +116,28 @@ public class ComboPanel extends JPanel{
 				}
 				repaint();
 			}
-			
+
 			public void mouseDragged(MouseEvent e) {
-				int lastX = e.getX();
-				int lastY = e.getY();
-				
-				Point p1 = new Point(origX, origY);
-				Point p2 = new Point(lastX, lastY);
-				int comboLineX = (getWidth()-(Constants.HUGE_CARD_WIDTH/2));
-				if(p1.distance(p2) > Constants.DRAG_THRESHOLD/2 || Math.abs(lastX - comboLineX) < Constants.DRAG_THRESHOLD/2) {
-					cpOption = -1;
-					repaint();
+				if(leftButtonClicked) {
+					int lastX = e.getX();
+					int lastY = e.getY();
+
+					Point p1 = new Point(origX, origY);
+					Point p2 = new Point(lastX, lastY);
+					int comboLineX = (getWidth()-(Constants.HUGE_CARD_WIDTH/2));
+					if(p1.distance(p2) > Constants.DRAG_THRESHOLD/2 || Math.abs(lastX - comboLineX) < Constants.DRAG_THRESHOLD/2) {
+						cpOption = -1;
+						repaint();
+					}
 				}
 			}
 		});
 	}
-	
+
 	public void addListener(ComboListener cl) {
 		listeners.add(cl);
 	}
-	
+
 	public void paintComponent(Graphics g) {
 		//comboCard.drawBigCard(g, getWidth(), getHeight());
 		comboCard.drawBigCard(g, Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT);

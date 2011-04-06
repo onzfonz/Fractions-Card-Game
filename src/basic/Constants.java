@@ -2,6 +2,7 @@ package basic;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.MouseEvent;
 
 public class Constants {
 	public static final int TRICK_HAND_SIZE = 4;
@@ -112,6 +113,7 @@ public class Constants {
 	public static final int PENCIL_MODE = 1;
 	public static final int LINE_MODE = 0;
 	public static final int PPL_MODE = -1;
+	public static final int LEFT_MOUSE_BTN = MouseEvent.BUTTON1;
 	public static final int PANEL_WIDTH = 1175;
 	public static final int PANEL_HEIGHT = 725;
 	public static final int SOCKET_PORT = 1604;

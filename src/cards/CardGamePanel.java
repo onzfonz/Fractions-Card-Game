@@ -31,6 +31,7 @@ import manipulatives.ManCardPanel;
 import manipulatives.ManFrame;
 import network.NetDelegate;
 import network.NetHelper;
+import pebblebag.IceCreamTruckView;
 import pebblebag.PebbleListener;
 import basic.Constants;
 import basic.FYIMessage;
@@ -38,7 +39,7 @@ import basic.GamePanel;
 import basic.Helpers;
 import basic.Player;
 
-import combo.ComboFrame;
+import combo.ChooseComboCardPanel;
 
 import extras.Debug;
 import extras.PanelListener;
@@ -71,7 +72,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	private static final String MANIP_PANEL = "Manip Panel";
 	private static final String MANIP_CALC_PANEL = "Manip Calc";
 	private static final String COMBO_NAME = "Combo View";
-	
+	private static final String ICE_NAME = "Ice Cream Truck View";
 	
 	public CardGamePanel(NetDelegate nRep) {
 		//setTitle(Constants.WINDOW_TITLE);
@@ -692,14 +693,30 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		return cardPanelNames.size() <= 2;
 	}
 	
-	public void comboViewCreated(ComboFrame cPanel) {
-		addLayout(cPanel, COMBO_NAME);
-		manipButton.setEnabled(false);
-		switchToLayout(COMBO_NAME);
+	public void comboViewCreated(ChooseComboCardPanel cPanel) {
+		panelViewCreated(cPanel, COMBO_NAME);
 	}
 	
-	public boolean comboViewDone(ComboFrame cPanel) {
-		removeLayout(cPanel, COMBO_NAME);
+	public boolean comboViewDone(ChooseComboCardPanel cPanel) {
+		return panelViewDone(cPanel, COMBO_NAME);
+	}
+	
+	public void iceViewCreated(IceCreamTruckView iPanel) {
+		panelViewCreated(iPanel, ICE_NAME);
+	}
+	
+	public boolean iceViewDone(IceCreamTruckView iPanel) {
+		return panelViewDone(iPanel, ICE_NAME);
+	}
+	
+	private void panelViewCreated(JPanel p, String name) {
+		addLayout(p, name);
+		manipButton.setEnabled(false);
+		switchToLayout(name);		
+	}
+	
+	private boolean panelViewDone(JPanel p, String name) {
+		removeLayout(p, name);
 		showGameLayout();
 		return true;
 	}

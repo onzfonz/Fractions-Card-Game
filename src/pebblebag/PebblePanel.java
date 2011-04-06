@@ -60,7 +60,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 	private boolean userCanClick;
 	private boolean playerIsShakingBag;
 	private boolean playerShouldStartShaking;
-	private JFrame frame;
+	private IceCreamTruckView frame;
 	private DeckView deckPlayedOn;
 	private ArrayList<IceWindowListener> listeners;
 	private NetDelegate netRep;
@@ -69,12 +69,13 @@ public class PebblePanel extends JPanel implements PebbleListener {
 	private Semaphore pebbleMoving;
 	private PebblePanelListener listener;
 	private String participant;
+	private boolean leftButtonClicked;
 
 	/* Need to have a good shake pebble method
 	 * that will have the pebbles randomly move in their locations
 	 * yet still stay inside the bag.
 	 */
-	public PebblePanel(DeckView dv, int w, int h, boolean playerStarts, JFrame f, NetDelegate nRep, PebblePanelListener l, String pName) {
+	public PebblePanel(DeckView dv, int w, int h, boolean playerStarts, IceCreamTruckView f, NetDelegate nRep, PebblePanelListener l, String pName) {
 		deckPlayedOn = dv;
 		netRep = nRep;
 		listener = l;
@@ -86,11 +87,11 @@ public class PebblePanel extends JPanel implements PebbleListener {
 	}
 
 	//This is only really for testing purposes - should not support this!
-	PebblePanel(PlayDeck pd, int w, int h, boolean playerStarts, JFrame f) {
+	PebblePanel(PlayDeck pd, int w, int h, boolean playerStarts, IceCreamTruckView f) {
 		setupPanel(pd, w, h, playerStarts, f);
 	}
 
-	private void setupPanel(PlayDeck pd, int w, int h, boolean playerStarts, JFrame f) {
+	private void setupPanel(PlayDeck pd, int w, int h, boolean playerStarts, IceCreamTruckView f) {
 		rgen = RandomGenerator.getInstance();
 		numIceCreamsPlayed = 0;
 		plays = new ArrayList<PebbleBagView>();
@@ -98,6 +99,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		chooseX = 0;
 		chooseY = 0;
 		userCanClick = true;
+		leftButtonClicked = false;
 		frame = f;
 		playerIsShakingBag = playerStarts;
 		setLayout(new BorderLayout());
@@ -126,33 +128,39 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		addMouseListener( new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
 				if(userCanClick) {
-					if(e.getButton() == MouseEvent.BUTTON3) {
-
-						resetBag();
+					//					if(e.getButton() == MouseEvent.BUTTON3) {
+					//
+					//						resetBag();
+					//					}
+					leftButtonClicked = true;
+					if(e.getButton() == Constants.LEFT_MOUSE_BTN) {
+						if(getCurrentPebbleBag().timeToDrawAPebble()) {
+							currentPebble = findPebble(e);
+						}
+						lastX = e.getX();
+						lastY = e.getY();
 					}
-					if(getCurrentPebbleBag().timeToDrawAPebble()) {
-						currentPebble = findPebble(e);
-					}
-					lastX = e.getX();
-					lastY = e.getY();
 				}
 			}
 
 			public void mouseReleased(MouseEvent e) {
 				if(userCanClick) {
-					PebbleBagView cpb = getCurrentPebbleBag();
-					if(currentPebble != null && currentPebble.isHidden()) {
-						repaintPebble(currentPebble);
-						if(currentPebble.completelyOutsideOfBag()) {
-							PebbleView peb = currentPebble;
-							revealPebble(peb);
-							NetHelper.sendNetChip(netRep, peb.isOrange());
-						}else if(!currentPebble.insideOfBag()) {
-							currentPebble.moveBackNearEdges();
+					leftButtonClicked = false;
+					if(e.getButton() == Constants.LEFT_MOUSE_BTN) { 
+						PebbleBagView cpb = getCurrentPebbleBag();
+						if(currentPebble != null && currentPebble.isHidden()) {
+							repaintPebble(currentPebble);
+							if(currentPebble.completelyOutsideOfBag()) {
+								PebbleView peb = currentPebble;
+								revealPebble(peb);
+								NetHelper.sendNetChip(netRep, peb.isOrange());
+							}else if(!currentPebble.insideOfBag()) {
+								currentPebble.moveBackNearEdges();
+							}
+							repaint();
 						}
-						repaint();
+						currentPebble = null;
 					}
-					currentPebble = null;
 				}
 			}
 		});
@@ -160,18 +168,20 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		addMouseMotionListener( new MouseMotionAdapter() {
 			public void mouseDragged(MouseEvent e) {
 				if(userCanClick) {
-					int currentX = e.getX();
-					int currentY = e.getY();
+					if(leftButtonClicked) {
+						int currentX = e.getX();
+						int currentY = e.getY();
 
-					if(getCurrentPebbleBag().bagNeedsShaking()) {
-						shakeTheBag(currentX, currentY);
-					}else if(currentPebble != null) {
-						movePebble(currentX, currentY);
+						if(getCurrentPebbleBag().bagNeedsShaking()) {
+							shakeTheBag(currentX, currentY);
+						}else if(currentPebble != null) {
+							movePebble(currentX, currentY);
+						}
+
+						lastX = currentX;
+						lastY = currentY;
+						repaint();
 					}
-
-					lastX = currentX;
-					lastY = currentY;
-					repaint();
 				}
 			}
 		});
@@ -290,7 +300,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		shakingDone.release();
 		notifyBagShaking();
 	}
-	
+
 	public void stopShakingAnimation() {
 		boolean didIt = false;
 		try{
@@ -311,7 +321,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		bagI.setTimer(bagTimer);
 		bagTimer.start();
 	}
-	
+
 	public void tellOppoToChoosePebbles() {
 		NetHelper.sendNetShaked(netRep, this);
 		turnOffUser();
@@ -326,7 +336,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 			forcePebbleAnimation(isOrange);
 		}
 	}
-	
+
 	private void forcePebbleAnimation(boolean isOrange) {
 		boolean didIt = false;
 		try{
@@ -345,7 +355,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 			return;
 		}
 	}
-	
+
 	public void pebbleMoverDone() {
 		pebbleMoving.release();
 		Debug.println("released pebbleMover");
@@ -380,14 +390,14 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		currentPebble = getCurrentPebbleBag().choosePebbleFromBag();
 		return currentPebble;
 	}
-	
+
 	/**
 	 * Function used to notify panel and bag that a certain chip was drawn.
 	 */
 	public void chipDrawn(boolean isOrange) {
 		beginPebbleAnimation(isOrange);
 	}
-	
+
 	public PebbleView oppoSelectedPebble(boolean isOrange) {
 		turnOffUser();
 		currentPebble = getCurrentPebbleBag().choosePebbleFromBag(isOrange);
@@ -550,10 +560,10 @@ public class PebblePanel extends JPanel implements PebbleListener {
 
 	public void fireIceCreamTruckDone(DeckView dv, boolean didKidsRunToTruck) {
 		for(IceWindowListener l:listeners) {
-			l.iceCreamTruckDone(dv, didKidsRunToTruck);
+			l.iceCreamTruckDone(frame, dv, didKidsRunToTruck);
 		}
 	}
-	
+
 	public void notifyBagShaking() {
 		for(IceWindowListener l:listeners) {
 			l.timeWhenBagShaking();
@@ -590,7 +600,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		p1.addTrickCard(one2Ice);
 		p1.addTrickCard(radio);
 
-		PebblePanel pPanel = new PebblePanel(p1, 400, 600, true, frame);
+		PebblePanel pPanel = new PebblePanel(p1, 400, 600, true, null);
 		frame.add(pPanel);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();

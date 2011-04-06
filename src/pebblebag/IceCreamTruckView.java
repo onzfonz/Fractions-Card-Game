@@ -1,6 +1,6 @@
 package pebblebag;
 /*
- * File: PebbleFrame
+ * File: IceCreamTruckView
  * This will be the container window that will have the buttons
  * and such to help manipulate the pebble window.  It will also have
  * a pebble panel.
@@ -20,7 +20,7 @@ import network.NetHelper;
 import basic.Constants;
 import deck.DeckView;
 
-public class PebbleFrame extends JFrame implements PebblePanelListener {
+public class IceCreamTruckView extends JPanel implements PebblePanelListener {
 	/**
 	 * 
 	 */
@@ -35,8 +35,7 @@ public class PebbleFrame extends JFrame implements PebblePanelListener {
 	private NetDelegate netRep;
 	private JButton movePebble;
 	
-	public PebbleFrame(DeckView dv, NetDelegate nRep, String p) {
-		setTitle("Ice Cream Truck Test");
+	public IceCreamTruckView(DeckView dv, NetDelegate nRep, String p) {
 		setLayout(new BorderLayout());
 		
 		JPanel manBox = new JPanel();
@@ -115,10 +114,8 @@ public class PebbleFrame extends JFrame implements PebblePanelListener {
 		netRep = nRep;
 		
 		manBox.add(pPanel, BorderLayout.CENTER);
-		add(manBox, BorderLayout.CENTER);
+		add(manBox, BorderLayout.WEST);
 		
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		pack();
 		setVisible(true);
 	}
 	
