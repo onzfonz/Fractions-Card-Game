@@ -69,7 +69,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 	private Semaphore pebbleMoving;
 	private PebblePanelListener listener;
 	private String participant;
-	private boolean leftButtonClicked;
+	private boolean leftButtonDown;
 
 	/* Need to have a good shake pebble method
 	 * that will have the pebbles randomly move in their locations
@@ -99,7 +99,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		chooseX = 0;
 		chooseY = 0;
 		userCanClick = true;
-		leftButtonClicked = false;
+		leftButtonDown = false;
 		frame = f;
 		playerIsShakingBag = playerStarts;
 		setLayout(new BorderLayout());
@@ -132,8 +132,8 @@ public class PebblePanel extends JPanel implements PebbleListener {
 					//
 					//						resetBag();
 					//					}
-					leftButtonClicked = true;
 					if(e.getButton() == Constants.LEFT_MOUSE_BTN) {
+						leftButtonDown = true;
 						if(getCurrentPebbleBag().timeToDrawAPebble()) {
 							currentPebble = findPebble(e);
 						}
@@ -145,8 +145,8 @@ public class PebblePanel extends JPanel implements PebbleListener {
 
 			public void mouseReleased(MouseEvent e) {
 				if(userCanClick) {
-					leftButtonClicked = false;
 					if(e.getButton() == Constants.LEFT_MOUSE_BTN) { 
+						leftButtonDown = false;
 						PebbleBagView cpb = getCurrentPebbleBag();
 						if(currentPebble != null && currentPebble.isHidden()) {
 							repaintPebble(currentPebble);
@@ -168,7 +168,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		addMouseMotionListener( new MouseMotionAdapter() {
 			public void mouseDragged(MouseEvent e) {
 				if(userCanClick) {
-					if(leftButtonClicked) {
+					if(leftButtonDown) {
 						int currentX = e.getX();
 						int currentY = e.getY();
 

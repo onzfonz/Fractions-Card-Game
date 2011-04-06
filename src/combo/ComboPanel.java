@@ -53,7 +53,7 @@ public class ComboPanel extends JPanel{
 	private ArrayList<ComboListener> listeners;
 	private ChooseComboCardPanel combo;
 	private int cpOption = -1;
-	private boolean leftButtonClicked;
+	private boolean leftButtonDown;
 
 	/* Need to have a good shake pebble method
 	 * that will have the pebbles randomly move in their locations
@@ -70,23 +70,23 @@ public class ComboPanel extends JPanel{
 		listeners = new ArrayList<ComboListener>();
 		chooseX = 0;
 		chooseY = 0;
-		leftButtonClicked = false;
+		leftButtonDown = false;
 		setLayout(new BorderLayout());
 
 		setPreferredSize(new Dimension(Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT));
 
 		addMouseListener( new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
-				leftButtonClicked = true;
 				if(e.getButton() == Constants.LEFT_MOUSE_BTN) {
+					leftButtonDown = true;
 					origX = e.getX();
 					origY = e.getY();
 				}
 			}
 
 			public void mouseReleased(MouseEvent e) {
-				leftButtonClicked = false;
 				if(e.getButton() == Constants.LEFT_MOUSE_BTN) { 
+					leftButtonDown = false;
 					int lastX = e.getX();
 					int lastY = e.getY();
 
@@ -118,7 +118,7 @@ public class ComboPanel extends JPanel{
 			}
 
 			public void mouseDragged(MouseEvent e) {
-				if(leftButtonClicked) {
+				if(leftButtonDown) {
 					int lastX = e.getX();
 					int lastY = e.getY();
 
