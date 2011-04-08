@@ -93,6 +93,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	private Semaphore timeToDrawPebs;
 	private RandomGenerator rgen;
 	private boolean firstPlayerTurn;
+	private boolean manipPlayerTurn;
 	private String title;
 	private boolean leftButtonDown;
 
@@ -112,6 +113,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		rgen = RandomGenerator.getInstance();
 
 		firstPlayerTurn = rgen.nextBoolean();
+		manipPlayerTurn = rgen.nextBoolean();
 		leftButtonDown = false;
 		resetPanel();
 		addStatusBox();
@@ -650,9 +652,9 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			int x = calculateXCoord(d, i, numCards, cv); 
 
 			if(isPlayer) {
-				cv.setLocation(x, (int) (d.getHeight()-h));
+				cv.setLocation(x, (int) (d.getHeight()-h) + initialYCoord());
 			}else{
-				cv.setLocation(x, 0/*(int)-h/2*/);
+				cv.setLocation(x, initialYCoord()/*(int)-h/2*/);
 			}
 			//Debug.println(cv.getX() + ", " + cv.getY());
 		}
@@ -717,7 +719,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			CardView cv = dHand.get(j);
 			double h = cv.getHeight();
 			int x = calculateXCoord(d, pos, playersDecks, cv);
-			int y = (int) (j*Math.max(PLAYDECK_OFFSET, Math.min(h*(numCards-1), d.getHeight()-h))/(numCards-1));
+			int y = (int) (j*Math.max(PLAYDECK_OFFSET, Math.min(h*(numCards-1), d.getHeight()-h))/(numCards-1))+initialYCoord();
 			y += oppoTrickHeight();
 			if(dv.getPlayer().isHuman()) {
 				//y = y + (int) d.getHeight();
@@ -725,6 +727,11 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			}
 			cv.setLocation(x, y);
 		}
+	}
+	
+	private int initialYCoord() {
+		return 0;
+//		return (int) (statusBox.getPreferredSize().getHeight());
 	}
 
 	private int calculateXCoord(Dimension d, int pos, int numObjects, CardView cv) {
@@ -1041,6 +1048,10 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		numRadiosInPlay = numRadios;
 		if(numRadiosInPlay > 0) {
 			p.playARadio(deckUsed);
+		}else{
+			if(deckUsed != null) {  //check is here since there could be times when opponent hasn't use the radio.
+				launchPebbleBagView(deckUsed);
+			}
 		}
 		deckUsed = null;
 	}
@@ -1091,7 +1102,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		TeammateCard tc = (TeammateCard) dv.getTeammateCard().getCard();
 		if(tc.isShadowPlayer()) {
 			//dv.showLabel(false);
-			launchManipWindow(parsePlayerName() + ", " + tc.getDescription(), dv, null);
+			launchManipWindow(parsePlayerManipName() + ", " + tc.getDescription(), dv, null);
 		}
 	}
 
@@ -1122,7 +1133,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			n = JOptionPane.showOptionDialog(this, message, "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, oneRadioOptions, oneRadioOptions[1]);
 		}
 		numRadiosInPlay = Math.min(n, p.numRadiosInHand());
-		if(n > 0) {
+		if(n > 0 && n != JOptionPane.CLOSED_OPTION) {
 			p.playARadio(dv);
 		}else{
 			launchPebbleBagView(dv);
@@ -1182,13 +1193,14 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	}
 
 	private String generateQuestionString(PlayDeck pd, CardView cv, boolean shouldCalcAllCards) {
-		return parsePlayerName() + ", " + pd.generateQuestion((TrickCard) cv.getCard(), shouldCalcAllCards);
+		return parsePlayerManipName() + ", " + pd.generateQuestion((TrickCard) cv.getCard(), shouldCalcAllCards);
 	}
 
 	private void launchManipWindow(String question, DeckView dv, CardView cv) {
 		if(Constants.ASK_USERS_FRACTION_QS) {
 			disableUser();
 			//Need to setup a Timer here;
+			manipPlayerTurn = !manipPlayerTurn;
 			status.setText(Constants.STATUS_CALC_FRACTION);
 			ManFrameLauncher mfl = new ManFrameLauncher(this, question, manWindows, dv, cv);
 			Timer t = new Timer(0, mfl);
@@ -1271,12 +1283,20 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 
 	private String decideTurn(boolean ourTurn) {
 		if(!ourTurn) {
-			return Constants.STATUS_OPPO_TURN + Constants.SENTENCE_SEP + parsePlayerName() + ", you will be up soon.";
+			return Constants.STATUS_OPPO_TURN + Constants.SENTENCE_SEP + parsePlayerTurnName() + ", you will be up soon.";
 		}
-		return parsePlayerName() + "'s" + Constants.STATUS_TURN;
+		return parsePlayerTurnName() + "'s" + Constants.STATUS_TURN;
 	}
 
-	public String parsePlayerName() {
+	public String parsePlayerTurnName() {
+		return parsePlayerTurn(firstPlayerTurn);
+	}
+	
+	public String parsePlayerManipName() {
+		return parsePlayerTurn(manipPlayerTurn);
+	}
+	
+	private String parsePlayerTurn(boolean turn) {
 		if(title == null || title.equals("")) {
 			return "Your ";
 		}
@@ -1284,7 +1304,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		if(andIndex == -1) {
 			return title;
 		}
-		if(firstPlayerTurn) {
+		if(turn) {
 			return title.substring(0, andIndex - 1);
 		}
 		return title.substring(andIndex + 2);
@@ -1452,6 +1472,12 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			}
 		}
 	}
+	
+	@Override public Dimension getPreferredSize() {
+		Dimension d = super.getPreferredSize();
+//		d.setSize(d.getWidth(), d.getHeight()-statusBox.getPreferredSize().getHeight());
+		return d;
+	}
 
 	private void recomputeAllByForce(Dimension d) {
 		setPreferredSize(d);
@@ -1592,6 +1618,10 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 
 	public void titleUpdated(String s) {
 		title = s;
+	}
+	
+	public String getTitle() {
+		return title;
 	}
 
 	public PanelListener getPanelListener() {

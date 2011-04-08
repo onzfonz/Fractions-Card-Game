@@ -78,9 +78,6 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		//setTitle(Constants.WINDOW_TITLE);
 		manipWindow = null;
 		myFrame = this;
-		controls = new ArrayList<JComponent>();
-		cardPanelNames = new ArrayList<String>();
-		cardMapping = new HashMap<String, ManCardPanel>();
 		netRep = nRep;
 		//if (file != null) boardPanel.open(file);
 		setLayout(new BorderLayout());
@@ -88,7 +85,12 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		toolbox.setLayout(new BoxLayout(toolbox, BoxLayout.Y_AXIS));
 		toolbox.setBackground(Constants.TOOLBOX_BACKGROUND);
 		add(toolbox, BorderLayout.WEST);
-
+		
+		manCardPanel = new ManCardPanel();
+		controls = new ArrayList<JComponent>();
+		gameArea = new JPanel(new CardLayout());
+		resetPanel(false);
+		
 		/*
 		 Create the checkboxes and wire them to setters
 		 on the ManPanel for each boolean feature.
@@ -329,15 +331,34 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		for(int i = 0; i < 3; i++) {
 			toolbox.add(Box.createVerticalGlue());	
 		}
-
-		gameArea = new JPanel(new CardLayout());
-		manCardPanel = new ManCardPanel();
-		gamePanel = new GamePanel(Constants.PANEL_WIDTH, Constants.PANEL_HEIGHT, this, nRep);
+		
+		add(gameArea, BorderLayout.CENTER);
+	}
+	
+	public void resetPanel(boolean isReset) {
+		String title = "";
+		if(isReset) {
+			gameArea.removeAll();
+			title = gamePanel.getTitle();
+		}
+		gamePanel = new GamePanel(Constants.PANEL_WIDTH, Constants.PANEL_HEIGHT, this, netRep);
 		manCardPanel.addManListener(gamePanel);
+		
+		if(isReset) {
+			cardMapping.clear();
+			cardPanelNames.clear();
+			gamePanel.titleUpdated(title);
+		}else{
+			cardPanelNames = new ArrayList<String>();
+			cardMapping = new HashMap<String, ManCardPanel>();
+		}
+		
+		if(!isReset) {
+			gameArea = new JPanel(new CardLayout());
+		}
 		currentLayout = GAME_PANEL;
 		addLayout(gamePanel, GAME_PANEL);
 		addLayout(manCardPanel, MANIP_PANEL);
-		add(gameArea, BorderLayout.CENTER);
 	}
 
 	public void beginGame() {
@@ -461,7 +482,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	}
 
 	private void handleWinScenario(int option) {
-		if(option == 0) {
+		if(option == JOptionPane.YES_OPTION || option == JOptionPane.CLOSED_OPTION) {
 			gamePanel.startGame(!Constants.NETWORK_MODE);
 		}else{
 			System.exit(0);
@@ -474,7 +495,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		if(option == 1) {
 			calculateScore();
 			NetHelper.sendNetCalc(netRep);
-		}else if(option == 0) {
+		}else if(option == 0 || option == JOptionPane.CLOSED_OPTION) {
 			forceUserTurn(true);
 		}
 	}
@@ -685,6 +706,10 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		removeLayout(mPanel, name);
 		cardMapping.remove(name);
 		//TODO: fix but where it is not showing that it is there. string is not the same
+		return switchToGameOrManipPanel();
+	}
+	
+	private boolean switchToGameOrManipPanel() {
 		if(cardPanelNames.size() > 2) {
 			switchToAskManipLayout();
 		}else{
@@ -706,7 +731,8 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	}
 	
 	public boolean iceViewDone(IceCreamTruckView iPanel) {
-		return panelViewDone(iPanel, ICE_NAME);
+		panelViewDone(iPanel, ICE_NAME);
+		return switchToGameOrManipPanel();
 	}
 	
 	private void panelViewCreated(JPanel p, String name) {

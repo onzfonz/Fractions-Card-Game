@@ -33,6 +33,7 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 import basic.Constants;
+import extras.CardGameUtils;
 import extras.Debug;
 import extras.RandomGenerator;
 
@@ -189,7 +190,9 @@ public class ManPanel extends JPanel  {
 
 			private void leftRelease(MouseEvent e) {
 				if (lastDot == null && newLine == null) {	// make a dot if nothing there
-					doAdd(e.getX(), e.getY());
+					int curX = CardGameUtils.keepInBoundary(e.getX(), Constants.MAN_WIDTH, 0, getWidth());
+					int curY = CardGameUtils.keepInBoundary(e.getY(), Constants.MAN_HEIGHT, 0, getHeight());
+					doAdd(curX, curY);
 				}
 			}
 
@@ -243,10 +246,14 @@ public class ManPanel extends JPanel  {
 
 				if (lastDot != null) {
 					// compute delta from last point
-					int dx = e.getX()-lastX;
-					int dy = e.getY()-lastY;
-					lastX = e.getX();
-					lastY = e.getY();
+					int curX = e.getX();
+					int curY = e.getY();
+					curX = CardGameUtils.keepInBoundary(curX, Constants.MAN_WIDTH, 0, getWidth());
+					curY = CardGameUtils.keepInBoundary(curY, Constants.MAN_HEIGHT, 0, getHeight());
+					int dx = curX-lastX;
+					int dy = curY-lastY;
+					lastX = curX;
+					lastY = curY;
 
 					// apply the delta to that dot model
 					doMove(lastDot, dx, dy);

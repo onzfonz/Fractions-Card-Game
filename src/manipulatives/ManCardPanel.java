@@ -126,7 +126,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		listeners = new ArrayList<ManListener>();
 		controls = new ArrayList<JComponent>();
 		userCanEdit = true;
-		manPanel = new ManPanel(800, 600, this);
+		manPanel = new ManPanel(800, 550, this);
 		manPanel.setToolTipText(Constants.TIP_MANIP_AREA);
 		controls.add(manPanel);
 		if (file != null) manPanel.open(file);
@@ -143,9 +143,6 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		JPanel statusBox = new JPanel();
 		statusBox.setLayout(new BoxLayout(statusBox, BoxLayout.X_AXIS));
 		manBox.add(statusBox, BorderLayout.SOUTH);
-
-		JLabel addLabel = new JLabel("Add this many men");
-		statusBox.add(addLabel);
 
 		questionBox = new JPanel();
 		questionBox.setLayout(new BoxLayout(questionBox, BoxLayout.X_AXIS));
@@ -203,27 +200,10 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 			}
 		});
 		add(questionBox, BorderLayout.NORTH);
-		statusBox.setVisible(Constants.DEBUG_MODE);
-		final JTextField addMany = new JTextField("");
+		JLabel addMany = new JLabel(new ImageIcon(CardGameUtils.getCardImageViaFilename("numberline-825.png")));
+		statusBox.setBackground(Color.WHITE);
 		statusBox.add(addMany);
 		controls.add(addMany);
-
-		JButton addButton = new JButton("Add to Screen");
-		statusBox.add(addButton);
-		controls.add(addButton);
-		addButton.addActionListener( new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int numMen = 0;
-				try {
-					numMen = Integer.parseInt(addMany.getText());
-				}catch(NumberFormatException ne) {
-					ne.printStackTrace();
-				}
-				for(int i = 0; i < numMen; i++) {
-					manPanel.doAdd(rgen.nextInt(Constants.MAN_WIDTH/2, manPanel.getWidth()-Constants.MAN_WIDTH/2), rgen.nextInt(Constants.MAN_HEIGHT/2, manPanel.getHeight()-Constants.MAN_HEIGHT/2));
-				}
-			}
-		});
 
 		//		JButton shufButton = new JButton("Shuffle Objects");
 		//		box.add(shufButton);

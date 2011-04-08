@@ -110,7 +110,7 @@ public class IceCreamTruckView extends JPanel implements PebblePanelListener {
 //			}
 //		});
 		
-		pPanel = new PebblePanel(dv, 400, 600, !dv.getPlayer().isHuman(), this, nRep, this, p);
+		pPanel = new PebblePanel(dv, 1000, 600, !dv.getPlayer().isHuman(), this, nRep, this, p);
 		netRep = nRep;
 		
 		manBox.add(pPanel, BorderLayout.CENTER);

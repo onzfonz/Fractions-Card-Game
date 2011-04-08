@@ -114,7 +114,7 @@ public class Constants {
 	public static final int LINE_MODE = 0;
 	public static final int PPL_MODE = -1;
 	public static final int LEFT_MOUSE_BTN = MouseEvent.BUTTON1;
-	public static final int PANEL_WIDTH = 1175;
+	public static final int PANEL_WIDTH = 1200;
 	public static final int PANEL_HEIGHT = 700;
 	public static final int SOCKET_PORT = 1604;
 	public static final String SERVER_IP = "128.12.200.60";

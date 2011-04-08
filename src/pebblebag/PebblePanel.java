@@ -41,6 +41,7 @@ import cards.TeammateCard;
 import cards.TrickCard;
 import deck.DeckView;
 import deck.PlayDeck;
+import extras.CardGameUtils;
 import extras.Debug;
 import extras.RandomGenerator;
 
@@ -171,8 +172,11 @@ public class PebblePanel extends JPanel implements PebbleListener {
 					if(leftButtonDown) {
 						int currentX = e.getX();
 						int currentY = e.getY();
-
-						if(getCurrentPebbleBag().bagNeedsShaking()) {
+						
+						boolean isBag = getCurrentPebbleBag().bagNeedsShaking();
+						currentX = keepObjectInXBoundary(currentX, isBag);
+						currentY = keepObjectInYBoundary(currentY, isBag);
+						if(isBag) {
 							shakeTheBag(currentX, currentY);
 						}else if(currentPebble != null) {
 							movePebble(currentX, currentY);
@@ -185,6 +189,22 @@ public class PebblePanel extends JPanel implements PebbleListener {
 				}
 			}
 		});
+	}
+	
+	private int keepObjectInXBoundary(int xCoord, boolean isBag) {
+		int size = Constants.PEBBLE_SIZE;
+		if(isBag) {
+			size = Constants.PEBBLE_BAG_SIZE/2;
+		}
+		return CardGameUtils.keepInBoundary(xCoord, size, 0, getWidth());
+	}
+	
+	private int keepObjectInYBoundary(int yCoord, boolean isBag) {
+		int size = Constants.PEBBLE_SIZE;
+		if(isBag) {
+			size = Constants.PEBBLE_BAG_SIZE/2;
+		}
+		return CardGameUtils.keepInBoundary(yCoord, size, 0, getHeight()-statusLine1.getHeight()-statusLine2.getHeight());
 	}
 
 	public int numPlays() {
@@ -364,6 +384,8 @@ public class PebblePanel extends JPanel implements PebbleListener {
 	public void compShakeBag() {
 		chooseX = chooseX + rgen.nextInt(-1, 1)*20;
 		chooseY = chooseY + rgen.nextInt(-1, 1)*20;
+		chooseX = keepObjectInXBoundary(chooseX, true);
+		chooseY = keepObjectInYBoundary(chooseY, true);
 		shakeTheBag(chooseX, chooseY);
 		lastX = chooseX;
 		lastY = chooseY;

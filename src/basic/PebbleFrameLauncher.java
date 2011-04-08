@@ -48,7 +48,7 @@ public class PebbleFrameLauncher implements ActionListener {
 	}
 	
 	private void completelyFinishTimer() {
-		IceCreamTruckView pebWindow = new IceCreamTruckView(view, netRep, gPanel.parsePlayerName());
+		IceCreamTruckView pebWindow = new IceCreamTruckView(view, netRep, gPanel.parsePlayerTurnName());
 		pebWindow.addBagListener(gPanel);
 		gPanel.setPebbleWindow(pebWindow);
 		gPanel.iceCreamTruckViewStarted(pebWindow);

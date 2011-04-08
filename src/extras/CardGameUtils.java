@@ -17,6 +17,10 @@ public class CardGameUtils {
 		}
 	}
 	
+	public static BufferedImage getCardImageViaFilename(String fname) {
+		return getCardImage(Constants.IMG_PATH + fname);
+	}
+	
 	public static BufferedImage getCardImage(String path) {
 		BufferedImage img = null;
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -28,5 +32,14 @@ public class CardGameUtils {
 			e.printStackTrace();
 		}
 		return img;
+	}
+	
+	public static int keepInBoundary(int coord, int size, int min, int max) {
+		if(coord < (min + size/2)) {
+			return min + size/2;
+		}else if(coord > (max - size/2)) {
+			return max - size/2;
+		}
+		return coord;
 	}
 }

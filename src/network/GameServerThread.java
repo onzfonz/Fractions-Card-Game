@@ -132,5 +132,6 @@ public class GameServerThread extends Thread {
 
 	public void sendToClient(String msg) {
 		out.println(msg);
+		System.out.println(sgp.getName() + " sent to other " + msg);
 	}
 }
