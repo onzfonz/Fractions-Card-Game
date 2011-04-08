@@ -190,11 +190,16 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 	private Socket getSocketMethod(int timesAttempted) throws IOException {
 		String input;
 		int ind;
+		if(Constants.DEBUG_MODE && timesAttempted == 0) {
+			return new Socket(Constants.LOCALHOST, Constants.SOCKET_PORT);
+		}
 		String[] ipAddrs = { Constants.LOCAL_SERVER_IP2, Constants.SERVER_IP, Constants.SERVER_ADDR, Constants.SERVER_IP_STANFORD, Constants.LOCALHOST};
 		switch(timesAttempted) {
 			case 0: return new Socket(Constants.LOCAL_SERVER_IP, Constants.SOCKET_PORT);
 			case 1: ind = JOptionPane.showOptionDialog(this, "Please pick the server location", "IP", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, ipAddrs, Constants.LOCAL_SERVER_IP2);
-			input = ipAddrs[ind]; break;
+			if(ind != JOptionPane.CLOSED_OPTION) {
+				input = ipAddrs[ind]; break;
+			}
 			case 2: input = JOptionPane.showInputDialog("The IP address you chose is not working!  Please enter an IP address for the server");
 			break;
 			default: return null;
@@ -265,6 +270,7 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 			sendToServer(Constants.NET_CMD_READY_TO_START);
 		} else if(fromServer.startsWith(Constants.NET_CMD_QUIT)) {
 			lobbyLabel.setText("We lost the connection with " + name);
+			game.resetPanel(true);
 			moveToLobby();
 			//more lobby stuff or restart lobby make it show up again
 		} else if(fromServer.startsWith(Constants.NET_CMD_PLAY)) {
