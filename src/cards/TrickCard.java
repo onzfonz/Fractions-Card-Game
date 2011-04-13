@@ -141,6 +141,27 @@ public class TrickCard extends Card {
 		
 	}
 	
+	private String readableType() {
+		if(isStink()) {
+			return "Stink Bomb";
+		}else if(isAir()) {
+			return "Air Freshener";
+		}else if(isRadio()) {
+			return "Radio";
+		}else if(isIceCream()) {
+			return "Ice Cream Truck";
+		}
+		return "Unknown Card";
+	}
+	
+	public String toReadableText() {
+		String prefix = "";
+		if(isStink() || isAir()) {
+			prefix = toFraction() + " ";
+		}
+		return prefix + readableType();
+	}
+	
 	public String toStream() {
 		return trickType + ", " + imgName + ", " + num + ", " + den;
 	}

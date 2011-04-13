@@ -31,6 +31,10 @@ public class TeammateCard extends Card {
 		}
 	}
 	
+	public String toReadableText() {
+		return toString();
+	}
+	
 	public String toStream() {
 		return name + ", " + description + ", " + imgName + ", " + value;
 	}

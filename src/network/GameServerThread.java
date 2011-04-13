@@ -73,6 +73,10 @@ public class GameServerThread extends Thread {
 
 	public void relayClientCommand(String message) {
 		String oppoName = serverPairs.get(sgp.getName());
+		if(oppoName.equals(message)) {
+			System.out.println(message + " and oppoName are the same.  Most likely person clicked to start playing the game when they shouldn't have");
+			return;
+		}
 		GameServerThread otherT = allSocks.get(oppoName);
 		otherT.sendCommandToClient(message);
 	}
@@ -132,6 +136,6 @@ public class GameServerThread extends Thread {
 
 	public void sendToClient(String msg) {
 		out.println(msg);
-		System.out.println(sgp.getName() + " sent to other " + msg);
+		System.out.println(sgp.getName() + " will be sent: " + msg);
 	}
 }

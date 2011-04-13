@@ -464,6 +464,10 @@ public class CardView {
 	public String toString() {
 		return card.toString();
 	}
+	
+	public String toReadableText() {
+		return card.toReadableText();
+	}
 
 	/* containers are commented out since we cannot simple make a JComponent that has a cardView
 	 * CardViews are no longer JComponents.

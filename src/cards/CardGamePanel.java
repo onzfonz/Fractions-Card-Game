@@ -67,13 +67,13 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	private JButton manipButton;
 	private JComboBox sliderOption;
 	private JPanel toolbox;
-	
+
 	private static final String GAME_PANEL = "Game Panel";
 	private static final String MANIP_PANEL = "Manip Panel";
 	private static final String MANIP_CALC_PANEL = "Manip Calc";
 	private static final String COMBO_NAME = "Combo View";
 	private static final String ICE_NAME = "Ice Cream Truck View";
-	
+
 	public CardGamePanel(NetDelegate nRep) {
 		//setTitle(Constants.WINDOW_TITLE);
 		manipWindow = null;
@@ -85,12 +85,12 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		toolbox.setLayout(new BoxLayout(toolbox, BoxLayout.Y_AXIS));
 		toolbox.setBackground(Constants.TOOLBOX_BACKGROUND);
 		add(toolbox, BorderLayout.WEST);
-		
+
 		manCardPanel = new ManCardPanel();
 		controls = new ArrayList<JComponent>();
 		gameArea = new JPanel(new CardLayout());
 		resetPanel(false);
-		
+
 		/*
 		 Create the checkboxes and wire them to setters
 		 on the ManPanel for each boolean feature.
@@ -149,7 +149,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		manipButton.setToolTipText(Constants.TIP_MANIP);
 		manipButton.setFont(Constants.FONT_TINY);
 		manipButton.setVisible(Constants.HAVE_MANIP_BUTTON);
-			//controls.add(newRound);
+		//controls.add(newRound);
 		toolbox.add(manipButton);
 		manipButton.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -218,7 +218,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 				gamePanel.setTrickHandToAirs(true);
 			}
 		});
-		
+
 		final JLabel redLabel = createDebugLabel(toolbox, "r");
 		final JSlider redSlider = createDebugSlider(toolbox, "Red", 0, 255, 128);
 		redSlider.addChangeListener( new ChangeListener() {
@@ -260,7 +260,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 				blueLabel.setText("" + blueSlider.getValue());
 			}
 		});
-		
+
 		String[] colorOpts = {"Left", "Game", "Status-Back", "Status-Fore"};
 		sliderOption = new JComboBox(colorOpts);
 		sliderOption.setVisible(Constants.DEBUG_MODE);
@@ -331,10 +331,10 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		for(int i = 0; i < 3; i++) {
 			toolbox.add(Box.createVerticalGlue());	
 		}
-		
+
 		add(gameArea, BorderLayout.CENTER);
 	}
-	
+
 	public void resetPanel(boolean isReset) {
 		String title = "";
 		if(isReset) {
@@ -343,7 +343,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		}
 		gamePanel = new GamePanel(Constants.PANEL_WIDTH, Constants.PANEL_HEIGHT, this, netRep);
 		manCardPanel.addManListener(gamePanel);
-		
+
 		if(isReset) {
 			cardMapping.clear();
 			cardPanelNames.clear();
@@ -352,7 +352,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			cardPanelNames = new ArrayList<String>();
 			cardMapping = new HashMap<String, ManCardPanel>();
 		}
-		
+
 		if(!isReset) {
 			gameArea = new JPanel(new CardLayout());
 		}
@@ -386,7 +386,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			jc.setEnabled(enabled);
 		}
 	}
-	
+
 	public JLabel createDebugLabel(JPanel b, String label) {
 		JLabel l = new JLabel(label);
 		l.setVisible(Constants.DEBUG_MODE);
@@ -537,10 +537,10 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		boolean shouldClear = command.contains(Constants.CMD_PART_CLEAR);
 		decideCommand(command, rest, isForSelf, shouldClear);
 	}
-	
+
 	private boolean isGamePanelCommand(String command) {
 		return !(command.equals(Constants.CMD_SHAKED) ||
-			command.equals(Constants.CMD_CHIP));
+				command.equals(Constants.CMD_CHIP));
 	}
 
 	private void decideCommand(String command, String rest, boolean isForSelf, boolean shouldClear) {
@@ -597,13 +597,8 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		gamePanel.handleNetworkMove(cardIndex, deckIndex);
 	}
 
-	public static final String CARD_DELIMITER = "_";
-
 	private void parseHand(String s, boolean isPlayer) {
-		s = StringUtils.within(s, Constants.CMD_ARG_START, Constants.CMD_ARG_END);
-		Debug.println(s);
-		ArrayList<String> ts = new ArrayList<String>(Arrays.asList(s.split(CARD_DELIMITER)));
-		Debug.println(ts);
+		ArrayList<String> ts = generateCardStrings(s);
 		if(ts.size() > 1) {
 			gamePanel.addTricksToHand(ts, isPlayer);
 		}else{
@@ -621,13 +616,17 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	}
 
 	private void parseTeam(String s, boolean isPlayer) {
-		s = StringUtils.within(s, "{", "}");
-		ArrayList<String> ts = new ArrayList<String>(Arrays.asList(s.split(CARD_DELIMITER)));
+		ArrayList<String> ts = generateCardStrings(s);
 		if(ts.size() > 1) {
 			gamePanel.addTeamsToHand(ts, isPlayer);
 		}else{
 			gamePanel.addTeamToHand(ts.get(0), isPlayer);
 		}
+	}
+	
+	private ArrayList<String> generateCardStrings(String s) {
+		s = StringUtils.within(s, Constants.CMD_ARG_START, Constants.CMD_ARG_END);
+		return new ArrayList<String>(Arrays.asList(s.split(Constants.CMD_CARD_DELIMITER)));
 	}
 
 	public void titleUpdated(String title) {
@@ -637,21 +636,21 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	public void setChipObserver(PebbleListener l) {
 		chipObserver = l;
 	}
-	
+
 	private void switchToLayout(String layoutName) {
-    	CardLayout cl = (CardLayout) gameArea.getLayout();
-    	cl.show(gameArea, layoutName);
-    	currentLayout = layoutName;
-    	repaint();
-    }
-	
+		CardLayout cl = (CardLayout) gameArea.getLayout();
+		cl.show(gameArea, layoutName);
+		currentLayout = layoutName;
+		repaint();
+	}
+
 	private void switchToAskManipLayout() {
 		String name = cardPanelNames.get(2);
 		switchToLayout(name);
 		ManCardPanel mcp = cardMapping.get(name);
 		mcp.askForFocus();
 	}
-	
+
 	private boolean addLayout(JPanel layout, String name) {
 		if(cardPanelNames.contains(name)) {
 			return false;
@@ -660,13 +659,13 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		cardPanelNames.add(name);
 		return true;
 	}
-	
+
 	private void removeLayout(JPanel mPanel, String name) {
 		assert(cardPanelNames.contains(name));
 		gameArea.remove(mPanel);
 		cardPanelNames.remove(name);
 	}
-	
+
 	private void toggleManipLayout() {
 		if(!currentLayout.equals(GAME_PANEL)) {
 			switchToLayout(GAME_PANEL);
@@ -674,15 +673,15 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			switchToLayout(MANIP_PANEL);
 		}
 	}
-	
+
 	private void showGameLayout() {
 		switchToLayout(GAME_PANEL);
 		manipButton.setEnabled(true);
 	}
-	
+
 	private boolean inLayout(String layoutName) {
-    	return currentLayout.equalsIgnoreCase(layoutName);
-    }
+		return currentLayout.equalsIgnoreCase(layoutName);
+	}
 
 	public void keyReleased(KeyEvent arg0) {
 
@@ -708,7 +707,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		//TODO: fix but where it is not showing that it is there. string is not the same
 		return switchToGameOrManipPanel();
 	}
-	
+
 	private boolean switchToGameOrManipPanel() {
 		if(cardPanelNames.size() > 2) {
 			switchToAskManipLayout();
@@ -717,30 +716,30 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		}
 		return cardPanelNames.size() <= 2;
 	}
-	
+
 	public void comboViewCreated(ChooseComboCardPanel cPanel) {
 		panelViewCreated(cPanel, COMBO_NAME);
 	}
-	
+
 	public boolean comboViewDone(ChooseComboCardPanel cPanel) {
 		return panelViewDone(cPanel, COMBO_NAME);
 	}
-	
+
 	public void iceViewCreated(IceCreamTruckView iPanel) {
 		panelViewCreated(iPanel, ICE_NAME);
 	}
-	
+
 	public boolean iceViewDone(IceCreamTruckView iPanel) {
 		panelViewDone(iPanel, ICE_NAME);
 		return switchToGameOrManipPanel();
 	}
-	
+
 	private void panelViewCreated(JPanel p, String name) {
 		addLayout(p, name);
 		manipButton.setEnabled(false);
 		switchToLayout(name);		
 	}
-	
+
 	private boolean panelViewDone(JPanel p, String name) {
 		removeLayout(p, name);
 		showGameLayout();
@@ -751,7 +750,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		// TODO Auto-generated method stub
 		toggleManipLayout();
 	}
-		
+
 	private Color getSliderColor() {
 		int opt = sliderOption.getSelectedIndex();
 		switch(opt) {
@@ -762,7 +761,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		}
 		return null;
 	}
-	
+
 	private void setSliderColor(Color c) {
 		int opt = sliderOption.getSelectedIndex();
 		switch(opt) {

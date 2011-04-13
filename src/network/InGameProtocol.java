@@ -83,15 +83,6 @@ public class InGameProtocol {
 		}
 	}
 	
-	private void dealTricksToThread(String name, List<String> names) {
-		String cmd = Constants.CMD_ADD_TRICK;
-		for(int i = 0; i < Constants.TRICK_HAND_SIZE; i++) {
-			String card = dealer.dealTrickCard();
-			dealCardToClient(name, card, cmd, true);
-			notifyOthersOfCardAdded(names, name, cmd, card);
-		}
-	}
-	
 	private void dealCardToClient(String name, String card, String command, boolean myHand) {
 		GameServerThread t = allSocks.get(name);
 		String preCmd = Constants.CMD_PART_OPPO;
@@ -99,11 +90,6 @@ public class InGameProtocol {
 			preCmd = Constants.CMD_PART_ME;
 		}
 		t.sendCommandToClient(preCmd + command + Constants.CMD_SEP_ARG + card + Constants.CMD_ARG_END);
-	}
-	
-	private void dealMessageToClient(String name, String command) {
-		GameServerThread t = allSocks.get(name);
-		t.sendCommandToClient(command);
 	}
 	
 	private void notifyOthersOfCardAdded(List<String> names, String name, String command, String card) {
@@ -123,6 +109,11 @@ public class InGameProtocol {
 		}
 	}
 	
+	private void dealMessageToClient(String name, String command) {
+		GameServerThread t = allSocks.get(name);
+		t.sendCommandToClient(command);
+	}
+	
 	private void dealTeamsToThreads(List<String> names) {
 		for(String n:names) {
 			dealTeamsToThread(n, names);
@@ -131,11 +122,28 @@ public class InGameProtocol {
 	
 	private void dealTeamsToThread(String name, List<String> names) {
 		String cmd = Constants.CMD_ADD_TEAM;
+		String card = "";
 		for(int i = 0; i < Constants.TEAM_HAND_SIZE; i++) { 
-			String card = dealer.dealTeammateCard();
-			dealCardToClient(name, card, cmd, true);
-			notifyOthersOfCardAdded(names, name, cmd, card);
+			if(i > 0) {
+				card += Constants.CMD_CARD_DELIMITER;
+			}
+			card += dealer.dealTeammateCard();
 		}
+		dealCardToClient(name, card, cmd, true);
+		notifyOthersOfCardAdded(names, name, cmd, card);
+	}
+	
+	private void dealTricksToThread(String name, List<String> names) {
+		String cmd = Constants.CMD_ADD_TRICK;
+		String card = "";
+		for(int i = 0; i < Constants.TRICK_HAND_SIZE; i++) {
+			if(i > 0) {
+				card += Constants.CMD_CARD_DELIMITER;
+			}
+			card += dealer.dealTrickCard();
+		}
+		dealCardToClient(name, card, cmd, true);
+		notifyOthersOfCardAdded(names, name, cmd, card);
 	}
 	
 	private List<GameServerThread> getPlayerThreads() {
@@ -145,11 +153,11 @@ public class InGameProtocol {
 		return threads;
 	}
 
-	/* I might not even need this */
-	public String processInput(String name, String theInput) {
-		notifyOthersOfMessage(name, theInput);
-		return "successfully told everyone about " + name + "'s move";
-	}
+//	/* I might not even need this */
+//	public String processInput(String name, String theInput) {
+//		notifyOthersOfMessage(name, theInput);
+//		return "successfully told everyone about " + name + "'s move";
+//	}
 
 	public String getName() {
 		return oneName;

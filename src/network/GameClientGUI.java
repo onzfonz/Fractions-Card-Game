@@ -372,7 +372,7 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 	public void sendCommand(String cmd, String args) {
 		String msg = cmd + Constants.CMD_SEP + args;
 		Debug.println("Sending: " + msg);
-		out.println(msg);
+		sendToServer(msg);
 	}
 
 	public void sendShakedCommand(String cmd, String args, PebbleListener l) {

@@ -52,4 +52,6 @@ public abstract class Card implements Transferable{
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	
+	public abstract String toReadableText();
 }

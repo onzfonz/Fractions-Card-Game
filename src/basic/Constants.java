@@ -157,21 +157,21 @@ public class Constants {
 	public static final String CORRECT = "Correct!" + SENTENCE_SEP;
 	
 	//Error messages
-	public static final String ERROR_PLACING_RADIO = "You need to have an "+Constants.ICE_CREAM_NAME+" card on this deck to use a Radio card.";
+	public static final String ERROR_PLACING_RADIO = "There needs to be an "+Constants.ICE_CREAM_NAME+" card first.";
 	public static final String ERROR_INPUT_NO_INT = "Please enter a whole number.";
 	public static final String ERROR_WRONG_ANSWER = "That is not the right answer." + SENTENCE_SEP;
 	public static final String ERROR_NO_GAME_YET = "Please click on New Game first.";
-	public static final String ERROR_HURTING_YOURSELF = "You would be hurting yourself!";
-	public static final String ERROR_PROTECT_OTHER = "You would be protecting your opponent!";
+	public static final String ERROR_HURTING_YOURSELF = "You'd be hurting yourself!";
+	public static final String ERROR_PROTECT_OTHER = "You'd be helping your opponent!";
 	public static final String ERROR_TRY_AGAIN = "Try again.";
 	public static final String ERROR_TRY_ONCE_MORE = "Please try again.";
 	public static final String ERROR_NOT_QUITE = "Not Quite!";
 	public static final String ERROR_NOT_AN_INTEGER = "Not an integer.";
-	public static final String ERROR_SORRY = "Sorry";
-	public static final String ERROR_CANT_PLACE_PREFIX = ERROR_SORRY + ", but you can't place the ";
+	public static final String ERROR_SORRY = "Oops!";
+	public static final String ERROR_CANT_PLACE_PREFIX = ERROR_SORRY + " You can't place a ";
 	public static final String ERROR_CANT_PLACE_ON = " on ";
 	public static final String ERROR_NOT_WHOLE_NUM = "It has to be evenly divisible.";
-	public static final String ERROR_NO_STINKERS_LEFT = "There needs to be stinky people left to use it.";
+	public static final String ERROR_NO_STINKERS_LEFT = "There needs to be stinky people to use it.";
 	public static final String ERROR_NO_STINK_CARDS = "There needs to be a stink bomb card first.";
 	public static final String ERROR_STINKS_LEFT_DIV = "Only the people that are not stinky count.";
 	
@@ -180,7 +180,7 @@ public class Constants {
 	public static final String INFO_PLAY_AGAIN = "Would you like to play again?";
 	public static final String INFO_NO_MOVES = "Your opponent has no more moves.  Would you like to proceed to the next round?";
 	public static final String INFO_START_GAME_HELP = "You've started a new game; to play one of your trick cards, drag it onto a teammate card.";
-	public static final String INFO_STARTING = "Starting up the game.  This may take a bit ok?";
+	public static final String INFO_STARTING = "Starting up the game.  This may take a bit, OK?";
 	
 	public static final String OPTION_WEST = "West";
 	public static final String OPTION_EAST = "East";
@@ -277,6 +277,8 @@ public class Constants {
 	public static final String CMD_SEP = ":";
 	public static final String CMD_MOVE_SEP = ";";
 	public static final String CMD_SEP_ARG = CMD_SEP + CMD_ARG_START;
+	public static final String CMD_CARD_DELIMITER = "_";
+
 	
 	//More network commands
 	public static final String NET_CMD_PRE = ".";
@@ -316,4 +318,5 @@ public class Constants {
 	public static boolean DEBUG_MODE = false;
 	public static boolean SHOW_COLOR_SLIDERS = DEBUG_MODE && false;
 	public static boolean NETWORK_MODE = true;
+	public static boolean SHOW_ME_HOW_ENABLED = false;
 }

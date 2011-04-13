@@ -228,7 +228,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		launchDemo = new JButton(Constants.BTN_MAN_HELP);
 		launchDemo.setToolTipText(Constants.TIP_SHOW);
 		launchDemo.setFont(Constants.FONT_SMALL);
-		launchDemo.setVisible(!isPlaying);
+		launchDemo.setVisible(!isPlaying && Constants.SHOW_ME_HOW_ENABLED);
 		box.add(launchDemo);
 		controls.add(launchDemo);
 		launchDemo.addActionListener( new ActionListener() {

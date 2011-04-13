@@ -1251,7 +1251,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 				suffix += dv.getPlayDeck().getErrorMsg();
 			}
 		}
-		String prefix = Constants.ERROR_CANT_PLACE_PREFIX + cv + Constants.ERROR_CANT_PLACE_ON + temp;
+		String prefix = Constants.ERROR_CANT_PLACE_PREFIX + cv.toReadableText() + Constants.ERROR_CANT_PLACE_ON + temp;
 		return prefix + suffix;
 	}
 
