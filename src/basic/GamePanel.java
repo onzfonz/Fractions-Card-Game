@@ -1202,7 +1202,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			//Need to setup a Timer here;
 			manipPlayerTurn = !manipPlayerTurn;
 			status.setText(Constants.STATUS_CALC_FRACTION);
-			ManFrameLauncher mfl = new ManFrameLauncher(this, question, manWindows, dv, cv);
+			ManFrameLauncher mfl = new ManFrameLauncher(this, question, manWindows, dv, cv, netRep);
 			Timer t = new Timer(0, mfl);
 			t.setInitialDelay(Constants.BETWEEN_GAME_PAUSE);
 			mfl.setTimer(t);

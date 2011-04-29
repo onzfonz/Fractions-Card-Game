@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import javax.swing.Timer;
 
 import manipulatives.ManCardPanel;
-import manipulatives.ManFrame;
+import network.NetDelegate;
 import cards.CardView;
 import deck.DeckView;
 import extras.Debug;
@@ -21,11 +21,12 @@ public class ManFrameLauncher implements ActionListener {
 	private Timer timer;
 	private DeckView view;
 	private CardView card;
+	private NetDelegate netRep;
 	
 	public static final int VELOCITY = 0;
 	public static final int MAX_MOVES = 0;
 	
-	public ManFrameLauncher(GamePanel gP, String q, ArrayList<ManCardPanel> manWindows, DeckView dv, CardView cv) {
+	public ManFrameLauncher(GamePanel gP, String q, ArrayList<ManCardPanel> manWindows, DeckView dv, CardView cv, NetDelegate nr) {
 		question = q;
 		frameList = manWindows;
 		frameList.add(null);
@@ -33,6 +34,7 @@ public class ManFrameLauncher implements ActionListener {
 		numTimesMoved = 0;
 		view = dv;
 		card = cv;
+		netRep = nr;
 	}
 	
 	public void setTimer(Timer t) {
@@ -57,7 +59,7 @@ public class ManFrameLauncher implements ActionListener {
 	}
 	
 	private void completelyFinishTimer() {
-		ManCardPanel manWindow = new ManCardPanel(question, view, card);
+		ManCardPanel manWindow = new ManCardPanel(question, view, card, netRep);
 		PanelListener pl = gPanel.getPanelListener();
 		pl.manViewCreated(manWindow);
 		frameList.remove(null);

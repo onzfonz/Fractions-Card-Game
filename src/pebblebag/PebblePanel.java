@@ -378,7 +378,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 
 	public void pebbleMoverDone() {
 		pebbleMoving.release();
-		Debug.println("released pebbleMover");
+		Debug.println("released pebbleMover from pebbleMoverDone");
 	}
 
 	public void compShakeBag() {

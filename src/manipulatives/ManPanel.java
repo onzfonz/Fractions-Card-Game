@@ -224,7 +224,7 @@ public class ManPanel extends JPanel  {
 
 			private void leftDrag(MouseEvent e, DoublePoint latestPoint) {
 				if(lastDot == null) {
-					if(pencilMode == 1) {
+					if(pencilMode == Constants.PENCIL_MODE) {
 						if(newLine == null) {
 							createLine(origPoint, latestPoint);
 							return;
@@ -235,7 +235,7 @@ public class ManPanel extends JPanel  {
 						}else{
 							//changeLine(newLine, latestPoint);
 						}
-					}else if(pencilMode == 0){
+					}else if(pencilMode == Constants.LINE_MODE){
 						if(newLine != null) {
 							changeLine(newLine, latestPoint);
 						}else if(origPoint.distance(latestPoint) > DRAG_VS_CLICK && newLine == null) {
@@ -816,7 +816,35 @@ public class ManPanel extends JPanel  {
 		return temp;
 	}
 	
+	public String generateStatLine() {
+		int numDots = dots.size();
+		int numLines = getNumPencilLines(false);
+		int marks = getNumPencilLines(true);
+		String dotSeg = "ppl " + numDots;
+		String lineSeg = "lines " + numLines;
+		String markSeg = "marks " + marks;
+		if(numDots == 0) {
+			dotSeg = "";
+		}
+		if(numLines == 0) {
+			lineSeg = "";
+		}
+		if(marks == 0) {
+			markSeg = "";
+		}
+		return dotSeg + ", " + lineSeg + ", " + markSeg; 
+	}
 	
+	public int getNumPencilLines(boolean isPencil) {
+		int numLines = 0;
+		for(int i = 0; i < lines.size(); i++) {
+			Line l = lines.get(i);
+			if(l.isPencil() == isPencil) {
+				numLines++;
+			}
+		}
+		return numLines;
+	}
 	
 	/**
 	 Saves out our state (all the dot models) to the given file.

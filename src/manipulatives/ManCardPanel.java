@@ -12,8 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -36,6 +34,8 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import network.NetDelegate;
+import network.NetHelper;
 import basic.Constants;
 import cards.CardView;
 import deck.DeckView;
@@ -74,6 +74,9 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 	private JButton notCoolManBtn;
 	private JLabel questionLabel;
 	private JPanel questionBox;
+	private NetDelegate netRep;
+	private boolean clickedShowedMeHow;
+	private String answersTried;
 	
 	private static final int GLUE_NUMS = 10;
 	
@@ -99,24 +102,24 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 	}
 	
 	public ManCardPanel() {
-		this(Constants.MAN_FRAME_DEFAULT_PLAY, null, null);
+		this(Constants.MAN_FRAME_DEFAULT_PLAY, null, null, null);
 	}
 
-	public ManCardPanel(String q, int answer, DeckView dv, CardView cv) {
-		this(q, answer, null, dv, cv);
+	public ManCardPanel(String q, int answer, DeckView dv, CardView cv, NetDelegate nr) {
+		this(q, answer, null, dv, cv, nr);
 	}
 
-	public ManCardPanel(String q, DeckView dv, CardView cv) {
-		this(q, 0, dv, cv);
+	public ManCardPanel(String q, DeckView dv, CardView cv, NetDelegate nr) {
+		this(q, 0, dv, cv, nr);
 	}
 
 	public ManCardPanel(File file) {
-		this("Osvaldo, What is 1/3 of 51?", null, null);
+		this("Osvaldo, What is 1/3 of 51?", null, null, null);
 	}
 
 	// Creates a new ManFrame
 	// If passed a non-null file, opens that file
-	public ManCardPanel(String q, int answer, File file, DeckView dv, CardView cv) {
+	public ManCardPanel(String q, int answer, File file, DeckView dv, CardView cv, NetDelegate nr) {
 		setLayout(new BorderLayout());
 		myFrame = this;
 		//solution = answer;
@@ -126,6 +129,10 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		listeners = new ArrayList<ManListener>();
 		controls = new ArrayList<JComponent>();
 		userCanEdit = true;
+		clickedShowedMeHow = false;
+		netRep = nr;
+		sendStartLogMessage();
+		answersTried = "";
 		manPanel = new ManPanel(800, 550, this);
 		manPanel.setToolTipText(Constants.TIP_MANIP_AREA);
 		controls.add(manPanel);
@@ -202,6 +209,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		add(questionBox, BorderLayout.NORTH);
 		JLabel addMany = new JLabel(new ImageIcon(CardGameUtils.getCardImageViaFilename("numberline-825.png")));
 		statusBox.setBackground(Color.WHITE);
+//		statusBox.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isPlaying);
 		statusBox.add(addMany);
 		controls.add(addMany);
 
@@ -216,6 +224,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 
 		clearScreenButton = new JButton(Constants.BTN_MAN_CLEAR);
 		clearScreenButton.setToolTipText(Constants.TIP_CLEAR);
+		clearScreenButton.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isPlaying);
 		clearScreenButton.setFont(Constants.FONT_SMALL);
 		box.add(clearScreenButton);
 		controls.add(clearScreenButton);
@@ -228,12 +237,13 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		launchDemo = new JButton(Constants.BTN_MAN_HELP);
 		launchDemo.setToolTipText(Constants.TIP_SHOW);
 		launchDemo.setFont(Constants.FONT_SMALL);
-		launchDemo.setVisible(!isPlaying && Constants.SHOW_ME_HOW_ENABLED);
+		launchDemo.setVisible(Constants.SHOW_WORK_ON_COMPUTER && !isPlaying && Constants.SHOW_ME_HOW_ENABLED);
 		box.add(launchDemo);
 		controls.add(launchDemo);
 		launchDemo.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				disableControls();
+				clickedShowedMeHow = true;
 				launchManipSimulation();
 			}
 		});
@@ -248,7 +258,9 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		ImageIcon pplIconUn = createImageIcon(addUnselectedPath(Constants.PPL_ICON_IMG_PATH));
 
 		drawLines = createRadioButton(lineIcon, lineIconUn, box, tools, Constants.TIP_LINE);
-		//drawLines.setSelected(true);
+		drawLines.setSelected(true);
+		manPanel.setPencilMode(false);
+		drawLines.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isPlaying);
 		drawLines.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				manPanel.setPencilMode(false);
@@ -256,8 +268,9 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		});
 		
 		makePpl = createRadioButton(pplIcon, pplIconUn, box, tools, Constants.TIP_PPL);
-		makePpl.setSelected(true);
-		manPanel.setPplMode(true);
+//		makePpl.setSelected(true);	
+//		manPanel.setPplMode(true);
+		makePpl.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isPlaying);
 		makePpl.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				manPanel.setPplMode(true);
@@ -265,6 +278,9 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		});
 		
 		drawFreely = createRadioButton(pencilIcon, pencilIconUn, box, tools, Constants.TIP_PENCIL);
+//		drawFreely.setSelected(true);
+//		manPanel.setPencilMode(true);
+		drawFreely.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isPlaying);
 		drawFreely.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				manPanel.setPencilMode(true);
@@ -324,6 +340,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 			}
 		});
 
+		manPanel.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isPlaying);
 		deckViewShown = new ManDeckViewPanel(dv, cv);
 		deckViewShown.setPreferredSize(new Dimension(Constants.ORIG_CARD_WIDTH, getHeight()));
 		add(deckViewShown, BorderLayout.EAST);
@@ -520,12 +537,17 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 	private void compareToAnswer(int num) {
 		if(num == solution) {
 			manPanel.displayMessage(Constants.CORRECT);
+			String c = (clickedShowedMeHow)? "y": "n";
+			sendLogMessage("Done tried " + answersTried + "| " + manPanel.generateStatLine() + "| shownHow? " + c);
 			fireWindowDone();
 		}else{
 			String response = Constants.ERROR_WRONG_ANSWER + Constants.SENTENCE_SEP + Constants.ERROR_TRY_ONCE_MORE;
-			if(solution == -1) {
+			String prefix = ", ";
+			if(answersTried.length() == 0) {
 				response = Constants.ERROR_WRONG_ANSWER + Constants.SENTENCE_SEP + Constants.ERROR_TRY_AGAIN;
+				prefix = "";
 			}
+			answersTried += prefix + num;
 			JOptionPane.showMessageDialog(myFrame,
 					response,
 					Constants.ERROR_NOT_QUITE,
@@ -575,6 +597,29 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 
 	public void addManListener(ManListener l) {
 		listeners.add(l);
+	}
+	
+	private void sendLogMessage(String str) {
+		int commapos = question.indexOf(",");
+		if(commapos == -1) {
+			return;
+		}
+		String name = question.substring(0, commapos);
+		NetHelper.logMessage(netRep, name, str);
+	}
+	
+	private void sendStartLogMessage() {
+		int commapos = question.indexOf(",");
+		if(commapos == -1) {
+			return;
+		}
+		String rest = question.substring(commapos+1);
+		sendLogMessage("Started" + rest);
+	}
+	
+	//This is where we have to combine or make the string
+	private void createLogMessage() {
+		
 	}
 
 	//@Override

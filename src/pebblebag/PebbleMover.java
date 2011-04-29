@@ -63,6 +63,7 @@ public class PebbleMover implements ActionListener {
 					pPanel.pebbleMoverDone();
 				}
 			}else{
+				Debug.println("finished Timer without releasing");
 				completelyFinishTimer();
 			}
 		}

@@ -18,7 +18,7 @@ public class GameServerThread extends Thread {
 	private GameProtocol sgp;
 	private Map<String, GameServerThread> allSocks;
 	private Map<String, String> serverPairs;
-
+	
 	public static final int INACTIVE_MS = 20000;
 
 	public GameServerThread(Socket client, Map<String, GameServerThread> dict, Map<String, String> pairs) {

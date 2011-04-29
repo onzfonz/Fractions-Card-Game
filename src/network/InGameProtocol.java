@@ -37,6 +37,7 @@ public class InGameProtocol {
 	private ServerDealer dealer;
 	private String oneName;
 	private RandomGenerator rgen;
+	private GameServerLogger log;
 
 	public InGameProtocol(Map<String, GameServerThread> dict, Map<String, String> pairs, String n) {
 		allSocks = dict;
@@ -45,6 +46,7 @@ public class InGameProtocol {
 		oneName = n;
 		rgen = RandomGenerator.getInstance();
 		currentPlayer = randomlySelectPlayer();
+		log = GameServerLogger.getLogger();
 		dealOutCards();
 	}
 	
@@ -89,7 +91,9 @@ public class InGameProtocol {
 		if(myHand) {
 			preCmd = Constants.CMD_PART_ME;
 		}
-		t.sendCommandToClient(preCmd + command + Constants.CMD_SEP_ARG + card + Constants.CMD_ARG_END);
+		String cardStr = preCmd + command + Constants.CMD_SEP_ARG + card + Constants.CMD_ARG_END;
+		log.logMessage(name + " sending " + cardStr);
+		t.sendCommandToClient(cardStr);
 	}
 	
 	private void notifyOthersOfCardAdded(List<String> names, String name, String command, String card) {

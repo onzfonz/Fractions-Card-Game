@@ -61,4 +61,10 @@ public class NetHelper {
 			n.sendCommand(Constants.CMD_NO_MOVES, "");
 		}
 	}
+	
+	public static void logMessage(NetDelegate n, String name, String logStr) {
+		if(n != null) {
+			n.sendCommand(Constants.CMD_LOG, name + " " + Constants.CMD_LOG_HYPHEN + " " + logStr);
+		}
+	}
 }

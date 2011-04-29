@@ -132,6 +132,9 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 
 	private void askNamesAndSend(String prefix) {
 		String s = (String)JOptionPane.showInputDialog(this, prefix + "What is your name?", "Name", JOptionPane.QUESTION_MESSAGE, null, null, "");
+		if(s.equalsIgnoreCase("exit")) {
+			System.exit(0);
+		}
 		while(s == null || s.equals("") || containsIllegalThings(s)) {
 			s = (String)JOptionPane.showInputDialog(this, "Please enter an actual name.", "Name", JOptionPane.QUESTION_MESSAGE, null, null, "");
 		}

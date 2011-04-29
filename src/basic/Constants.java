@@ -278,6 +278,8 @@ public class Constants {
 	public static final String CMD_MOVE_SEP = ";";
 	public static final String CMD_SEP_ARG = CMD_SEP + CMD_ARG_START;
 	public static final String CMD_CARD_DELIMITER = "_";
+	public static final String CMD_LOG = "log";
+	public static final String CMD_LOG_HYPHEN = "-";
 
 	
 	//More network commands
@@ -318,5 +320,6 @@ public class Constants {
 	public static boolean DEBUG_MODE = false;
 	public static boolean SHOW_COLOR_SLIDERS = DEBUG_MODE && false;
 	public static boolean NETWORK_MODE = true;
-	public static boolean SHOW_ME_HOW_ENABLED = false;
+	public static boolean SHOW_ME_HOW_ENABLED = true;
+	public static boolean SHOW_WORK_ON_COMPUTER = true;
 }

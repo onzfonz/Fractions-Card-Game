@@ -23,11 +23,13 @@ public class GameProtocol {
 	private GameServerThread thread;
 	private String name;
 	private InGameProtocol inGameRules;
+	private GameServerLogger log;
 
 	public GameProtocol(Map<String, GameServerThread> dict, Map<String, String> pairs, GameServerThread t) {
 		allSocks = dict;
 		serverPairs = pairs;
 		thread = t;
+		log = GameServerLogger.getLogger();
 	}
 
 	/* Ewww....this is messy */
@@ -75,10 +77,13 @@ public class GameProtocol {
 				setInGameProtocolForPartner(inGameRules);
 			}else if(theInput.startsWith(Constants.CMD_NEW_ROUND)) {
 				inGameRules.dealOutCards();
-			}else {
+			}else if(theInput.startsWith(Constants.CMD_LOG)) {
+				//Do nothing in this case...will be catched on the downfall
+			} else {
 				thread.relayClientCommand(theInput);
 				theOutput = "Successfully sent command" + theInput;
 			}
+			log.logMessage(name + " sent " + theInput);
 		}
 		return theOutput;
 	}
@@ -163,6 +168,7 @@ public class GameProtocol {
 				GameServerThread st = allSocks.get(key);
 				st.notifyRemove(name);
 			}
+			log.logWarningMessage(name + " quit!");
 		}
 	}
 

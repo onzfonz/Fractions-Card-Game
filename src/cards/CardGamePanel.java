@@ -515,6 +515,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	public void keyPressed(KeyEvent arg0) {
 		if(arg0.getKeyCode() == KeyEvent.VK_ENTER) {
 			parseTextInput(textCommands.getText());
+			textCommands.setText("");
 		}
 	}
 
