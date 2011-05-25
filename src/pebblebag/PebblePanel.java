@@ -178,6 +178,8 @@ public class PebblePanel extends JPanel implements PebbleListener {
 						currentY = keepObjectInYBoundary(currentY, isBag);
 						if(isBag) {
 							shakeTheBag(currentX, currentY);
+							//In the future place code here to send shaking bag coordinates.
+							//NetHelper.sendNetShaking(netRep, currentX, currentY);
 						}else if(currentPebble != null) {
 							movePebble(currentX, currentY);
 						}
@@ -320,6 +322,10 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		shakingDone.release();
 		notifyBagShaking();
 	}
+	
+	public void doAShake(int x, int y) {
+		shaker.forceBagShake(x, y);
+	}
 
 	public void stopShakingAnimation() {
 		boolean didIt = false;
@@ -390,6 +396,10 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		lastX = chooseX;
 		lastY = chooseY;
 		repaint();
+	}
+	
+	public void netShakeTheBag(int x, int y) {
+		shakeTheBag(x, y);
 	}
 
 	private void shakeTheBag(int x, int y) {

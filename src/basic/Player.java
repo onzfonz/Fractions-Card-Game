@@ -331,7 +331,7 @@ public class Player {
 		CardView radio = getARadio();
 		PossibleMove move = couldBePlayed(dv, radio);
 		if(move != null) {
-			fireCardAnimation(move, null, "played a radio to defend against the stink bomb!");
+			fireCardAnimation(move, null, "played a radio to defend against the Ice Cream Truck!");
 		}
 	}
 	

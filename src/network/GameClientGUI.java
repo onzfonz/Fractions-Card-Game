@@ -382,6 +382,10 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 		game.setChipObserver(l);
 		sendCommand(cmd, args);
 	}
+	
+	public void sendShakingCommand(String cmd, String args) {
+		sendCommand(cmd, args);
+	}
 
 	public String getFrameTitle() {
 		return getTitle();

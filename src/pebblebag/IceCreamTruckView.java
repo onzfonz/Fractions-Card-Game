@@ -126,6 +126,10 @@ public class IceCreamTruckView extends JPanel implements PebblePanelListener {
 	public void pebbleDrawingTime() {
 		pPanel.stopShakingAnimation();
 	}
+	
+	public void forceABagShake(int x, int y) {
+		pPanel.doAShake(x, y);
+	}
 
 	public void bagShakingDone() {
 		// TODO Auto-generated method stub

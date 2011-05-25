@@ -267,6 +267,7 @@ public class Constants {
 	public static final String CMD_RADIOS = "radios";
 	public static final String CMD_PART_OPPO = "o";
 	public static final String CMD_SHAKED = "shaked";
+	public static final String CMD_SHAKING = "shaking";
 	public static final String CMD_CHIP = "chip";
 	public static final String CMD_MYHAND = CMD_PART_ME + CMD_ADD_TRICK;
 	public static final String CMD_OHAND = CMD_PART_OPPO + CMD_ADD_TRICK;
@@ -320,6 +321,6 @@ public class Constants {
 	public static boolean DEBUG_MODE = false;
 	public static boolean SHOW_COLOR_SLIDERS = DEBUG_MODE && false;
 	public static boolean NETWORK_MODE = true;
-	public static boolean SHOW_ME_HOW_ENABLED = true;
-	public static boolean SHOW_WORK_ON_COMPUTER = true;
+	public static boolean SHOW_ME_HOW_ENABLED = false;
+	public static boolean SHOW_WORK_ON_COMPUTER = false;
 }

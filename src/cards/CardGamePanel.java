@@ -565,7 +565,9 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			chipObserver.chipDrawn(Boolean.parseBoolean(rest));
 		}else if(command.contains(Constants.CMD_SHAKED)) {
 			gamePanel.timeToDrawPebbles();
-		}else if(command.contains(Constants.CMD_ADD_TRICK)) {
+		} else if(command.contains(Constants.CMD_SHAKING)) {
+			gamePanel.timeToMoveBagAround(rest);
+		} else if(command.contains(Constants.CMD_ADD_TRICK)) {
 			Helpers.acquireSem(Helpers.cardDist);
 			if(shouldClear){
 				clearHand(rest, isForSelf);

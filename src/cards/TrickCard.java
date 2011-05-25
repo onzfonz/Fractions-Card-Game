@@ -133,10 +133,12 @@ public class TrickCard extends Card {
 	}
 	
 	public String toString() {
-		if(!isIceCream()) {
+		if(!isIceCream() && !isCombo() && !isRadio()) {
 			return trickType + ":" + toFraction();
-		}else{
+		}else if(isIceCream()){
 			return trickType + "-" + toIce();
+		}else{
+			return trickType;
 		}
 		
 	}

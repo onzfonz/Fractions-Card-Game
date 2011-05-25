@@ -296,6 +296,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		decksInPlay = Collections.synchronizedList(new ArrayList<DeckView>());
 		currentCard = null;
 		currentDeck = null;
+		bigCard = null;
 		origX = lastX = 0;
 		origY = lastY = 0;
 		dragging = false;
@@ -309,6 +310,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 
 	public void newRound() {
 		status.setText(Constants.STATUS_NEW_ROUND);
+		resetPanel();
 		if(Constants.NETWORK_MODE) {
 			currentGame.clearTheRound();
 			setTurn(false);
@@ -523,8 +525,12 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 
 	private void makeSelectedCard(CardView cv) {
 		Debug.println("CardView " + cv + " selectable? " + isSelectable(cv));
+		if(cv == null) {
+			origComboTrick = null;
+		}
 		if(isSelectable(cv)) {
 			if(cv != currentCard && currentCard != null) {
+				Debug.println("unselecting Cardview " + currentCard);
 				unSelectCard(currentCard);
 				//repaintCard(currentSelection);
 			}
@@ -536,6 +542,8 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			cv = null;
 		}
 		currentCard = cv;
+		bigCard = currentCard;
+		Debug.println("makeSelectedCard ending, currentCard now: " + currentCard);
 	}
 
 	private void unSelectCard(CardView cv) {
@@ -544,16 +552,20 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			//setComponentZOrder(cv, cv.getZOrder());
 			if(!isTeammateCard(cv)) {
 				int index = currentTrickCardsLeft.indexOf(cv);
-
+				Debug.println("index: " + index + ", cv: " + cv + " otherCards: " + currentTrickCardsLeft);
 				if(index != -1) {
 					currentTrickCardsLeft.remove(cv);
 					currentTrickCardsLeft.add(curSelOrigIndex, cv);
+					Debug.println("currentTrickCards now looks like " + currentTrickCardsLeft);
 				}else{
+					Debug.println("card cv: " + cv + " is not in currentCardsLeft, so adding to playersTrickCards but is it in there? " + playersTrickCards.contains(cv));
 					playersTrickCards.remove(cv);
 					playersTrickCards.add(curSelOrigIndex, cv);
+					Debug.println("playerTrickCards now looks like " + playersTrickCards);
 				}
 			}else{
 				playersTrickCards.remove(cv);
+				Debug.println("was teammate so playersTrickCards now looks like " + playersTrickCards);
 			}
 			repaintCard(cv);
 			curSelOrigIndex = -1;
@@ -1358,6 +1370,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	private void sendCardBack(CardView cv) {
 		repaintCard(cv);
 		if(origComboTrick != null && cv.isCombo() && isInTrickHand(cv)) {
+			Debug.println("sending card back with origComboTrick: " + origComboTrick);
 			cv.setCard(origComboTrick);
 			origComboTrick = null;
 		}
@@ -1577,6 +1590,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		cv.setOptionChosen(option);
 		panel.comboViewDone(cf);
 		TrickCard cardSelected = optList.get(option);
+		Debug.println("Combo card " + cv + " done and card Selected is: " + cardSelected);
 		origComboTrick = (TrickCard) cv.getCard();
 		currentCard.setCard(cardSelected);
 		launchWindowOrTryToPlaceCard();
@@ -1610,6 +1624,13 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		}catch(InterruptedException e) {
 			if(didIt) timeToDrawPebs.release();
 		}
+	}
+	
+	public void timeToMoveBagAround(String arg) {
+		int commaPos = arg.indexOf(",");
+		int x = Integer.parseInt(arg.substring(0, commaPos));
+		int y = Integer.parseInt(arg.substring(commaPos+2));
+		pebbleWindow.forceABagShake(x, y);
 	}
 
 	public void timeWhenBagShaking() {

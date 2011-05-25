@@ -35,6 +35,10 @@ public class BagShaker implements ActionListener {
 		}
 	}
 	
+	public void forceBagShake(int x, int y) {
+		pPanel.netShakeTheBag(x, y);
+	}
+	
 	public void stopShaking() {
 		numShakes = 0;
 		pPanel.doneShakingTheBag(false);

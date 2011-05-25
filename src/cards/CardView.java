@@ -165,7 +165,7 @@ public class CardView {
 		return isCombo;
 	}
 
-	private boolean isComboCard() {
+	public boolean isComboCard() {
 		if(card instanceof TrickCard) {
 			return ((TrickCard) card).isCombo();
 		}

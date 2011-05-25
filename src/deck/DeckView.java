@@ -187,7 +187,8 @@ public class DeckView {
 		BufferedImage stinkManip = PebbleImages.getStinkyMan();
 		BufferedImage freshManip = PebbleImages.getFreshenedMan();
 		if(Constants.DEBUG_MODE) {
-			System.out.println("getCardWidth is: " + getCardWidth() + ", while manip width is " + manip.getWidth());
+			//TODO: put this back in if needed
+			//System.out.println("getCardWidth is: " + getCardWidth() + ", while manip width is " + manip.getWidth());
 		}
 		//TODO: Take away this hack to do something a little nicer.  Use something like the x coordinate to figure
 		//out the spacing needed to be able to move around.

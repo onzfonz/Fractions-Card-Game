@@ -38,6 +38,12 @@ public class NetHelper {
 		}
 	}
 	
+	public static void sendNetShaking(NetDelegate n, int x, int y) {
+		if(n != null) {
+			n.sendCommand(Constants.CMD_SHAKING, x + ", " + y);
+		}
+	}
+	
 	public static void sendNetCalc(NetDelegate n) {
 		if(n != null) {
 			n.sendCommand(Constants.CMD_CALC, "");
