@@ -24,6 +24,7 @@ import javax.swing.UIManager;
 
 import basic.Constants;
 import extras.Debug;
+import extras.GameUtils;
 import extras.RandomGenerator;
 
 public class ManFrameDebug extends JFrame {
@@ -287,9 +288,9 @@ public class ManFrameDebug extends JFrame {
 	}
 	
 	private void launchManipSimulation() {
-		int num = extractNumerator();
-		int den = extractDenominator();
-		int ppl = extractPeople();
+		int num = GameUtils.extractNumerator(question);
+		int den = GameUtils.extractDenominator(question);
+		int ppl = GameUtils.extractPeople(question);
 		Debug.println("num is " + num + ", den is " + den + ", and ppl are " + ppl);
 		manPanel.launchDividingAnimation(den, ppl, num, solution);
 		//manPanel.launchPeopleAddAnimation(ppl, den, num, solution);
@@ -320,36 +321,6 @@ public class ManFrameDebug extends JFrame {
 	
 	private void drawMessage(String s) {
 		manPanel.displayMessage(s);
-	}
-	
-	/* Assumes that there is only one forward slash and that the
-	 * numbers needed are:  num/den of ppl?
-	 */
-	private int extractNumerator() {
-		int pos = question.indexOf("/");
-		int spacePos = question.lastIndexOf(" ", pos);
-		if(pos == -1 || spacePos == -1) {
-			return -1;
-		}
-		return Integer.parseInt(question.substring(spacePos+1, pos));
-	}
-	
-	private int extractDenominator() {
-		int pos = question.indexOf("/");
-		int spacePos = question.indexOf(" ", pos);
-		if(pos == -1 || spacePos == -1) {
-			return -1;
-		}
-		return Integer.parseInt(question.substring(pos+1, spacePos));
-	}
-	
-	private int extractPeople() {
-		int pos = question.indexOf("?");
-		int spacePos = question.lastIndexOf(" ", pos);
-		if(pos == -1 || spacePos == -1) {
-			return -1;
-		}
-		return Integer.parseInt(question.substring(spacePos+1, pos));
 	}
 
 	// Save (or saveAs) the panel

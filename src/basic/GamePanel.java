@@ -1534,7 +1534,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			msg = Constants.STATUS_NO_FALL;
 		}
 		showDeckExtras(true);
-		status.setText(Constants.STATUS_THEY + msg + Constants.STATUS_FOR_THE + Constants.ICE_CREAM_NAME + Constants.STATUS_FIB + Constants.SENTENCE_SEP + decideTurn(ourTurn));
+		status.setText(Constants.STATUS_THEY + msg + Constants.STATUS_FOR_THE + Constants.STATUS_FIB + Constants.SENTENCE_SEP + decideTurn(ourTurn));
 		repaint();
 	}
 

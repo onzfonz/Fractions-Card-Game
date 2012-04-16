@@ -29,4 +29,22 @@ public class StringUtils {
 		}
 		return strs;
 	}
+	
+	public static String convertToSentenceCase(String line) {
+		ArrayList<String> words = breakStrings(line, " ");
+		String newStr = "";
+		int i;
+		for(i = 0; i < words.size() - 1; i++) {
+			String w = words.get(i);
+			String corrected = convertWordToSentenceCase(w);
+			newStr = corrected + " ";
+		}
+		return newStr + convertWordToSentenceCase(words.get(i)); 
+	}
+	
+	private static String convertWordToSentenceCase(String word) {
+		String str = word.toLowerCase();
+		char firstChar = str.charAt(0);
+		return Character.toUpperCase(firstChar) + str.substring(1);
+	}
 }

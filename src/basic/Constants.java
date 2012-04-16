@@ -175,6 +175,13 @@ public class Constants {
 	public static final String ERROR_NO_STINK_CARDS = "There needs to be a stink bomb card first.";
 	public static final String ERROR_STINKS_LEFT_DIV = "Only the people that are not stinky count.";
 	
+	//Card type messages
+	public static final String STINK_TYPE = "Stink Bomb";
+	public static final String AIR_TYPE = "Air Freshener";
+	public static final String ICE_TYPE = ICE_CREAM_NAME;
+	public static final String RADIO_TYPE = "Radio";
+	public static final String MONEY_TYPE = "Ice Cream Truck";
+	
 	//Info messages
 	public static final String INFO_SHUFFLING = "Shuffling and dealing cards for the next round...be patient, OK?";
 	public static final String INFO_PLAY_AGAIN = "Would you like to play again?";
@@ -204,7 +211,7 @@ public class Constants {
 	public static final String STATUS_FALL = "fell";
 	public static final String STATUS_NO_FALL = "didn't fall";
 	public static final String STATUS_FOR_THE = " for the ";
-	public static final String STATUS_FIB = " fib!";
+	public static final String STATUS_FIB = ICE_CREAM_NAME + " fib!";
 	public static final String STATUS_OWN_DECK = "your own deck";
 	public static final String STATUS_OPPO_DECK = "the opponent's deck";
 	public static final String STATUS_FIB_FIGURE_PREFIX = "Let's figure out if ";

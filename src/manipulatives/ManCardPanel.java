@@ -41,6 +41,7 @@ import cards.CardView;
 import deck.DeckView;
 import extras.CardGameUtils;
 import extras.Debug;
+import extras.GameUtils;
 import extras.RandomGenerator;
 
 public class ManCardPanel extends JPanel implements KeyListener, ManPanelListener{
@@ -124,7 +125,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		myFrame = this;
 		//solution = answer;
 		question = q;
-		solution = generateAnswer(q);
+		solution = GameUtils.generateAnswer(q);
 		assert(answer == solution);
 		listeners = new ArrayList<ManListener>();
 		controls = new ArrayList<JComponent>();
@@ -438,7 +439,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		String leftPart = q.substring(0, leftPar-1);
 		String rightPart = q.substring(rightPar+2);
 		String decimal = q.substring(leftPar+1, rightPar);
-		int num = extractNumerator();
+		int num = GameUtils.extractNumerator(question);
 		int numPos = q.indexOf(""+num);
 		int denPos = q.indexOf(" of ");
 		leftPart = q.substring(0, numPos);
@@ -447,24 +448,14 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 	}
 
 	private void launchManipSimulation() {
-		int num = extractNumerator();
-		int den = extractDenominator();
-		int ppl = extractPeople();
+		int num = GameUtils.extractNumerator(question);
+		int den = GameUtils.extractDenominator(question);
+		int ppl = GameUtils.extractPeople(question);
 		Debug.println("num is " + num + ", den is " + den + ", and ppl are " + ppl);
 		manPanel.launchDividingAnimation(den, ppl, num, solution);
 		//manPanel.launchPeopleAddAnimation(ppl, den, num, solution);
 		//populateWithNPeople(ppl, den);
 		//circleNGroups(num, den, solution);
-	}
-
-	private int generateAnswer(String question) {
-		int num = extractNumerator();
-		int den = extractDenominator();
-		int ppl = extractPeople();
-		if(ppl % den != 0) {
-			return -1;
-		}
-		return (ppl / den) * num;
 	}
 
 	private void populateWithNPeople(int ppl, int den) {
@@ -486,36 +477,6 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 
 	private void drawMessage(String s) {
 		manPanel.displayMessage(s);
-	}
-
-	/* Assumes that there is only one forward slash and that the
-	 * numbers needed are:  num/den of ppl?
-	 */
-	private int extractNumerator() {
-		int pos = question.indexOf("/");
-		int spacePos = question.lastIndexOf(" ", pos);
-		if(pos == -1) {
-			return -1;
-		}
-		return Integer.parseInt(question.substring(spacePos+1, pos));
-	}
-
-	private int extractDenominator() {
-		int pos = question.indexOf("/");
-		int spacePos = question.indexOf(" ", pos);
-		if(pos == -1 || spacePos == -1) {
-			return -1;
-		}
-		return Integer.parseInt(question.substring(pos+1, spacePos));
-	}
-
-	private int extractPeople() {
-		int pos = question.indexOf("?");
-		int spacePos = question.lastIndexOf(" ", pos);
-		if(pos == -1 || spacePos == -1) {
-			return -1;
-		}
-		return Integer.parseInt(question.substring(spacePos+1, pos));
 	}
 
 	private void checkUserAnswer() {

@@ -250,10 +250,7 @@ public class PlayDeck extends Deck {
 	}
 
 	private static int applyFraction(int teammates, TrickCard t) {
-		if(teammates % t.getDenominator() != 0) {
-			return -1;
-		}
-		return ((teammates / t.getDenominator())*t.getNumerator());
+		return GameUtils.solveEasyFraction(t.getNumerator(), t.getDenominator(), teammates);
 	}
 
 	private static double applyHypoIceFraction(double teammates, TrickCard t) {

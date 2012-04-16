@@ -145,13 +145,13 @@ public class TrickCard extends Card {
 	
 	private String readableType() {
 		if(isStink()) {
-			return "Stink Bomb";
+			return Constants.STINK_TYPE;
 		}else if(isAir()) {
-			return "Air Freshener";
+			return Constants.AIR_TYPE;
 		}else if(isRadio()) {
-			return "Radio";
+			return Constants.RADIO_TYPE;
 		}else if(isIceCream()) {
-			return "Ice Cream Truck";
+			return Constants.ICE_TYPE;
 		}
 		return "Unknown Card";
 	}
@@ -174,7 +174,7 @@ public class TrickCard extends Card {
 			double dec = (double)num/den;
 			String otherS = "" + dec;
 			int pos = otherS.indexOf(".");
-			s += " (" + otherS.substring(pos) + ") ";
+			s += " (" + otherS.substring(pos) + ")";
 		}
 		return s;
 	}
@@ -188,16 +188,16 @@ public class TrickCard extends Card {
 			setName(Constants.ICE_CREAM_NAME);
 			setDescription(Constants.ICE_DESC);
 		}else if(isStink()) {
-			setName("Stink Bomb");
+			setName(Constants.STINK_TYPE);
 			setDescription(Constants.STINK_DESC);
 		}else if(isAir()) {
-			setName("Air Freshener");
+			setName(Constants.AIR_TYPE);
 			setDescription(Constants.AIR_DESC);
 		}else if(isRadio()) {
-			setName("Radio");
+			setName(Constants.RADIO_TYPE);
 			setDescription(Constants.RADIO_DESC);
 		}else if(isMoney()) {
-			setName("Money");
+			setName(Constants.MONEY_TYPE);
 			setDescription(Constants.MONEY_DESC);
 		}
 	}
