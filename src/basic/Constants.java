@@ -328,6 +328,6 @@ public class Constants {
 	public static boolean DEBUG_MODE = false;
 	public static boolean SHOW_COLOR_SLIDERS = DEBUG_MODE && false;
 	public static boolean NETWORK_MODE = true;
-	public static boolean SHOW_ME_HOW_ENABLED = false;
-	public static boolean SHOW_WORK_ON_COMPUTER = false;
+	public static boolean SHOW_ME_HOW_ENABLED = true;
+	public static boolean SHOW_WORK_ON_COMPUTER = true;
 }
