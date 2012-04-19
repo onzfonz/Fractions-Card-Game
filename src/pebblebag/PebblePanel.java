@@ -348,6 +348,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		bagTimer.start();
 	}
 
+	//need to fix for computer or have the computer player call this method
 	public void tellOppoToChoosePebbles() {
 		NetHelper.sendNetShaked(netRep, this);
 		turnOffUser();
@@ -356,7 +357,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 
 	public void beginPebbleAnimation(boolean isOrange) {
 		if(userActive() && !Constants.NETWORK_MODE) {
-			turnOffUser();
+			tellOppoToChoosePebbles();
 			forcePebbleAnimation(isOrange);
 		}else if(Constants.NETWORK_MODE){
 			forcePebbleAnimation(isOrange);

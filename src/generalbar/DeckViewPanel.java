@@ -20,6 +20,7 @@ import cards.Card;
 import cards.TeammateCard;
 import cards.TrickCard;
 import deck.PlayDeck;
+import extras.GraphicUtils;
 
 /* 
  * This is using a bit more of the CardViewPanel but will be using a JLayeredPane
@@ -246,7 +247,7 @@ public class DeckViewPanel extends JPanel {
 		int y = getTeammateCard().getY();
 		int width = getCardWidth();
 		int height = (int) calculateDeckHeight();
-		CardViewPanel.drawThickRectangle(x, y, width, height, c, g);
+		GraphicUtils.drawThickRectangle(x, y, width, height, c, g);
 	}
 
 	public int calculateDeckHeight() {

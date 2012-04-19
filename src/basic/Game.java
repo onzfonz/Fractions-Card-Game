@@ -77,19 +77,19 @@ public class Game {
 		String prefix = "";
 		String suffix = "";
 		String postsuffix = "";
-		String message = " had " + difference + " more teammate" + ((difference == 1)?"":"s") + " than ";
+		String message = Constants.PARTS_HAD + difference + Constants.PARTS_MORE_TEAMMATE + ((difference == 1)?"":Constants.PARTS_PLURAL_SUFFIX) + Constants.PARTS_THAN;
 		if(p1Score > p2Score) {
 			p1.updatePoints(difference);
-			prefix = "You";
-			suffix = "your opponent.";
+			prefix = Constants.PARTS_PREFIX_YOU;
+			suffix = Constants.PARTS_SUFFIX_THEM;
 			postsuffix = prefix;
 		}else if(p2Score > p1Score) {
 			opponent.updatePoints(difference);
-			prefix = "Your opponent";
-			suffix = "you.";
-			postsuffix = "They";
+			prefix = Constants.PARTS_PREFIX_THEM;
+			suffix = Constants.PARTS_SUFFIX_YOU;
+			postsuffix = Constants.PARTS_POST_THEY;
 		}else{
-			return "You tied that round.  No points were handed out. Let's go to the next one.";
+			return Constants.PARTS_TIE;
 		}
 		return prefix + message + suffix + "  " + postsuffix + " scored " + difference + " point" + ((difference == 1)?"":"s") + "!  Let's start the next round!";
 	}

@@ -72,7 +72,7 @@ public class PopulateGamesTable
 			
 			//insertStatementsSQL(DBUtils.SQL_INSERT_GAMES, allGames, DBUtils.SQL_TYPES_GAMES);
 			for(LogGame lg: allGames) {
-				insertStatementsSQL(DBUtils.SQL_INSERT_PLOGS, lg.getPairLogs(), DBUtils.SQL_TYPES_PLOGS);
+//				insertStatementsSQL(DBUtils.SQL_INSERT_PLOGS, lg.getPairLogs(), DBUtils.SQL_TYPES_PLOGS);
 //				insertStatementsSQL(DBUtils.SQL_INSERT_ULOGS, lg.getUserLogs(), DBUtils.SQL_TYPES_ULOGS);
 //				insertStatementsSQL(DBUtils.SQL_INSERT_SLOGS, lg.getStateLogs(), DBUtils.SQL_TYPES_SLOGS);
 			}

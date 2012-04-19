@@ -10,16 +10,15 @@ package cards;
  * These will follow our early attempts at creating something where the components are separated.
  */
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 
 import basic.Constants;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
+import extras.GraphicUtils;
 
 public class ShadowCardView extends CardView{
 	private BufferedImage backGround;
@@ -55,7 +54,7 @@ public class ShadowCardView extends CardView{
 				drawCardText(g, Constants.FONT_SMALL, x, y, SHADOW_DEN_X, SHADOW_DEN_Y, SHADOW_NUM_Y, getWidth(), getHeight());
 				if(highlighted) {
 					//drawThickRectangle(Math.abs(getWidth()/2-scaledImg.getWidth(null)/2), Math.abs(getHeight()/2-.getHeight(null)/2), Math.min(b.getWidth(null)-1, getWidth()-1), Math.min(b.getHeight(null)-1, getHeight()-1), 4, g);
-					drawThickRectangle(x, y, (int) getSize().getWidth(), (int) getSize().getHeight(), 4, Color.red, g);
+					GraphicUtils.drawThickRectangle(x, y, (int) getSize().getWidth(), (int) getSize().getHeight(), 4, Color.red, g);
 				}
 			}else{
 				drawCardComponents(g, 0, 0, x, y, false);

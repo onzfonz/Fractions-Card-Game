@@ -155,6 +155,10 @@ public class Constants {
 	public static final String MAN_FRAME_DEFAULT_PLAY = "Play Here";
 	public static final String SENTENCE_SEP = "  ";
 	public static final String CORRECT = "Correct!" + SENTENCE_SEP;
+	public static final String CONNECT_SERVER = "Click Connect to Server To Start";
+	public static final String DECIDED_MOVE = "decided on a move!";
+	public static final String THOUGHT_MOVE = "thought about where to move.";
+	public static final String UP_SOON = ", you will be up soon.";
 	
 	//Error messages
 	public static final String ERROR_PLACING_RADIO = "There needs to be an "+Constants.ICE_CREAM_NAME+" card first.";
@@ -188,6 +192,15 @@ public class Constants {
 	public static final String INFO_NO_MOVES = "Your opponent has no more moves.  Would you like to proceed to the next round?";
 	public static final String INFO_START_GAME_HELP = "You've started a new game; to play one of your trick cards, drag it onto a teammate card.";
 	public static final String INFO_STARTING = "Starting up the game.  This may take a bit, OK?";
+	public static final String INFO_NET_ASK_NAME = "What is your name?";
+	public static final String INFO_NET_ASK_PARTNER = "What is your partner's name? (If it's just you, click Cancel)";
+	public static final String INFO_ERR_REAL_NAME = "Please enter an actual name";
+	public static final String INFO_PICK_SERVER = "Please pick the server location";
+	public static final String INFO_ERR_SERVER_404 = "The IP address you chose is not working!  Please enter an IP address for the server";
+	public static final String INFO_ERR_NAMES_TAKEN = "Names are taken! Please choose other names";
+	public static final String INFO_NET_ERR_LOST_CONN = "We lost the connection with ";
+	public static final String INFO_ASK_B4_CLOSING = "You are about to close the game...are you sure?";
+	
 	
 	public static final String OPTION_WEST = "West";
 	public static final String OPTION_EAST = "East";
@@ -218,6 +231,16 @@ public class Constants {
 	public static final String STATUS_FIB_FIGURE_MID = " teammates will fall for the ";
 	public static final String STATUS_FIB_FIGURE_SUFFIX = " fib!";
 	
+	public static final String PARTS_PREFIX_YOU = "You";
+	public static final String PARTS_SUFFIX_YOU = "you.";
+	public static final String PARTS_PREFIX_THEM = "Your opponent";
+	public static final String PARTS_SUFFIX_THEM = "your opponent.";
+	public static final String PARTS_POST_THEY = "They";
+	public static final String PARTS_TIE = "You tied that round.  No points were handed out. Let's go to the next one.";
+	public static final String PARTS_HAD = " had ";
+	public static final String PARTS_MORE_TEAMMATE = " more teammate";
+	public static final String PARTS_PLURAL_SUFFIX = "s";
+	public static final String PARTS_THAN = " than ";
 	
 	//Man messages
 	public static final String MAN_MSG_HOW_MANY = "How many people were circled?";
@@ -314,7 +337,7 @@ public class Constants {
 	public static final double REP_COMBO_Y_MOD = .57;
 	
 	//General Debugging and Other Future User Options
-	public static boolean SHOW_COMPUTER_CARDS = false;
+	public static boolean SHOW_COMPUTER_CARDS = true;
 	public static boolean REGULAR_MODE = true;  //false gives green rectangle, doesn't have them calculate their mistakes, can be used for easy level
 	public static boolean SHOW_DECK_LABEL_NUMBER = false;
 	public static boolean SHOW_DECK_MANIPS = true;
@@ -323,11 +346,11 @@ public class Constants {
 	//When they have something like .5 of 12 to have them figure out all the values.
 	public static boolean GIVE_QUESTION_TO_USER = true;
 	public static boolean TEXT_AS_IMAGES = true;  //Need to change ComboCardView superclass if you change this
-	public static boolean ASK_USERS_FRACTION_QS = true;
+	public static boolean ASK_USERS_FRACTION_QS = false;
 	public static boolean MANIPS_OVERLAP = true;
-	public static boolean DEBUG_MODE = false;
+	public static boolean DEBUG_MODE = true;
 	public static boolean SHOW_COLOR_SLIDERS = DEBUG_MODE && false;
-	public static boolean NETWORK_MODE = true;
+	public static boolean NETWORK_MODE = false;
 	public static boolean SHOW_ME_HOW_ENABLED = true;
 	public static boolean SHOW_WORK_ON_COMPUTER = true;
 }

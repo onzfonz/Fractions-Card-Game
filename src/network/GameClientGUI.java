@@ -68,17 +68,24 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 		lobbyPeople = new DefaultListModel();
 		lobbyPanel = new JPanel(new BorderLayout());
 		createLobbyPanel(lobbyPanel);
-
+		
 		gamePanel = new JPanel(new BorderLayout());
 		createGamePanel(gamePanel);
 
 		windows.add(lobbyPanel, LOBBY_PANEL);
 		windows.add(gamePanel, GAME_PANEL);
-		alertMsg = new FYIMessage(null, Constants.INFO_STARTING);
+		if(Constants.NETWORK_MODE) {
+			alertMsg = new FYIMessage(null, Constants.INFO_STARTING);
+		}
 		add(windows);
 		initialize();
 		askNamesAndSend("");
-		alertMsg.killMessage();
+		if(!Constants.NETWORK_MODE) {
+			makeWindowShowUp();
+			moveToGame();
+		}else{
+			alertMsg.killMessage();
+		}
 	}
 
 	private void createLobbyPanel(JPanel parentPanel) {
@@ -96,7 +103,9 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 		start = new JButton("Play");
 		start.setFont(Constants.FONT_REG);
 		box.add(start);
+		if(Constants.NETWORK_MODE) {
 		start.addActionListener( new ActionListener() {
+		
 			public void actionPerformed(ActionEvent e) {
 				String challenger = (String) jLobbyPeople.getSelectedValue(); 
 				if(challenger != null) {
@@ -106,7 +115,8 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 				}
 			}
 		});
-
+		}
+		
 		jLobbyPeople = new JList(lobbyPeople);
 		jLobbyPeople.setFont(Constants.FONT_REG);
 		jLobbyPeople.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -116,7 +126,7 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 
 		center.add(listScroller);
 
-		lobbyLabel = new JLabel("Click Connect to Server To Start");
+		lobbyLabel = new JLabel(Constants.CONNECT_SERVER);
 		lobbyLabel.setFont(Constants.FONT_REG);
 		upperBox.add(lobbyLabel);
 		//Commenting out the textbox at the bottom
@@ -131,14 +141,14 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 	}
 
 	private void askNamesAndSend(String prefix) {
-		String s = (String)JOptionPane.showInputDialog(this, prefix + "What is your name?", "Name", JOptionPane.QUESTION_MESSAGE, null, null, "");
+		String s = (String)JOptionPane.showInputDialog(this, prefix + Constants.INFO_NET_ASK_NAME, "Name", JOptionPane.QUESTION_MESSAGE, null, null, "");
 		if(s.equalsIgnoreCase("exit")) {
 			System.exit(0);
 		}
 		while(s == null || s.equals("") || containsIllegalThings(s)) {
-			s = (String)JOptionPane.showInputDialog(this, "Please enter an actual name.", "Name", JOptionPane.QUESTION_MESSAGE, null, null, "");
+			s = (String)JOptionPane.showInputDialog(this, Constants.INFO_ERR_REAL_NAME, "Name", JOptionPane.QUESTION_MESSAGE, null, null, "");
 		}
-		String partner = (String)JOptionPane.showInputDialog(this, "What is your partner's name? (If it's just you, click Cancel)", "Partner", JOptionPane.QUESTION_MESSAGE, null, null, "");
+		String partner = (String)JOptionPane.showInputDialog(this, Constants.INFO_NET_ASK_PARTNER, "Partner", JOptionPane.QUESTION_MESSAGE, null, null, "");
 		String id = s + " & " + partner;
 		if(partner == null || partner.equals("")) {
 			id = s;
@@ -164,6 +174,7 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 	}
 
 	private void initialize() {
+		if(!Constants.NETWORK_MODE) return;
 		boolean noAddress = true;
 		int i = 0;
 
@@ -199,11 +210,11 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 		String[] ipAddrs = { Constants.LOCAL_SERVER_IP2, Constants.SERVER_IP, Constants.SERVER_ADDR, Constants.SERVER_IP_STANFORD, Constants.LOCALHOST};
 		switch(timesAttempted) {
 			case 0: return new Socket(Constants.LOCAL_SERVER_IP, Constants.SOCKET_PORT);
-			case 1: ind = JOptionPane.showOptionDialog(this, "Please pick the server location", "IP", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, ipAddrs, Constants.LOCAL_SERVER_IP2);
+			case 1: ind = JOptionPane.showOptionDialog(this, Constants.INFO_PICK_SERVER, "IP", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, ipAddrs, Constants.LOCAL_SERVER_IP2);
 			if(ind != JOptionPane.CLOSED_OPTION) {
 				input = ipAddrs[ind]; break;
 			}
-			case 2: input = JOptionPane.showInputDialog("The IP address you chose is not working!  Please enter an IP address for the server");
+			case 2: input = JOptionPane.showInputDialog(Constants.INFO_ERR_SERVER_404);
 			break;
 			default: return null;
 		}
@@ -236,6 +247,14 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 		}
 		closeAll();
 	}
+	
+	public void makeWindowShowUp() {
+		myName = getTitle();
+		pack();
+		setVisible(true);
+		addWindowListener(this);
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+	}
 
 	public void handleMsg(String fromServer) {
 		if(Constants.DEBUG_MODE){
@@ -245,13 +264,9 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 			System.out.println(fromServer);
 			if(!fromServer.startsWith(".error")) {
 				moveToLobby();
-				myName = getTitle();
-				pack();
-				setVisible(true);
-				addWindowListener(this);
-				setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+				makeWindowShowUp();
 			}else{
-				askNamesAndSend("Names are taken! Please choose other names");
+				askNamesAndSend(Constants.INFO_ERR_NAMES_TAKEN);
 				return;
 			}
 		}
@@ -272,7 +287,7 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 			moveToGame();
 			sendToServer(Constants.NET_CMD_READY_TO_START);
 		} else if(fromServer.startsWith(Constants.NET_CMD_QUIT)) {
-			lobbyLabel.setText("We lost the connection with " + name);
+			lobbyLabel.setText(Constants.INFO_NET_ERR_LOST_CONN + name);
 			game.resetPanel(true);
 			moveToLobby();
 			//more lobby stuff or restart lobby make it show up again
@@ -326,7 +341,9 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 	}
 
 	private void sendToServer(String msg) {
-		out.println(msg);
+		if(Constants.NETWORK_MODE) {
+			out.println(msg);
+		}
 	}
 
 	public void closeAll() {
@@ -404,7 +421,7 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 	public void windowClosing(WindowEvent arg0) {
 		int option = 0;
 		if(inGame()) {
-			option = JOptionPane.showConfirmDialog(this, "You are about to close the game...are you sure?", "Exit?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+			option = JOptionPane.showConfirmDialog(this, Constants.INFO_ASK_B4_CLOSING, "Exit?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 			Debug.println(option);
 		}
 		if(option == 0) {

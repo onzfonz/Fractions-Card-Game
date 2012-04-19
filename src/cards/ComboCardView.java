@@ -10,18 +10,13 @@ package cards;
  * These will follow our early attempts at creating something where the components are separated.
  */
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-
-import extras.Debug;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 
 import basic.Constants;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
+import extras.Debug;
+import extras.GraphicUtils;
 
 public class ComboCardView extends CardView{
 	private BufferedImage backGround;
@@ -61,7 +56,7 @@ public class ComboCardView extends CardView{
 //		g.drawImage(bimg, xCoord, yCoord, null);
 //		TrickCard c = (TrickCard) getCard();
 //		if(comboSelected != -1 && !c.isCombo()) {
-//			drawThickOval(xCoord, yCoord, Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT, 4, Color.RED, g);
+//			GraphicUtils.drawThickOval(xCoord, yCoord, Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT, 4, Color.RED, g);
 //		}
 		super.drawBigCard(g, panelWidth, panelHeight);
 		drawOptionSelection(g, panelWidth-Constants.HUGE_CARD_WIDTH, panelHeight-Constants.HUGE_CARD_HEIGHT, Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT);
@@ -81,6 +76,7 @@ public class ComboCardView extends CardView{
 	}
 	
 	public static void drawACircle(Graphics g, int x, int y, int width, int height, int option) {
-		drawThickOval(x + (width/2)*option, y+height/4, width/2, height/2, 4, Color.RED, g);
+		GraphicUtils.drawThickRectangle(x + (width/2)*option, y+height/4, width/2, height/2, 4, Color.RED, g);
+//		GraphicUtils.drawThickOval(x + (width/2)*option, y+height/4, width/2, height/2, 4, Color.RED, g);
 	}
 }

@@ -96,6 +96,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	private boolean manipPlayerTurn;
 	private String title;
 	private boolean leftButtonDown;
+	private boolean iceCreamBeingPlayed;
 
 	private static final int PLAYDECK_OFFSET = 60;
 	//private static final int MINIMUM_CARD_DISPLACEMENT = 15;
@@ -115,6 +116,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		firstPlayerTurn = rgen.nextBoolean();
 		manipPlayerTurn = rgen.nextBoolean();
 		leftButtonDown = false;
+		iceCreamBeingPlayed = false;
 		resetPanel();
 		addStatusBox();
 
@@ -249,6 +251,10 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 				textToShow = generateSuccessMessage(cv, dv, p);
 			}
 			firstPlayerTurn = !firstPlayerTurn;
+			if(!iceCreamBeingPlayed) {
+				boolean nextRound = panel.possibleComputerTurn();
+				if(nextRound) return;
+			}
 		}else{
 			textToShow = generateErrorMessage(cv, dv, p);
 			sendCardBack(cv);
@@ -313,10 +319,10 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		resetPanel();
 		if(Constants.NETWORK_MODE) {
 			currentGame.clearTheRound();
-			setTurn(false);
 		}else{
 			currentGame.playOneRound();
 		}
+		setTurn(!Constants.NETWORK_MODE);
 	}
 
 	public void addTeam(boolean isForPlayer) {
@@ -875,8 +881,15 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 
 	private void paintTrickHand(Graphics g) {
 		int i = 0;
-		for(Iterator<CardView> iter = currentTrickCardsLeft.iterator(); iter.hasNext();) {
-			CardView cv = iter.next();
+//		for(Iterator<CardView> iter = currentTrickCardsLeft.iterator(); iter.hasNext();) {
+//			CardView cv = iter.next();
+//			cv.setZOrder(i);
+//			cv.drawCard(g);
+//			i++;
+//		}
+		
+		for(int index = 0; index < currentTrickCardsLeft.size(); index++) {
+			CardView cv = currentTrickCardsLeft.get(index);
 			cv.setZOrder(i);
 			cv.drawCard(g);
 			i++;
@@ -884,13 +897,15 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	}
 
 	private void paintOpponentTricks(Graphics g) {
-		for(CardView cv:opponentsTrickCardsLeft) {
+		for(int i = 0; i < opponentsTrickCardsLeft.size(); i++) {
+			CardView cv = opponentsTrickCardsLeft.get(i);
 			cv.drawCard(g);
 		}
 	}
 
 	private void paintDecks(Graphics g) {
-		for(DeckView dv:decksInPlay) {
+		for(int i = 0; i < decksInPlay.size(); i++) {
+			DeckView dv = decksInPlay.get(i);
 			dv.drawDeck(g);
 		}
 		drawDividingLine(g);
@@ -1069,6 +1084,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	}
 
 	public void iceCreamPlayed(Player p, DeckView dv, Player cvOwner) {
+		iceCreamBeingPlayed = true;
 		int numRadios = 0;
 		if(p.numRadiosInHand() > 0) {
 			if(isOurUser(p)) {
@@ -1122,10 +1138,6 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		if(!isOurUser(cvOwner)) {  //Launching Manip Window for Computer
 			launchCompManipWindow(dv);
 		}
-	}
-
-	private void decideToLaunchPebbleBag(DeckView dv) {
-
 	}
 
 	public boolean isOurUser(Player p) {
@@ -1295,7 +1307,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 
 	private String decideTurn(boolean ourTurn) {
 		if(!ourTurn) {
-			return Constants.STATUS_OPPO_TURN + Constants.SENTENCE_SEP + parsePlayerTurnName() + ", you will be up soon.";
+			return Constants.STATUS_OPPO_TURN + Constants.SENTENCE_SEP + parsePlayerTurnName() + Constants.UP_SOON;
 		}
 		return parsePlayerTurnName() + "'s" + Constants.STATUS_TURN;
 	}
@@ -1517,13 +1529,9 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	public void iceCreamTruckDone(IceCreamTruckView pf, DeckView dv, boolean didKidsRunToTruck) {
 		panel.iceViewDone(pf);
 		boolean ourTurn = false;
-		if(Constants.NETWORK_MODE) {
-			if(isOurUser(dv.getPlayer())){
-				enableUser();
-				ourTurn = true;
-			}
-		}else{
+		if(isOurUser(dv.getPlayer())){
 			enableUser();
+			ourTurn = true;
 		}
 		String msg = "";
 		if(didKidsRunToTruck) {
@@ -1535,6 +1543,10 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		}
 		showDeckExtras(true);
 		status.setText(Constants.STATUS_THEY + msg + Constants.STATUS_FOR_THE + Constants.STATUS_FIB + Constants.SENTENCE_SEP + decideTurn(ourTurn));
+		iceCreamBeingPlayed = false;
+		if(!Constants.NETWORK_MODE && !isOurUser(dv.getPlayer())) {
+			panel.possibleComputerTurn();
+		}
 		repaint();
 	}
 

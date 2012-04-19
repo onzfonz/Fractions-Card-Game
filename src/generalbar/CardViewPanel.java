@@ -6,13 +6,10 @@ package generalbar;
  * a single card, but it also has all of the view stuff associated with that card including it's width, height, etc.
  */
 
-import extras.Debug;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +26,8 @@ import cards.BackCardView;
 import cards.Card;
 import cards.TeammateCard;
 import cards.TrickCard;
+import extras.Debug;
+import extras.GraphicUtils;
 
 public class CardViewPanel extends JPanel{
 	protected Card card;
@@ -253,7 +252,7 @@ public class CardViewPanel extends JPanel{
 				drawImages(g, x, y, xScale, yScale);
 				if(highlighted) {
 					//drawThickRectangle(Math.abs(getWidth()/2-scaledImg.getWidth(null)/2), Math.abs(getHeight()/2-.getHeight(null)/2), Math.min(b.getWidth(null)-1, getWidth()-1), Math.min(b.getHeight(null)-1, getHeight()-1), 4, g);
-					drawThickRectangle(x, y, (int) getSize().getWidth(), (int) getSize().getHeight(), 4, Color.red, g);
+					GraphicUtils.drawThickRectangle(x, y, (int) getSize().getWidth(), (int) getSize().getHeight(), 4, Color.red, g);
 				}
 			}else{
 				drawImages(g, x, y);
@@ -305,33 +304,6 @@ public class CardViewPanel extends JPanel{
 
 	public void drawBigCard(Graphics g, int width, int height) {
 		drawImages(g, width-Constants.HUGE_CARD_WIDTH, height-Constants.HUGE_CARD_HEIGHT, Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT);
-	}
-
-	/* Draws lineSize pixel width rectangle, bounded with the box x y width height */
-	public static void drawThickRectangle(int x, int y, int width, int height, int lineSize, Color c, Graphics g) {
-		Color oldColor = g.getColor();
-		g.setColor(c);
-		for(int i = 0; i < lineSize; i++) {
-			g.drawRect(x, y, width, height);
-			x++;
-			y++;
-			width-=2;
-			height-=2;
-		}
-		g.setColor(oldColor);
-	}
-
-	public static void drawThickOval(int x, int y, int width, int height, int lineSize, Color c, Graphics g) {
-		Color oldColor = g.getColor();
-		g.setColor(c);
-		for(int i = 0; i < lineSize; i++) {
-			g.drawOval(x, y, width, height);
-			x++;
-			y++;
-			width-=2;
-			height-=2;
-		}
-		g.setColor(oldColor);
 	}
 
 	private ArrayList<String> buildImageFilenames(Card c) {
@@ -411,10 +383,6 @@ public class CardViewPanel extends JPanel{
 		return name.substring(pos + Constants.FNAME_SPACE_SEP.length());
 	}
 	// Convenience setters for clients
-
-	public static void drawThickRectangle(int x, int y, int width, int height, Color c, Graphics g) {
-		drawThickRectangle(x, y, width, height, Constants.DEFAULT_PEN_THICKNESS, c, g);
-	}
 
 	public boolean withinBounds(int x, int y) {
 		return (x >= getX() && x <= (getX()+getSize().getWidth()) && y >= getY() && y <= (getY()+getSize().getHeight()));

@@ -16,6 +16,7 @@ import cards.ShadowCardView;
 import cards.TeammateCard;
 import cards.TrickCard;
 import extras.Debug;
+import extras.GraphicUtils;
 
 /* This will be a delegation style class
  * that will have a playdeck and all that it entails,
@@ -231,7 +232,7 @@ public class DeckView {
 		int y = getTeammateCard().getY();
 		int width = getCardWidth();
 		int height = (int) calculateDeckHeight();
-		CardView.drawThickRectangle(x, y, width, height, c, g);
+		GraphicUtils.drawThickRectangle(x, y, width, height, c, g);
 	}
 
 	public int calculateDeckHeight() {

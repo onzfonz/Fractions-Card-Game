@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -359,6 +360,21 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		currentLayout = GAME_PANEL;
 		addLayout(gamePanel, GAME_PANEL);
 		addLayout(manCardPanel, MANIP_PANEL);
+	}
+	
+	public boolean possibleComputerTurn() {
+		if(!Constants.NETWORK_MODE) {
+			return doAComputerOpponentMove();
+		}
+		return false;
+	}
+	
+	private boolean doAComputerOpponentMove() {
+		if(!gamePanel.computerMove()) {
+			askToFinishRound();
+			return true;
+		}
+		return false;
 	}
 
 	public void beginGame() {
