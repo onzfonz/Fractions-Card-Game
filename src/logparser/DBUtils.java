@@ -55,9 +55,28 @@ public class DBUtils {
     public static final String SQL_UID_FROM_NAME = "select uid from users where uname = ?";
     public static final String SQL_PID_FROM_UIDS = "select pid from pairs where uid1 = (select uid from users where uname = ?) AND uid2 = (select uid from users where uname = ?)";
     public static final String SQL_PID_FROM_UID = "select pid from pairs where uid1 = (select uid from users where uname = ?) AND uid2 is null";
+    public static final String SQL_B_USERS = "select uid, u3cset, u4cset, mqtot, zqtot, (mq12 + mq13 + mq14 + mq15 + mq16 + mq17), (zq12 + zq13 + zq14 + zq15 + zq16 + zq17) from users where treatment = 'B'";
+    public static final String SQL_SHOWN = "select qid from userlogs where uid = ? AND ulogtype = 'QShown'";
+    public static final String SQL_WRONG_Q = "select qid from userlogs where uid = ? AND ulogtype = 'QStarted' AND qid IN (select qid from questions where qans = -1)";
+    public static final String SQL_TRIED = "select qid, ulogattempt from userlogs where uid = ? AND ulogtype = 'QTried'";
+    public static final String SQL_GAMES = "select gid from games where pid1 IN (select pid from pairs where uid1 = ? OR uid2 = ?) OR pid2 IN (select pid from pairs where uid1 = ? OR uid2 = ?)";
+    public static final String SQL_NUM_QS = "select qid from userlogs where uid = ? AND ulogtype = 'QDone'";
+    public static final String SQL_QID_ULOGS = "select * from userlogs where qid = ?";
+    public static final String SQL_SHADOW_ULOGS = "select * from userlogs where qaid in (select distinct qaid from pairlogs where qaid is not null and plogcontent like '%Shadow%') and uid = ?";
+
+    public static final String SQL_GET_QIDS = "select qid from questions";
+    
+    //More complex SQL Statements
+    public static final String SQL_ULOGS_FROM_UIDGID = "select * from userlogs where uid = ? and qaid in (select qaid from pairlogs where plogtype = 'QuestionAns' and gid in (select gid from games where gid >= ? and gid <= ? and (pid1 IN (select pid from pairs where uid1 = ? OR uid2 = ?) OR pid2 IN (select pid from pairs where uid1 = ? OR uid2 = ?))))";
+    public static final String SQL_SHADOW_ULOGS_FROM_UIDGID = "select * from userlogs where uid = ? and qaid in (select distinct qaid from pairlogs where qaid is not null and plogcontent like '%Shadow%' and gid in (select gid from games where gid >= ? and gid <= ? and (pid1 IN (select pid from pairs where uid1 = ? OR uid2 = ?) OR pid2 IN (select pid from pairs where uid1 = ? OR uid2 = ?))))";
     
     public static final String[] USER_LOG_NAMES = {"Hawes2011-1.log", "Hawes2011-2.log", "Hawes2011-4.log", "Hawes2011-5.log"};
     public static final String[] VALID_MOVES = {"myHand", "myTeam", "move", "radios", "chip"};
+    public static final int[] session1gids = {1, 4};
+    public static final int[] session2gids = {5, 8};
+    public static final int[] session4gids = {9, 13};
+    public static final int[] session5gids = {14, 17};
+    public static final int[][] hawessessionmarkers = {session1gids, session2gids, session4gids, session5gids};
 	
     public static final String FILE_DELIMITER = "----------------------------";
     public static final String INFO_REGEX = "(.*)\\sINFO\\s(.+)\\ssen\\w+\\s(((\\w+):(.*))|(\\.(\\w+)))";
@@ -309,6 +328,146 @@ public class DBUtils {
     	return rs.getString(1);
     }
     
+    public static ArrayList<LogUser> getUserQuestionsFromSession(PreparedStatement ps, int uid, int[] sessionLimits) throws SQLException {
+    	//1, 4, 5, 6, 7 the uid
+    	//2 and 3 the gid
+    	ps.setInt(1, uid);
+    	for(int i = 4; i <= 7; i++) {
+    		ps.setInt(i, uid);
+    	}
+    	ps.setInt(2, sessionLimits[0]);
+    	ps.setInt(3, sessionLimits[1]);
+    	return constructUserLogs(ps);
+    }
+    
+    public static ArrayList<LogUser> constructUserLogs(PreparedStatement ps) throws SQLException {
+    	ResultSet rs = ps.executeQuery();
+    	ArrayList<LogUser> logs = new ArrayList<LogUser>();
+    	while(rs.next()) {
+    		LogUser ulog = new LogUser(rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getInt(5), rs.getTimestamp(6), rs.getString(8), rs.getString(7), rs.getString(9), rs.getString(10), rs.getString(11), rs.getString(12));
+    		logs.add(ulog);
+    	}
+    	return logs;
+    }
+    
+    public static ArrayList<LogUserMine> getAllUsersMineableInfo(PreparedStatement ps) throws SQLException {
+    	ResultSet rs = ps.executeQuery();
+    	ArrayList<LogUserMine> list = new ArrayList<LogUserMine>();
+    	while(rs.next()) {
+    		LogUserMine temp = new LogUserMine(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7));
+    		list.add(temp);
+    	}
+    	return list;
+    }
+    
+	public static void setMineShownHow(LogUserMine mine, PreparedStatement ps) throws SQLException {
+		ps.setInt(1, mine.getUid());
+		ArrayList<String> list = getSQLResultList(ps);
+		mine.setClickedShow(list);
+	}
+
+	public static void setMineWrong(LogUserMine mine, PreparedStatement ps) throws SQLException {
+		ps.setInt(1, mine.getUid());
+		ArrayList<String> list = getSQLResultList(ps);
+		mine.setQidsIncorrect(list);
+	}
+
+	public static void setMineAttempts(LogUserMine mine, PreparedStatement ps) throws SQLException {
+		ps.setInt(1, mine.getUid());
+		ArrayList<String> qids = new ArrayList<String>();
+		ArrayList<String> answered = new ArrayList<String>();
+		ResultSet rs = ps.executeQuery();
+		while(rs.next()) {
+			qids.add(rs.getString(1));
+			answered.add(rs.getString(2));
+		}
+		mine.setQtriedids(qids);
+		mine.setQtriedattempt(answered);
+	}
+
+	public static void setMineNumGames(LogUserMine mine, PreparedStatement ps) throws SQLException {
+		for(int i = 1; i <= 4; i++) {
+			ps.setInt(i,  mine.getUid());
+		}
+		ArrayList<Integer> games = getSQLResultListInt(ps);
+		int numGames = numSessionsPlayed(games, hawessessionmarkers);
+		mine.setNumSessionsPlayed(numGames);
+	}
+	
+	private static int numSessionsPlayed(ArrayList<Integer> gids, int[][] sessionmarkers) {
+		boolean[] session = new boolean[sessionmarkers.length];
+		for(int gid:gids) {
+			for(int i = 0; i < sessionmarkers.length; i++) {
+				if(gid >= sessionmarkers[i][0] && gid <= sessionmarkers[i][1]) {
+					session[i] = true;
+				}
+			}
+		}
+		return countBooleans(session);
+	}
+	
+	public static int countBooleans(boolean[] arr) {
+		int num = 0;
+		for(int i = 0; i < arr.length; i++) {
+			if(arr[i]) {
+				num++;
+			}
+		}
+		return num;
+	}
+
+	public static void setMineQsAnswered(LogUserMine mine, PreparedStatement ps) throws SQLException {
+		ps.setInt(1, mine.getUid());
+		int numAnswered = getSQLResultCount(ps);
+		mine.setNumQuestionsAnswered(numAnswered);
+	}
+	
+	public static void setMineEarlyLateQs(LogUserMine mine, PreparedStatement ps) throws SQLException {
+		ArrayList<LogUser> earlyULs = getSomeUserQuestionsFromSession(ps, mine.getUid(), session1gids, session2gids);
+		ArrayList<LogUser> lateULs = getSomeUserQuestionsFromSession(ps, mine.getUid(), session5gids, session4gids);
+//		for(LogUser lu: earlyULs) {
+//			System.out.println(Arrays.asList(lu.toSQLString()));
+//		}
+		mine.setEarlyQuestions(earlyULs);
+		mine.setLateQuestions(lateULs);
+	}
+	
+	public static void setMineEarlyLateShadowQs(LogUserMine mine, PreparedStatement ps) throws SQLException{
+		ArrayList<LogUser> earlyULs = getSomeUserQuestionsFromSession(ps, mine.getUid(), session1gids, session2gids);
+		ArrayList<LogUser> lateULs = getSomeUserQuestionsFromSession(ps, mine.getUid(), session5gids, session4gids);
+		mine.setEarlyShadowQs(earlyULs);
+		mine.setLateShadowQs(lateULs);
+	}
+
+	public static ArrayList<LogUser> getSomeUserQuestionsFromSession(PreparedStatement ps, int uid, int[] gids, int[] altgids) throws SQLException {
+		ArrayList<LogUser> lus = getUserQuestionsFromSession(ps, uid, gids);
+		if(lus.size() <= 0) {
+			lus = getUserQuestionsFromSession(ps, uid, altgids);
+		}
+		return lus;
+	}
+		
+	public static ArrayList<String> getSQLResultList(PreparedStatement ps) throws SQLException {
+		ArrayList<String> list = new ArrayList<String>();
+		ResultSet rs = ps.executeQuery();
+		while(rs.next()) {
+			list.add(rs.getString(1));
+		}
+		return list;
+	}
+	
+	public static ArrayList<Integer> getSQLResultListInt(PreparedStatement ps) throws SQLException {
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		ResultSet rs = ps.executeQuery();
+		while(rs.next()) {
+			list.add(rs.getInt(1));
+		}
+		return list;
+	}
+
+	public static int getSQLResultCount(PreparedStatement ps) throws SQLException {
+		return getSQLResultList(ps).size();
+	}
     public static HashMap<String, String> linkUIDsToNames(String[] names, PreparedStatement ps) throws SQLException {
     	HashMap<String, String> uidNameMap = new HashMap<String, String>();
     	for(int i = 0; i < names.length; i++) {
@@ -489,7 +648,13 @@ public class DBUtils {
   		return id < 0;
   	}
 	/* --------------------Utilities for JDBC Driver -------------------------*/
-
+  	public static PreparedStatement prepareAStatement(Connection conn, String sqlString, ArrayList<Statement> statements) throws SQLException{
+  		PreparedStatement temp = conn.prepareStatement(sqlString);
+  		statements.add(temp);
+  		return temp;
+  	}
+  	
+  	
     public static Connection getDBConnection(String schema, String dbName, String protocol) throws SQLException {
 		Properties props = new Properties(); // connection properties
         props.put("user", schema);

@@ -337,7 +337,7 @@ public class Constants {
 	public static final double REP_COMBO_Y_MOD = .57;
 	
 	//General Debugging and Other Future User Options
-	public static boolean SHOW_COMPUTER_CARDS = true;
+	public static boolean SHOW_COMPUTER_CARDS = false;
 	public static boolean REGULAR_MODE = true;  //false gives green rectangle, doesn't have them calculate their mistakes, can be used for easy level
 	public static boolean SHOW_DECK_LABEL_NUMBER = false;
 	public static boolean SHOW_DECK_MANIPS = true;
@@ -346,7 +346,7 @@ public class Constants {
 	//When they have something like .5 of 12 to have them figure out all the values.
 	public static boolean GIVE_QUESTION_TO_USER = true;
 	public static boolean TEXT_AS_IMAGES = true;  //Need to change ComboCardView superclass if you change this
-	public static boolean ASK_USERS_FRACTION_QS = false;
+	public static boolean ASK_USERS_FRACTION_QS = true;
 	public static boolean MANIPS_OVERLAP = true;
 	public static boolean DEBUG_MODE = true;
 	public static boolean SHOW_COLOR_SLIDERS = DEBUG_MODE && false;
