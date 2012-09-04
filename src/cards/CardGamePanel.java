@@ -23,7 +23,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -34,6 +33,7 @@ import network.NetDelegate;
 import network.NetHelper;
 import pebblebag.IceCreamTruckView;
 import pebblebag.PebbleListener;
+import tugstory.TugPanel;
 import basic.Constants;
 import basic.FYIMessage;
 import basic.GamePanel;
@@ -73,7 +73,8 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	private static final String MANIP_PANEL = "Manip Panel";
 	private static final String MANIP_CALC_PANEL = "Manip Calc";
 	private static final String COMBO_NAME = "Combo View";
-	private static final String ICE_NAME = "Ice Cream Truck View";
+	private static final String ICE_NAME = "Chance View";
+	private static final String TUG_VIEW = "End-Of-Round View";
 
 	public CardGamePanel(NetDelegate nRep) {
 		//setTitle(Constants.WINDOW_TITLE);
@@ -217,6 +218,13 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		newRound.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				gamePanel.setTrickHandToAirs(true);
+			}
+		});
+		
+		newRound = createDebugButton(toolbox, "End the Round");
+		newRound.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				gamePanel.endOfRoundAnimation();
 			}
 		});
 
@@ -459,7 +467,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		}
 	}
 
-	private void calculateScore() {
+	private void calculateScore() {  //This is the part that I want to look into for calculating the score, which we'll swap out
 		if(gamePanel.gameStarted()) {
 			JOptionPane.showMessageDialog(myFrame, gamePanel.calculateScoreForRound());
 			int oppoPoints = gamePanel.getOppositionPoints();
@@ -509,8 +517,9 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		String[] optsArray = {"No", "Yes"};
 		int option = JOptionPane.showOptionDialog(myFrame, Constants.INFO_NO_MOVES, "", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, optsArray, 0);
 		if(option == 1) {
-			calculateScore();
-			NetHelper.sendNetCalc(netRep);
+			NetHelper.sendNetCalc(netRep); //send this out first so that the animation doesn't take over...
+			//calculateScore();
+			gamePanel.endOfRoundAnimation();
 		}else if(option == 0 || option == JOptionPane.CLOSED_OPTION) {
 			forceUserTurn(true);
 		}
@@ -567,7 +576,8 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		if(command.equals(Constants.CMD_MOVE)) {
 			parseMove(rest);
 		}else if(command.equals(Constants.CMD_CALC)) {
-			calculateScore();
+			gamePanel.endOfRoundAnimation();
+			//calculateScore();
 			NetHelper.sendNetNewRound(netRep);
 		}else if(command.equals(Constants.CMD_START)) {
 			beginGame();
@@ -751,6 +761,16 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	public boolean iceViewDone(IceCreamTruckView iPanel) {
 		panelViewDone(iPanel, ICE_NAME);
 		return switchToGameOrManipPanel();
+	}
+	
+	public void tugViewCreated(TugPanel tPanel) {
+		panelViewCreated(tPanel, TUG_VIEW);
+	}
+	
+	public boolean tugViewDone(TugPanel tPanel) {
+		boolean b = panelViewDone(tPanel, TUG_VIEW);
+		calculateScore();
+		return b;
 	}
 
 	private void panelViewCreated(JPanel p, String name) {

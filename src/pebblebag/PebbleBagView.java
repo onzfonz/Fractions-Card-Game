@@ -293,7 +293,7 @@ public class PebbleBagView {
 	}
 	
 	public void drawBag(Graphics g) {
-		g.drawImage(PebbleImages.getPebbleBag(), x, y, null);
+		g.drawImage(TugImages.getPebbleBag(), x, y, null);
 		for(PebbleView pv:pebbles) {
 			g.drawImage(pv.getPebbleImage(), x + pv.getX(), y + pv.getY(), null);
 		}

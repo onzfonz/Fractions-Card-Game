@@ -27,12 +27,12 @@ public class PebbleView {
 
 	public BufferedImage getPebbleImage() {
 		if(isHidden){
-			return PebbleImages.getHiddenPebble();
+			return TugImages.getHiddenPebble();
 		}else{
 			if(kidsRunToTruck) {
-				return PebbleImages.getOrangePebble();
+				return TugImages.getOrangePebble();
 			}else{
-				return PebbleImages.getPurplePebble();
+				return TugImages.getPurplePebble();
 			}
 		}
 	}

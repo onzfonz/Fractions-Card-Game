@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 
-import pebblebag.PebbleImages;
+import pebblebag.TugImages;
 
 public class IcePanel extends RepPanel {
 	private int num;
@@ -32,8 +32,8 @@ public class IcePanel extends RepPanel {
 	
 	public void drawIce(Graphics g, double x, double y, double width, double height) {
 		double proposedSpacing = width/((((num+den)*3)+(num+den)+1));
-		drawPebbles(g, PebbleImages.getOrangePebble(), proposedSpacing, 0, 0, getWidth(), getHeight(), 0, num);
-		drawPebbles(g, PebbleImages.getPurplePebble(), proposedSpacing, 0, 0, getWidth(), getHeight(), num, num+den);
+		drawPebbles(g, TugImages.getOrangePebble(), proposedSpacing, 0, 0, getWidth(), getHeight(), 0, num);
+		drawPebbles(g, TugImages.getPurplePebble(), proposedSpacing, 0, 0, getWidth(), getHeight(), num, num+den);
 	}
 	
 	private void drawPebbles(Graphics g, BufferedImage img, double spacing, double x, double y, double width, double height, int start, int end) {

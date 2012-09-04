@@ -2,6 +2,7 @@ package extras;
 
 import manipulatives.ManCardPanel;
 import pebblebag.IceCreamTruckView;
+import tugstory.TugPanel;
 import basic.Player;
 
 import combo.ChooseComboCardPanel;
@@ -19,4 +20,6 @@ public interface PanelListener {
 	public boolean comboViewDone(ChooseComboCardPanel cPanel);
 	public void iceViewCreated(IceCreamTruckView iPanel);
 	public boolean iceViewDone(IceCreamTruckView iPanel);
+	public void tugViewCreated(TugPanel tPanel);
+	public boolean tugViewDone(TugPanel tPanel);
 }

@@ -13,7 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
-import pebblebag.PebbleImages;
+import pebblebag.TugImages;
 import basic.Constants;
 import basic.Player;
 import cards.Card;
@@ -206,9 +206,9 @@ public class DeckViewPanel extends JPanel {
 	private void drawManipulatives(Graphics g) {
 		int x = getCardWidth() + getX();
 		int y = getY();
-		BufferedImage manip = PebbleImages.getMan();
-		BufferedImage stinkManip = PebbleImages.getStinkyMan();
-		BufferedImage freshManip = PebbleImages.getFreshenedMan();
+		BufferedImage manip = TugImages.getMan();
+		BufferedImage stinkManip = TugImages.getStinkyMan();
+		BufferedImage freshManip = TugImages.getFreshenedMan();
 		if(Constants.DEBUG_MODE) {
 			System.out.println("getCardWidth is: " + getCardWidth() + ", while manip width is " + manip.getWidth());
 		}

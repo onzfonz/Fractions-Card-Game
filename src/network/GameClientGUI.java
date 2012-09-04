@@ -31,6 +31,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 
 import pebblebag.PebbleListener;
+import tutorial.SimpleGameClientThread;
 import basic.Constants;
 import basic.FYIMessage;
 import cards.CardGamePanel;
@@ -68,7 +69,7 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 		lobbyPeople = new DefaultListModel();
 		lobbyPanel = new JPanel(new BorderLayout());
 		createLobbyPanel(lobbyPanel);
-		
+
 		gamePanel = new JPanel(new BorderLayout());
 		createGamePanel(gamePanel);
 
@@ -104,19 +105,19 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 		start.setFont(Constants.FONT_REG);
 		box.add(start);
 		if(Constants.NETWORK_MODE) {
-		start.addActionListener( new ActionListener() {
-		
-			public void actionPerformed(ActionEvent e) {
-				String challenger = (String) jLobbyPeople.getSelectedValue(); 
-				if(challenger != null) {
-					moveToGame();
-					sendToServer(challenger);
-					lobbyLabel.setText("Please wait while we check with " + challenger);
+			start.addActionListener( new ActionListener() {
+
+				public void actionPerformed(ActionEvent e) {
+					String challenger = (String) jLobbyPeople.getSelectedValue(); 
+					if(challenger != null) {
+						moveToGame();
+						sendToServer(challenger);
+						lobbyLabel.setText("Please wait while we check with " + challenger);
+					}
 				}
-			}
-		});
+			});
 		}
-		
+
 		jLobbyPeople = new JList(lobbyPeople);
 		jLobbyPeople.setFont(Constants.FONT_REG);
 		jLobbyPeople.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -141,17 +142,21 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 	}
 
 	private void askNamesAndSend(String prefix) {
-		String s = (String)JOptionPane.showInputDialog(this, prefix + Constants.INFO_NET_ASK_NAME, "Name", JOptionPane.QUESTION_MESSAGE, null, null, "");
-		if(s.equalsIgnoreCase("exit")) {
-			System.exit(0);
-		}
-		while(s == null || s.equals("") || containsIllegalThings(s)) {
-			s = (String)JOptionPane.showInputDialog(this, Constants.INFO_ERR_REAL_NAME, "Name", JOptionPane.QUESTION_MESSAGE, null, null, "");
-		}
-		String partner = (String)JOptionPane.showInputDialog(this, Constants.INFO_NET_ASK_PARTNER, "Partner", JOptionPane.QUESTION_MESSAGE, null, null, "");
-		String id = s + " & " + partner;
-		if(partner == null || partner.equals("")) {
-			id = s;
+		String id = "DPlayer1 & DPlayer2";
+		if(!Constants.DEBUG_MODE) {
+			String s = (String)JOptionPane.showInputDialog(this, prefix + Constants.INFO_NET_ASK_NAME, "Name", JOptionPane.QUESTION_MESSAGE, null, null, "");
+
+			if(s.equalsIgnoreCase("exit")) {
+				System.exit(0);
+			}
+			while(s == null || s.equals("") || containsIllegalThings(s)) {
+				s = (String)JOptionPane.showInputDialog(this, Constants.INFO_ERR_REAL_NAME, "Name", JOptionPane.QUESTION_MESSAGE, null, null, "");
+			}
+			String partner = (String)JOptionPane.showInputDialog(this, Constants.INFO_NET_ASK_PARTNER, "Partner", JOptionPane.QUESTION_MESSAGE, null, null, "");
+			id = s + " & " + partner;
+			if(partner == null || partner.equals("")) {
+				id = s;
+			}
 		}
 		setTitle(id);
 		game.titleUpdated(id);
@@ -209,16 +214,16 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 		}
 		String[] ipAddrs = { Constants.LOCAL_SERVER_IP2, Constants.SERVER_IP, Constants.SERVER_ADDR, Constants.SERVER_IP_STANFORD, Constants.LOCALHOST};
 		switch(timesAttempted) {
-			case 0: return new Socket(Constants.LOCAL_SERVER_IP, Constants.SOCKET_PORT);
-			case 1: ind = JOptionPane.showOptionDialog(this, Constants.INFO_PICK_SERVER, "IP", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, ipAddrs, Constants.LOCAL_SERVER_IP2);
-			if(ind != JOptionPane.CLOSED_OPTION) {
-				input = ipAddrs[ind]; break;
-			}
-			case 2: input = JOptionPane.showInputDialog(Constants.INFO_ERR_SERVER_404);
-			break;
-			default: return null;
+		case 0: return new Socket(Constants.LOCAL_SERVER_IP, Constants.SOCKET_PORT);
+		case 1: ind = JOptionPane.showOptionDialog(this, Constants.INFO_PICK_SERVER, "IP", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, ipAddrs, Constants.LOCAL_SERVER_IP2);
+		if(ind != JOptionPane.CLOSED_OPTION) {
+			input = ipAddrs[ind]; break;
 		}
-		
+		case 2: input = JOptionPane.showInputDialog(Constants.INFO_ERR_SERVER_404);
+		break;
+		default: return null;
+		}
+
 		return new Socket(input, Constants.SOCKET_PORT);
 	}
 
@@ -247,7 +252,7 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 		}
 		closeAll();
 	}
-	
+
 	public void makeWindowShowUp() {
 		myName = getTitle();
 		pack();
@@ -399,7 +404,7 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 		game.setChipObserver(l);
 		sendCommand(cmd, args);
 	}
-	
+
 	public void sendShakingCommand(String cmd, String args) {
 		sendCommand(cmd, args);
 	}
@@ -420,9 +425,8 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 
 	public void windowClosing(WindowEvent arg0) {
 		int option = 0;
-		if(inGame()) {
+		if(inGame() && !Constants.DEBUG_MODE) {
 			option = JOptionPane.showConfirmDialog(this, Constants.INFO_ASK_B4_CLOSING, "Exit?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-			Debug.println(option);
 		}
 		if(option == 0) {
 			System.exit(0);

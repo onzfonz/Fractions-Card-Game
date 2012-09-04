@@ -71,8 +71,8 @@ public class Game {
 	}
 	
 	public String calculateScore() {
-		int p1Score = p1.totalTeammates();
-		int p2Score = opponent.totalTeammates();
+		int p1Score = getMyRound();
+		int p2Score = getOppoRound();
 		int difference = Math.abs(p1Score-p2Score);
 		String prefix = "";
 		String suffix = "";
@@ -92,6 +92,14 @@ public class Game {
 			return Constants.PARTS_TIE;
 		}
 		return prefix + message + suffix + "  " + postsuffix + " scored " + difference + " point" + ((difference == 1)?"":"s") + "!  Let's start the next round!";
+	}
+	
+	public int getMyRound() {
+		return p1.totalTeammates();
+	}
+	
+	public int getOppoRound() {
+		return opponent.totalTeammates();
 	}
 	
 	private TrickCard playTrickCard(Player p, Player otherP) {

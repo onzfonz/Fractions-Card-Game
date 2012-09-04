@@ -6,7 +6,15 @@ import java.util.Scanner;
 
 import basic.Constants;
 
-
+/* File: TrickCard.java
+ * --------------------
+ * This is the basic model for a trick card
+ * Biggest things about the trick are:
+ * ---The fraction (represented as a numerator and denominator)
+ * ---The type of trick card
+ * ---whether or not it's a decimal
+ * Nothing complicated other than some simple parsing
+ */
 
 public class TrickCard extends Card {
 	protected int num;
@@ -58,6 +66,8 @@ public class TrickCard extends Card {
 		return containsCategory("combo");
 	}
 	
+	//methods for extracting contents of the card when we have
+	//combo cards like [air:1/2,stink:1/2]
 	public TrickCard getFirstCard() {
 		if(isCombo()) {
 			return getCard(0);

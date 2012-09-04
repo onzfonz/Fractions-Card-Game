@@ -34,8 +34,8 @@ public class Constants {
 	public static final String FNAME_COMBO_REP = FNAME_REP + FNAME_SPACE_SEP + "Combo" + FNAME_SPACE_SEP;
 	public static final String FNAME_SEP = "-";
 	public static final String IMG_EXT = ".png";
-	public static final String FNAME_TEAM_DECK = "Team1DeckOrig.txt";
-	public static final String FNAME_TRICK_DECK = "Tricks1Deck.txt";
+	public static final String FNAME_TEAM_DECK = "Team1BGCPDeck.txt";
+	public static final String FNAME_TRICK_DECK = "Tricks1BGCPDeck.txt";
 	
 	//Trick Card types
 	public static final String STINK = "stink";
@@ -52,6 +52,10 @@ public class Constants {
 	public static final String MAN_IMG_FILENAME = "man.png";
 	public static final String MAN_STINKY_FILENAME = "stinkyman.png";
 	public static final String MAN_FRESH_FILENAME = "freshman.png";
+	public static final String MAN_LOST_FILENAME = "lostman.png";
+	public static final String TUG_BG_FILENAME = "tugbackground3.png";
+	public static final String TUG_FLAG_FILENAME = "flag1.png";
+	public static final String TUG_ROPE_FILENAME = "ropethin.png";
 	public static final String MAN_IMG_PATH = "images/man.png";
 	public static final String PEN_ICON_IMG_PATH = IMG_PATH + "lineicon.png";
 	public static final String LINE_ICON_IMG_PATH = IMG_PATH + "pencilicon.png";

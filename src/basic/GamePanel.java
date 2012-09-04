@@ -14,7 +14,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -33,8 +32,10 @@ import manipulatives.ManFrame;
 import manipulatives.ManListener;
 import network.NetDelegate;
 import network.NetHelper;
-import pebblebag.IceWindowListener;
 import pebblebag.IceCreamTruckView;
+import pebblebag.IceWindowListener;
+import tugstory.TugListener;
+import tugstory.TugPanel;
 import cards.CardView;
 import cards.TeammateCard;
 import cards.TeammateCardFactory;
@@ -50,7 +51,7 @@ import extras.Debug;
 import extras.PanelListener;
 import extras.RandomGenerator;
 
-public class GamePanel extends JPanel implements PlayerListener, ComponentListener, IceWindowListener, ManListener, ComboListener {
+public class GamePanel extends JPanel implements PlayerListener, ComponentListener, IceWindowListener, ManListener, ComboListener, TugListener {
 
 	/* Panel will have
 	 * opponent's decks in play up top
@@ -409,18 +410,25 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	}
 
 	public String calculateScoreForRound() {
-		String message = currentGame.calculateScore();
-		return message;
+		return currentGame.calculateScore();
 	}
 
 	public int getOppositionPoints() {
 		return currentGame.getOpposingPlayer().getPoints();
 	}
 
+	public int getOppositionRoundTotal() {
+		return currentGame.getOppoRound();
+	}
+
 	public int getPlayerPoints() {
 		return currentGame.getHumanPlayer().getPoints();
 	}
-
+	
+	public int getPlayerRoundTotal() {
+		return currentGame.getMyRound();
+	}
+	
 	public void removeTeam(boolean isForPlayer, DeckView dv) {
 		Player p = getCorrectPlayer(isForPlayer);
 		p.removePlayDeckFromHand(dv);
@@ -1185,6 +1193,18 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		combo.addListener(this);
 		panel.comboViewCreated(combo);
 	}
+	
+	public void endOfRoundAnimation() {
+		launchEndRoundFrame();
+	}
+	
+	private void launchEndRoundFrame() {
+		disableUser();
+		TugPanel tPanel = new TugPanel(getPlayerRoundTotal(), getOppositionRoundTotal());
+		tPanel.addListener(this);
+		panel.tugViewCreated(tPanel);
+		tPanel.startPulling();
+	}
 
 	public void setPebbleWindow(IceCreamTruckView pebWin) {
 		pebbleWindow = pebWin;
@@ -1609,6 +1629,10 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		resetToZero();
 		//Only happens with user, so this will go away
 		//enableUser();
+	}
+	
+	public void tugPanelDone(TugPanel tf) {
+		panel.tugViewDone(tf);
 	}
 
 	private void makeSuccessfulDragChanges() {

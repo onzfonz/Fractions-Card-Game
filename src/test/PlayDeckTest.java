@@ -2,7 +2,9 @@ package test;
 /*
  * File: PlayDeckTest.java
  * -----------------------
- * This is a Junit testing file for the PlayDeck class
+ * This is a Junit testing file for the PlayDeck class.
+ * Anytime changes are made to the PlayDeck class we should make sure that this class gets run
+ * to make sure that things don't become broken.
  */
 
 import junit.framework.TestCase;

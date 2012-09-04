@@ -13,7 +13,7 @@ import basic.Constants;
 
 
 
-public final class PebbleImages {
+public final class TugImages {
 	private static BufferedImage orangePebble;
 	private static BufferedImage purplePebble;
 	private static BufferedImage hiddenPebble;
@@ -21,8 +21,12 @@ public final class PebbleImages {
 	private static BufferedImage man;
 	private static BufferedImage stinkyMan;
 	private static BufferedImage freshenedMan;
-
-	public PebbleImages() {
+	private static BufferedImage lostMan;
+	private static BufferedImage tugBackground;
+	private static BufferedImage redFlag;
+	private static BufferedImage tugRope;
+	
+	public TugImages() {
 		orangePebble = getOrangePebble();
 		purplePebble = getPurplePebble();
 		hiddenPebble = getHiddenPebble();
@@ -30,6 +34,10 @@ public final class PebbleImages {
 		man = getMan();
 		stinkyMan = getStinkyMan();
 		freshenedMan = getFreshenedMan();
+		tugBackground = getTugBackground();
+		redFlag = getRedFlag();
+		tugRope = getTugRope();
+		lostMan = getLostMan();
 	}
 
 	public static BufferedImage getOrangePebble() {
@@ -66,7 +74,27 @@ public final class PebbleImages {
 		freshenedMan = retrieveImage(freshenedMan, Constants.MAN_FRESH_FILENAME);
 		return freshenedMan;
 	}
-
+	
+	public static BufferedImage getLostMan() {
+		lostMan = retrieveImage(lostMan, Constants.MAN_LOST_FILENAME);
+		return lostMan;
+	}
+	
+	public static BufferedImage getTugBackground() {
+		tugBackground = retrieveImage(tugBackground, Constants.TUG_BG_FILENAME);
+		return tugBackground;
+	}
+	
+	public static BufferedImage getRedFlag() {
+		redFlag = retrieveImage(redFlag, Constants.TUG_FLAG_FILENAME);
+		return redFlag;
+	}
+	
+	public static BufferedImage getTugRope() {
+		tugRope = retrieveImage(tugRope, Constants.TUG_ROPE_FILENAME);
+		return tugRope;
+	}
+	
 	private static BufferedImage retrieveImage(BufferedImage img, String filename) {
 		if(img == null) {
 			ClassLoader cl = Thread.currentThread().getContextClassLoader();
