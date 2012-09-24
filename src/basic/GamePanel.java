@@ -1300,7 +1300,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	}
 
 	private String generateSuccessMessage(CardView cv, DeckView dv, Player p) {
-		return Constants.STATUS_NICE_MOVE;
+		return Constants.STATUS_NICE_MOVE + Constants.SENTENCE_SEP;
 	}
 
 	private void clearCardList(List<CardView> playersTrickCards2) {
@@ -1605,7 +1605,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			Debug.println("enabling user");
 		}
 		if(shouldChangeText) {
-			status.setText(Constants.CORRECT + decideTurn(isMyTurn()));
+			status.setText(Constants.CORRECT + Constants.SENTENCE_SEP + decideTurn(isMyTurn()));
 		}else{
 			status.setText(formerText);
 		}

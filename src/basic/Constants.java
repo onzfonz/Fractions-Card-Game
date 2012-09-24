@@ -3,10 +3,375 @@ package basic;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 public class Constants {
-	public static final int TRICK_HAND_SIZE = 4;
-	public static final int TEAM_HAND_SIZE = 2;
+	private static final Properties props = new Properties();
+	public static final int TRICK_HAND_SIZE;
+	public static final int TEAM_HAND_SIZE;
+	public static final String IMG_PATH;
+	public static final String BASE_IMG_PATH;
+	public static final String FNAME_TEAM_DECK;
+	public static final String FNAME_TRICK_DECK;
+	public static final int SCORE_TO_WIN;
+	
+	//IP Addresses
+	public static final String SERVER_IP;
+	public static final String SERVER_IP_STANFORD;
+	//older one was 127.0.0.1
+//	public static final String SERVER_IP = "10.32.25.19";
+	public static final String LOCAL_SERVER_IP;
+	public static final String LOCAL_SERVER_IP2;
+	public static final String SERVER_ADDR;
+	public static final String LOCALHOST;
+
+	public static final int PANEL_WIDTH;
+	public static final int PANEL_HEIGHT;
+	
+	//Tooltip Message
+	public static final String TIP_START;
+	public static final String TIP_DONE_TURN;
+	public static final String TIP_MANIP;
+	public static final String TIP_USER_ANSWER;
+	public static final String TIP_ANSWER;
+	public static final String TIP_NOT_WHOLE;
+	public static final String TIP_CLEAR;
+	public static final String TIP_SHOW;
+	public static final String TIP_LINE;
+	public static final String TIP_PENCIL;
+	public static final String TIP_PPL;
+	public static final String TIP_DONE_SHAKING;
+	public static final String TIP_MANIP_AREA;
+	
+	//String messages
+	public static final String ICE_CREAM_NAME;
+	public static final String ICE_DESC;
+	public static final String STINK_DESC;
+	public static final String AIR_DESC;
+	public static final String RADIO_DESC;
+	public static final String MONEY_DESC;
+	public static final String YOU_WON;
+	public static final String YOU_LOST;
+	public static final String MAN_FRAME_YOUR_DECK_TEXT;
+	public static final String MAN_FRAME_THEIR_DECK_TEXT;
+	public static final String MAN_FRAME_DEFAULT_PLAY;
+	public static final String CORRECT;
+	public static final String CONNECT_SERVER;
+	public static final String DECIDED_MOVE;
+	public static final String THOUGHT_MOVE;
+	public static final String UP_SOON;
+
+	//Error Messages
+	public static final String ERROR_PLACING_RADIO;
+	public static final String ERROR_INPUT_NO_INT;
+	public static final String ERROR_WRONG_ANSWER;
+	public static final String ERROR_NO_GAME_YET;
+	public static final String ERROR_HURTING_YOURSELF;
+	public static final String ERROR_PROTECT_OTHER;
+	public static final String ERROR_TRY_AGAIN;
+	public static final String ERROR_TRY_ONCE_MORE;
+	public static final String ERROR_NOT_QUITE;
+	public static final String ERROR_NOT_AN_INTEGER;
+	public static final String ERROR_SORRY;
+	public static final String ERROR_CANT_PLACE_PREFIX;
+	public static final String ERROR_CANT_PLACE_ON;
+	public static final String ERROR_NOT_WHOLE_NUM;
+	public static final String ERROR_NO_STINKERS_LEFT;
+	public static final String ERROR_NO_STINK_CARDS;
+	public static final String ERROR_STINKS_LEFT_DIV;
+	
+	public static final String STATUS_NEW_ROUND;
+	public static final String MAN_FRAME_NO_ANSWER_BTN_TEXT;
+	
+	//Info messages
+	public static final String INFO_SHUFFLING;
+	public static final String INFO_PLAY_AGAIN;
+	public static final String INFO_NO_MOVES;
+	public static final String INFO_START_GAME_HELP;
+	public static final String INFO_STARTING;
+	public static final String INFO_NET_ASK_NAME;
+	public static final String INFO_NET_ASK_PARTNER;
+	public static final String INFO_ERR_REAL_NAME;
+	public static final String INFO_PICK_SERVER;
+	public static final String INFO_ERR_SERVER_404;
+	public static final String INFO_ERR_NAMES_TAKEN;
+	public static final String INFO_NET_ERR_LOST_CONN;
+	public static final String INFO_ASK_B4_CLOSING;
+		
+	//Status messages
+	//public static final String STATUS_NEW_ROUND = "A new round has started; choose which tricks you want to play.";
+	public static final String STATUS_OPPO_NO_MOVES;
+	public static final String STATUS_CALC_FRACTION;
+	public static final String STATUS_TURN;
+	public static final String STATUS_YOUR_TURN;
+	public static final String STATUS_OPPO_TURN;
+	public static final String STATUS_NICE_MOVE;
+	public static final String STATUS_NO_SUCH_CMD;
+	public static final String STATUS_DECIDING_WHOS_FIRST;
+	
+	public static final String STATUS_THEY;
+	public static final String STATUS_FALL;
+	public static final String STATUS_NO_FALL;
+	public static final String STATUS_FOR_THE;
+	public static final String STATUS_FIB;
+	public static final String STATUS_OWN_DECK;
+	public static final String STATUS_OPPO_DECK;
+	public static final String STATUS_FIB_FIGURE_PREFIX;
+	public static final String STATUS_FIB_FIGURE_MID;
+	public static final String STATUS_FIB_FIGURE_SUFFIX;
+	
+	public static final String PARTS_PREFIX_YOU;
+	public static final String PARTS_SUFFIX_YOU;
+	public static final String PARTS_PREFIX_THEM;
+	public static final String PARTS_SUFFIX_THEM;
+	public static final String PARTS_POST_THEY;
+	public static final String PARTS_TIE;
+	public static final String PARTS_HAD;
+	public static final String PARTS_MORE_TEAMMATE;
+	public static final String PARTS_PLURAL_SUFFIX;
+	public static final String PARTS_THAN;
+	
+	//Man messages
+	public static final String MAN_MSG_HOW_MANY;
+	public static final String MAN_MSG_GROUPS_NOT_EQUAL;
+	public static final String MAN_MSG_NOT_COOL_MAN;
+	public static final String MAN_HELP_PLACE_PREFIX;
+	public static final String MAN_HELP_PLACE_SUFFIX;
+	public static final String MAN_HELP_CIRCLE_PREFIX;
+	public static final String MAN_HELP_CIRCLE_SUFFIX;
+	
+	public static final String COMBO_MSG_SIDE;
+	
+	//Button names
+	public static final String BTN_NEW_GAME;
+	public static final String BTN_DONE_TURN;
+	public static final String BTN_PASS;
+	public static final String BTN_LAUNCH_MANIP;
+	public static final String BTN_MAN_ANSWER;
+	public static final String BTN_MAN_CLEAR;
+	public static final String BTN_MAN_HELP;
+	public static final String BTN_PEBBLE_DONE_SHAKING;
+	public static final String BTN_BACK_TO_GAME;
+	
+	public static final String[] YES_NO;
+	public static final String[] RADIO_OPTIONS;
+	
+	
+	public static final String WINDOW_TITLE;
+	public static final String TITLE_COMBO;
+	public static final String TITLE_ICE;
+	public static final String YOU_ARE;
+	public static final String YOUR_OPPO_HAS;
+	
+	public static final String YOUR_INIT_SCORE;
+	public static final String THEIR_INIT_SCORE;
+	
+	//Question prompts
+	public static final String ASK_FOR_RADIOS;
+	
+	//User Preferences
+	public static boolean SHOW_COMPUTER_CARDS;
+	public static boolean REGULAR_MODE;  //false gives green rectangle, doesn't have them calculate their mistakes, can be used for easy level
+	public static boolean SHOW_DECK_LABEL_NUMBER;
+	public static boolean SHOW_DECK_MANIPS;
+	public static boolean HAVE_MANIP_BUTTON;
+	//Option not implemented yet...Whether or not to construct the question to the user
+	//When they have something like .5 of 12 to have them figure out all the values.
+	public static boolean GIVE_QUESTION_TO_USER;
+	public static boolean ASK_USERS_FRACTION_QS;
+	public static boolean MANIPS_OVERLAP;
+	public static boolean DEBUG_MODE;
+	public static boolean SHOW_COLOR_SLIDERS;
+	public static boolean NETWORK_MODE;
+	public static boolean SHOW_ME_HOW_ENABLED;
+	public static boolean SHOW_WORK_ON_COMPUTER;
+	
+	static {
+		InputStream input = Constants.class.getResourceAsStream("/game.properties");
+		if(input != null) {
+			try {
+				props.load(input);
+			}catch(IOException e) {
+				e.printStackTrace();
+			}
+		}
+		TRICK_HAND_SIZE = propIntValue("TRICK_HAND_SIZE");
+		TEAM_HAND_SIZE = propIntValue("TEAM_HAND_SIZE");
+		IMG_PATH = propValue("IMG_PATH");
+		BASE_IMG_PATH = propValue("BASE_IMG_PATH");
+		FNAME_TEAM_DECK = propValue("FNAME_TEAM_DECK");
+		FNAME_TRICK_DECK = propValue("FNAME_TRICK_DECK");
+		SCORE_TO_WIN = propIntValue("SCORE_TO_WIN");
+		
+		SERVER_IP = propValue("SERVER_IP");
+		SERVER_IP_STANFORD = propValue("SERVER_IP");
+		LOCAL_SERVER_IP = propValue("LOCAL_SERVER_IP");
+		LOCAL_SERVER_IP2 = propValue("LOCAL_SERVER_IP2");
+		SERVER_ADDR = propValue("SERVER_ADDR");
+		LOCALHOST = propValue("LOCALHOST");
+		
+		PANEL_WIDTH = propIntValue("PANEL_WIDTH");
+		PANEL_HEIGHT = propIntValue("PANEL_HEIGHT");
+		
+		TIP_START = propValue("TIP_START");
+		TIP_DONE_TURN = propValue("TIP_DONE_TURN");
+		TIP_MANIP = propValue("TIP_MANIP");
+		TIP_USER_ANSWER = propValue("TIP_USER_ANSWER");
+		TIP_ANSWER = propValue("TIP_ANSWER");
+		TIP_NOT_WHOLE = propValue("TIP_NOT_WHOLE");
+		TIP_CLEAR = propValue("TIP_CLEAR");
+		TIP_SHOW = propValue("TIP_SHOW");
+		TIP_LINE = propValue("TIP_LINE");
+		TIP_PENCIL = propValue("TIP_PENCIL");
+		TIP_PPL = propValue("TIP_PPL");
+		TIP_DONE_SHAKING = propValue("TIP_DONE_SHAKING");
+		TIP_MANIP_AREA = propValue("TIP_MANIP_AREA");
+		
+		ICE_CREAM_NAME = propValue("ICE_CREAM_NAME");
+		ICE_DESC = propValue("ICE_DESC");
+		STINK_DESC = propValue("STINK_DESC");
+		AIR_DESC = propValue("AIR_DESC");
+		RADIO_DESC = propValue("RADIO_DESC");
+		MONEY_DESC = propValue("MONEY_DESC");
+		YOU_WON = propValue("YOU_WON");
+		YOU_LOST = propValue("YOU_LOST");
+		MAN_FRAME_YOUR_DECK_TEXT = propValue("MAN_FRAME_YOUR_DECK_TEXT");
+		MAN_FRAME_THEIR_DECK_TEXT = propValue("MAN_FRAME_THEIR_DECK_TEXT");
+		MAN_FRAME_DEFAULT_PLAY = propValue("MAN_FRAME_DEFAULT_PLAY");
+		CORRECT = propValue("CORRECT");
+		CONNECT_SERVER = propValue("CONNECT_SERVER");
+		DECIDED_MOVE = propValue("DECIDED_MOVE");
+		THOUGHT_MOVE = propValue("THOUGHT_MOVE");
+		UP_SOON = propValue("UP_SOON");
+		
+		ERROR_PLACING_RADIO = propValue("ERROR_PLACING_RADIO");
+		ERROR_INPUT_NO_INT = propValue("ERROR_INPUT_NO_INT");
+		ERROR_WRONG_ANSWER = propValue("ERROR_WRONG_ANSWER");
+		ERROR_NO_GAME_YET = propValue("ERROR_NO_GAME_YET");
+		ERROR_HURTING_YOURSELF = propValue("ERROR_HURTING_YOURSELF");
+		ERROR_PROTECT_OTHER = propValue("ERROR_PROTECT_OTHER");
+		ERROR_TRY_AGAIN = propValue("ERROR_TRY_AGAIN");
+		ERROR_TRY_ONCE_MORE = propValue("ERROR_TRY_ONCE_MORE");
+		ERROR_NOT_QUITE = propValue("ERROR_NOT_QUITE");
+		ERROR_NOT_AN_INTEGER = propValue("ERROR_NOT_AN_INTEGER");
+		ERROR_SORRY = propValue("ERROR_SORRY");
+		ERROR_CANT_PLACE_PREFIX = propValue("ERROR_CANT_PLACE_PREFIX"); 
+		ERROR_CANT_PLACE_ON = propValue("ERROR_CANT_PLACE_ON"); 
+		ERROR_NOT_WHOLE_NUM = propValue("ERROR_NOT_WHOLE_NUM");
+		ERROR_NO_STINKERS_LEFT = propValue("ERROR_NO_STINKERS_LEFT");
+		ERROR_NO_STINK_CARDS = propValue("ERROR_NO_STINK_CARDS");
+		ERROR_STINKS_LEFT_DIV = propValue("ERROR_STINKS_LEFT_DIV");
+		
+		INFO_SHUFFLING = propValue("INFO_SHUFFLING");
+		INFO_PLAY_AGAIN = propValue("INFO_PLAY_AGAIN");
+		INFO_NO_MOVES = propValue("INFO_NO_MOVES");
+		INFO_START_GAME_HELP = propValue("INFO_START_GAME_HELP");
+		INFO_STARTING = propValue("INFO_STARTING");
+		INFO_NET_ASK_NAME = propValue("INFO_NET_ASK_NAME");
+		INFO_NET_ASK_PARTNER = propValue("INFO_NET_ASK_PARTNER");
+		INFO_ERR_REAL_NAME = propValue("INFO_ERR_REAL_NAME");
+		INFO_PICK_SERVER = propValue("INFO_PICK_SERVER");
+		INFO_ERR_SERVER_404 = propValue("INFO_ERR_SERVER_404");
+		INFO_ERR_NAMES_TAKEN = propValue("INFO_ERR_NAMES_TAKEN");
+		INFO_NET_ERR_LOST_CONN = propValue("INFO_NET_ERR_LOST_CONN"); 
+		INFO_ASK_B4_CLOSING = propValue("INFO_ASK_B4_CLOSING");
+
+		STATUS_OPPO_NO_MOVES = propValue("STATUS_OPPO_NO_MOVES");
+		STATUS_CALC_FRACTION = propValue("STATUS_CALC_FRACTION");
+		STATUS_TURN = propValue("STATUS_TURN");
+		STATUS_YOUR_TURN = propValue("STATUS_YOUR_TURN");
+		STATUS_OPPO_TURN = propValue("STATUS_OPPO_TURN");
+		STATUS_NICE_MOVE = propValue("STATUS_NICE_MOVE");
+		STATUS_NO_SUCH_CMD = propValue("STATUS_NO_SUCH_CMD");
+		STATUS_DECIDING_WHOS_FIRST = propValue("STATUS_DECIDING_WHOS_FIRST");
+		STATUS_THEY = propValue("STATUS_THEY"); 
+		STATUS_FALL = propValue("STATUS_FALL");
+		STATUS_NO_FALL = propValue("STATUS_NO_FALL");
+		STATUS_FOR_THE = propValue("STATUS_FOR_THE"); 
+		STATUS_FIB = propValue("STATUS_FIB");
+		STATUS_OWN_DECK = propValue("STATUS_OWN_DECK");
+		STATUS_OPPO_DECK = propValue("STATUS_OPPO_DECK");
+		STATUS_FIB_FIGURE_PREFIX = propValue("STATUS_FIB_FIGURE_PREFIX"); 
+		STATUS_FIB_FIGURE_MID = propValue("STATUS_FIB_FIGURE_MID"); 
+		STATUS_FIB_FIGURE_SUFFIX = propValue("STATUS_FIB_FIGURE_SUFFIX");
+		STATUS_NEW_ROUND = propValue("STATUS_NEW_ROUND");
+
+		PARTS_PREFIX_YOU = propValue("PARTS_PREFIX_YOU");
+		PARTS_SUFFIX_YOU = propValue("PARTS_SUFFIX_YOU");
+		PARTS_PREFIX_THEM = propValue("PARTS_PREFIX_THEM");
+		PARTS_SUFFIX_THEM = propValue("PARTS_SUFFIX_THEM");
+		PARTS_POST_THEY = propValue("PARTS_POST_THEY");
+		PARTS_TIE = propValue("PARTS_TIE");
+		PARTS_HAD = propValue("PARTS_HAD"); 
+		PARTS_MORE_TEAMMATE = propValue("PARTS_MORE_TEAMMATE");
+		PARTS_PLURAL_SUFFIX = propValue("PARTS_PLURAL_SUFFIX");
+		PARTS_THAN = propValue("PARTS_THAN"); 
+
+		MAN_MSG_HOW_MANY = propValue("MAN_MSG_HOW_MANY");
+		MAN_MSG_GROUPS_NOT_EQUAL = propValue("MAN_MSG_GROUPS_NOT_EQUAL");
+		MAN_MSG_NOT_COOL_MAN = propValue("MAN_MSG_NOT_COOL_MAN");
+		MAN_HELP_PLACE_PREFIX = propValue("MAN_HELP_PLACE_PREFIX"); 
+		MAN_HELP_PLACE_SUFFIX = propValue("MAN_HELP_PLACE_SUFFIX");
+		MAN_HELP_CIRCLE_PREFIX = propValue("MAN_HELP_CIRCLE_PREFIX"); 
+		MAN_HELP_CIRCLE_SUFFIX = propValue("MAN_HELP_CIRCLE_SUFFIX");
+		COMBO_MSG_SIDE = propValue("COMBO_MSG_SIDE");
+
+		BTN_NEW_GAME = propValue("BTN_NEW_GAME");
+		BTN_DONE_TURN = propValue("BTN_DONE_TURN");
+		BTN_PASS = propValue("BTN_PASS");
+		BTN_LAUNCH_MANIP = propValue("BTN_LAUNCH_MANIP");
+		BTN_MAN_ANSWER = propValue("BTN_MAN_ANSWER");
+		BTN_MAN_CLEAR = propValue("BTN_MAN_CLEAR");
+		BTN_MAN_HELP = propValue("BTN_MAN_HELP");
+		BTN_PEBBLE_DONE_SHAKING = propValue("BTN_PEBBLE_DONE_SHAKING");
+		BTN_BACK_TO_GAME = propValue("BTN_BACK_TO_GAME");
+		MAN_FRAME_NO_ANSWER_BTN_TEXT = propValue("MAN_FRAME_NO_ANSWER_BTN_TEXT");
+		YES_NO = new String[2];
+		YES_NO[0] = propValue("YES_NO_YES");
+		YES_NO[1] = propValue("YES_NO_NO");
+		RADIO_OPTIONS = new String[3];
+		RADIO_OPTIONS[0] = propValue("RADIO_OPTIONS_0");
+		RADIO_OPTIONS[1] = propValue("RADIO_OPTIONS_1");
+		RADIO_OPTIONS[2] = propValue("RADIO_OPTIONS_2");
+
+		WINDOW_TITLE = propValue("WINDOW_TITLE");
+		TITLE_COMBO = propValue("TITLE_COMBO");
+		TITLE_ICE = propValue("TITLE_ICE");
+		YOU_ARE = propValue("YOU_ARE"); 
+		YOUR_OPPO_HAS = propValue("YOUR_OPPO_HAS"); 
+		YOUR_INIT_SCORE = propValue("YOUR_INIT_SCORE"); 
+		THEIR_INIT_SCORE = propValue("THEIR_INIT_SCORE"); 
+		ASK_FOR_RADIOS = propValue("ASK_FOR_RADIOS");
+		
+		REGULAR_MODE = propTFValue("REGULAR_MODE");
+		SHOW_DECK_MANIPS = propTFValue("SHOW_DECK_MANIPS");
+		HAVE_MANIP_BUTTON = propTFValue("HAVE_MANIP_BUTTON");
+		GIVE_QUESTION_TO_USER = propTFValue("GIVE_QUESTION_TO_USER");
+		ASK_USERS_FRACTION_QS = propTFValue("ASK_USERS_FRACTION_QS");
+		MANIPS_OVERLAP = propTFValue("MANIPS_OVERLAP");
+		DEBUG_MODE = propTFValue("DEBUG_MODE");
+		NETWORK_MODE = propTFValue("NETWORK_MODE");
+		SHOW_ME_HOW_ENABLED = propTFValue("SHOW_ME_HOW_ENABLED");
+		SHOW_WORK_ON_COMPUTER = propTFValue("SHOW_WORK_ON_COMPUTER");
+		SHOW_COLOR_SLIDERS = propTFValue("DEBUG_MODE") && propTFValue("SHOW_COLOR_SLIDERS");
+		SHOW_DECK_LABEL_NUMBER = propTFValue("DEBUG_MODE") && propTFValue("SHOW_DECK_LABEL_NUMBER");
+		SHOW_COMPUTER_CARDS = propTFValue("DEBUG_MODE") && propTFValue("SHOW_COMPUTER_CARDS");
+	}
+	
+	public static String propValue(String propName) {
+		return props.getProperty(propName);
+	}
+	
+	public static int propIntValue(String propName) {
+		return Integer.parseInt(propValue(propName));
+	}
+	
+	public static boolean propTFValue(String propName) {
+		return Boolean.parseBoolean(propValue(propName));
+	}
+	
 	public static final int BOARD_MARGIN = 50;
 	public static final int DECK_VIEW_MARGIN = 25;
 	public static final double SCALE = .75;
@@ -18,8 +383,6 @@ public class Constants {
 	public static final int MAX_CARD_HEIGHT = (int) (ORIG_CARD_HEIGHT*SCALE);
 	public static final int HUGE_CARD_HEIGHT = MAX_CARD_HEIGHT * 2;
 
-	public static final String IMG_PATH = "images/PNG/";
-	public static final String BASE_IMG_PATH = "images/";
 	public static final int DEFAULT_X = 0;
 	public static final int DEFAULT_Y = 0;
 	public static final int DEFAULT_PEN_THICKNESS = 4;
@@ -34,8 +397,6 @@ public class Constants {
 	public static final String FNAME_COMBO_REP = FNAME_REP + FNAME_SPACE_SEP + "Combo" + FNAME_SPACE_SEP;
 	public static final String FNAME_SEP = "-";
 	public static final String IMG_EXT = ".png";
-	public static final String FNAME_TEAM_DECK = "Team1BGCPDeck.txt";
-	public static final String FNAME_TRICK_DECK = "Tricks1BGCPDeck.txt";
 	
 	//Trick Card types
 	public static final String STINK = "stink";
@@ -56,7 +417,7 @@ public class Constants {
 	public static final String TUG_BG_FILENAME = "tugbackground3.png";
 	public static final String TUG_FLAG_FILENAME = "flag1.png";
 	public static final String TUG_ROPE_FILENAME = "ropethin.png";
-	public static final String MAN_IMG_PATH = "images/man.png";
+	public static final String MAN_IMG_PATH = BASE_IMG_PATH + "man.png";
 	public static final String PEN_ICON_IMG_PATH = IMG_PATH + "lineicon.png";
 	public static final String LINE_ICON_IMG_PATH = IMG_PATH + "pencilicon.png";
 	public static final String PPL_ICON_IMG_PATH = IMG_PATH + "pplicon.png";
@@ -96,7 +457,6 @@ public class Constants {
 	public static final int MAX_PEBBLES_FOR_RESIZING = 6;
 	public static final int BETWEEN_GAME_PAUSE = 2500;
 	public static final int MINI_GAME_PAUSE = 300;
-	public static final int SCORE_TO_WIN = 20;
 	public static final Font FONT_TINY = new Font("sans-serif", Font.BOLD, 16);
 	public static final Font FONT_SMALL = new Font("sans-serif", Font.BOLD, 24);
 	public static final Font FONT_REG = new Font("sans-serif", Font.BOLD, 32);
@@ -110,7 +470,6 @@ public class Constants {
 	public static final Color COLOR_LIGHT_WOOD = new Color(221, 202, 147);
 	public static final Color MANIP_CENTER_BACKGROUND = new Color(197, 241, 186);
 	public static final Color COLOR_SKIN_TONE = new Color(244, 213, 183);
-	public static final String MAN_FRAME_NO_ANSWER_BTN_TEXT = "Not a whole number!";
 	public static final int LINE_THICKNESS = 2;
 	public static final int NUM_DASHES = 20;
 	public static final int DRAG_THRESHOLD = 30;
@@ -118,93 +477,9 @@ public class Constants {
 	public static final int LINE_MODE = 0;
 	public static final int PPL_MODE = -1;
 	public static final int LEFT_MOUSE_BTN = MouseEvent.BUTTON1;
-	public static final int PANEL_WIDTH = 1200;
-	public static final int PANEL_HEIGHT = 700;
 	public static final int SOCKET_PORT = 1604;
-	public static final String SERVER_IP = "128.12.200.60";
-	public static final String SERVER_IP_STANFORD = "10.32.26.41";
-	//older one was 127.0.0.1
-//	public static final String SERVER_IP = "10.32.25.19";
-	public static final String LOCAL_SERVER_IP = "192.168.1.5";
-	public static final String LOCAL_SERVER_IP2 = "192.168.0.15";
-	public static final String SERVER_ADDR = "osvi.stanford.edu";
-	public static final String LOCALHOST = "127.0.0.1";
-	
-	//Tooltip Message
-	public static final String TIP_START = "Start playing a new game.";
-	public static final String TIP_DONE_TURN = "Have your opponent make a move.";
-	public static final String TIP_MANIP = "Play with the manipulatives.";
-	public static final String TIP_USER_ANSWER = "Type your answer here.";
-	public static final String TIP_ANSWER = "Answer the question with the text on the left.";
-	public static final String TIP_NOT_WHOLE = "The answer to this question is not a whole number.";
-	public static final String TIP_CLEAR = "Clear the screen of manipulatives and lines.";
-	public static final String TIP_SHOW = "Show me how to calculate this fraction.";
-	public static final String TIP_LINE = "Line tool.";
-	public static final String TIP_PENCIL = "Pencil tool.";
-	public static final String TIP_PPL = "Add-People tool.";
-	public static final String TIP_DONE_SHAKING = "Have your opponent draw out a chip.";
-	public static final String TIP_MANIP_AREA = "Use this area to figure out the answer to the question up top.  Click and drag or click in this area to get started.";
-	
-	//String messages
-	public static final String ICE_CREAM_NAME = "Ice Cream Truck";
-	public static final String ICE_DESC = "Choose one of the other player's groups.  Put the pebbles in the bag.  If the other player chooses one of the bad pebbles, then the kids will run to the " + Constants.ICE_CREAM_NAME + ".";
-	public static final String STINK_DESC = "Choose one of the other player's groups.  Remove a fraction of teammates from that group.";
-	public static final String AIR_DESC = "Choose one of the other player's groups.  Protect a fraction of the teammates from that group.";
-	public static final String RADIO_DESC = "Choose one your teammate cards that has an " + ICE_CREAM_NAME + " on it.  That card now gets to remove two pebbles from the bag!";
-	public static final String MONEY_DESC = "Use this card and combine it with other cards to buy more trick cards or teammates!";
-	public static final String YOU_WON = "YOU WON!!";
-	public static final String YOU_LOST = "You lost.";
-	public static final String MAN_FRAME_YOUR_DECK_TEXT = "Your Deck";
-	public static final String MAN_FRAME_THEIR_DECK_TEXT = "Their Deck";
-	public static final String MAN_FRAME_DEFAULT_PLAY = "Play Here";
 	public static final String SENTENCE_SEP = "  ";
-	public static final String CORRECT = "Correct!" + SENTENCE_SEP;
-	public static final String CONNECT_SERVER = "Click Connect to Server To Start";
-	public static final String DECIDED_MOVE = "decided on a move!";
-	public static final String THOUGHT_MOVE = "thought about where to move.";
-	public static final String UP_SOON = ", you will be up soon.";
-	
-	//Error messages
-	public static final String ERROR_PLACING_RADIO = "There needs to be an "+Constants.ICE_CREAM_NAME+" card first.";
-	public static final String ERROR_INPUT_NO_INT = "Please enter a whole number.";
-	public static final String ERROR_WRONG_ANSWER = "That is not the right answer." + SENTENCE_SEP;
-	public static final String ERROR_NO_GAME_YET = "Please click on New Game first.";
-	public static final String ERROR_HURTING_YOURSELF = "You'd be hurting yourself!";
-	public static final String ERROR_PROTECT_OTHER = "You'd be helping your opponent!";
-	public static final String ERROR_TRY_AGAIN = "Try again.";
-	public static final String ERROR_TRY_ONCE_MORE = "Please try again.";
-	public static final String ERROR_NOT_QUITE = "Not Quite!";
-	public static final String ERROR_NOT_AN_INTEGER = "Not an integer.";
-	public static final String ERROR_SORRY = "Oops!";
-	public static final String ERROR_CANT_PLACE_PREFIX = ERROR_SORRY + " You can't place a ";
-	public static final String ERROR_CANT_PLACE_ON = " on ";
-	public static final String ERROR_NOT_WHOLE_NUM = "It has to be evenly divisible.";
-	public static final String ERROR_NO_STINKERS_LEFT = "There needs to be stinky people to use it.";
-	public static final String ERROR_NO_STINK_CARDS = "There needs to be a stink bomb card first.";
-	public static final String ERROR_STINKS_LEFT_DIV = "Only the people that are not stinky count.";
-	
-	//Card type messages
-	public static final String STINK_TYPE = "Stink Bomb";
-	public static final String AIR_TYPE = "Air Freshener";
-	public static final String ICE_TYPE = ICE_CREAM_NAME;
-	public static final String RADIO_TYPE = "Radio";
-	public static final String MONEY_TYPE = "Ice Cream Truck";
-	
-	//Info messages
-	public static final String INFO_SHUFFLING = "Shuffling and dealing cards for the next round...be patient, OK?";
-	public static final String INFO_PLAY_AGAIN = "Would you like to play again?";
-	public static final String INFO_NO_MOVES = "Your opponent has no more moves.  Would you like to proceed to the next round?";
-	public static final String INFO_START_GAME_HELP = "You've started a new game; to play one of your trick cards, drag it onto a teammate card.";
-	public static final String INFO_STARTING = "Starting up the game.  This may take a bit, OK?";
-	public static final String INFO_NET_ASK_NAME = "What is your name?";
-	public static final String INFO_NET_ASK_PARTNER = "What is your partner's name? (If it's just you, click Cancel)";
-	public static final String INFO_ERR_REAL_NAME = "Please enter an actual name";
-	public static final String INFO_PICK_SERVER = "Please pick the server location";
-	public static final String INFO_ERR_SERVER_404 = "The IP address you chose is not working!  Please enter an IP address for the server";
-	public static final String INFO_ERR_NAMES_TAKEN = "Names are taken! Please choose other names";
-	public static final String INFO_NET_ERR_LOST_CONN = "We lost the connection with ";
-	public static final String INFO_ASK_B4_CLOSING = "You are about to close the game...are you sure?";
-	
+
 	
 	public static final String OPTION_WEST = "West";
 	public static final String OPTION_EAST = "East";
@@ -213,76 +488,12 @@ public class Constants {
 	public static final String OPTION_CENTER = "Center";
 	public static final String OPTION_OUTER = "Outer";
 	
-	//Status messages
-	public static final String STATUS_NEW_ROUND = "A new round has started; choose which tricks you want to play.";
-	public static final String STATUS_OPPO_NO_MOVES = "Your opponent doesn't have any cards they want to play.";
-	public static final String STATUS_CALC_FRACTION = "Looks like we need to calculate a fraction.";
-	public static final String STATUS_TURN = " turn.";
-	public static final String STATUS_YOUR_TURN = "Your" + STATUS_TURN;
-	public static final String STATUS_OPPO_TURN = "Your opponent's" + STATUS_TURN;
-	public static final String STATUS_NICE_MOVE = "Nice Move!" + SENTENCE_SEP;
-	public static final String STATUS_NO_SUCH_CMD = "Did not find a command in text.";
-	public static final String STATUS_DECIDING_WHOS_FIRST = "Please wait while we figure out who starts.";
-	
-	public static final String STATUS_THEY = "They ";
-	public static final String STATUS_FALL = "fell";
-	public static final String STATUS_NO_FALL = "didn't fall";
-	public static final String STATUS_FOR_THE = " for the ";
-	public static final String STATUS_FIB = ICE_CREAM_NAME + " fib!";
-	public static final String STATUS_OWN_DECK = "your own deck";
-	public static final String STATUS_OPPO_DECK = "the opponent's deck";
-	public static final String STATUS_FIB_FIGURE_PREFIX = "Let's figure out if ";
-	public static final String STATUS_FIB_FIGURE_MID = " teammates will fall for the ";
-	public static final String STATUS_FIB_FIGURE_SUFFIX = " fib!";
-	
-	public static final String PARTS_PREFIX_YOU = "You";
-	public static final String PARTS_SUFFIX_YOU = "you.";
-	public static final String PARTS_PREFIX_THEM = "Your opponent";
-	public static final String PARTS_SUFFIX_THEM = "your opponent.";
-	public static final String PARTS_POST_THEY = "They";
-	public static final String PARTS_TIE = "You tied that round.  No points were handed out. Let's go to the next one.";
-	public static final String PARTS_HAD = " had ";
-	public static final String PARTS_MORE_TEAMMATE = " more teammate";
-	public static final String PARTS_PLURAL_SUFFIX = "s";
-	public static final String PARTS_THAN = " than ";
-	
-	//Man messages
-	public static final String MAN_MSG_HOW_MANY = "How many people were circled?";
-	public static final String MAN_MSG_GROUPS_NOT_EQUAL = "Hey!  The groups aren't equal!";
-	public static final String MAN_MSG_NOT_COOL_MAN = "There aren't an equal number of groups...Not Cool, Man!";
-	public static final String MAN_HELP_PLACE_PREFIX = "Place ";
-	public static final String MAN_HELP_PLACE_SUFFIX = " people going in a circle.";
-	public static final String MAN_HELP_CIRCLE_PREFIX = "Circle ";
-	public static final String MAN_HELP_CIRCLE_SUFFIX = " of those groups.";
-	
-	public static final String COMBO_MSG_SIDE = "Which side?";
-	
-	//Button names
-	public static final String BTN_NEW_GAME = "New Game";
-	public static final String BTN_DONE_TURN = "Done with Turn";
-	public static final String BTN_PASS = "Pass";
-	public static final String BTN_LAUNCH_MANIP = "Scratch Paper";
-	public static final String BTN_MAN_ANSWER = "Answer";
-	public static final String BTN_MAN_CLEAR = "Clear Screen";
-	public static final String BTN_MAN_HELP = "Show Me How";
-	public static final String BTN_PEBBLE_DONE_SHAKING = "Done Shaking";
-	public static final String BTN_BACK_TO_GAME = "Return to Game";
-	
-	public static final String[] YES_NO = {"Yes", "No"};
-	public static final String[] RADIO_OPTIONS = {"No Radios", "One Radio", "Two Radios"};
-	
-	
-	public static final String WINDOW_TITLE = "Fractions Card Game";
-	public static final String TITLE_COMBO = "Which Card?";
-	public static final String TITLE_ICE = "Ice Cream Truck";
-	public static final String YOU_ARE = "You have ";
-	public static final String YOUR_OPPO_HAS = "Your opponent has ";
-	
-	public static final String YOUR_INIT_SCORE = "You: ";
-	public static final String THEIR_INIT_SCORE = "Them: ";
-	
-	//Question prompts
-	public static final String ASK_FOR_RADIOS = "An "+Constants.ICE_CREAM_NAME+" fib has been played. How many Radios would you like to play?";
+	//Card type messages
+	public static final String STINK_TYPE = "Stink Bomb";
+	public static final String AIR_TYPE = "Air Freshener";
+	public static final String ICE_TYPE = "Ice Cream Truck";
+	public static final String RADIO_TYPE = "Radio";
+	public static final String MONEY_TYPE = "Ice Cream Truck";
 	
 	//Network constants
 	public static final String NETWORK_SEND_DEBUG = "Send via Network: ";
@@ -315,7 +526,6 @@ public class Constants {
 	public static final String CMD_CARD_DELIMITER = "_";
 	public static final String CMD_LOG = "log";
 	public static final String CMD_LOG_HYPHEN = "-";
-
 	
 	//More network commands
 	public static final String NET_CMD_PRE = ".";
@@ -338,23 +548,7 @@ public class Constants {
 	public static final double REP_COMBO_W_MOD = .9;
 	public static final double REP_COMBO_H_MOD = .13;
 	public static final double REP_COMBO_X_MOD = .02;
-	public static final double REP_COMBO_Y_MOD = .57;
-	
-	//General Debugging and Other Future User Options
-	public static boolean SHOW_COMPUTER_CARDS = false;
-	public static boolean REGULAR_MODE = true;  //false gives green rectangle, doesn't have them calculate their mistakes, can be used for easy level
-	public static boolean SHOW_DECK_LABEL_NUMBER = false;
-	public static boolean SHOW_DECK_MANIPS = true;
-	public static boolean HAVE_MANIP_BUTTON = true;
-	//Option not implemented yet...Whether or not to construct the question to the user
-	//When they have something like .5 of 12 to have them figure out all the values.
-	public static boolean GIVE_QUESTION_TO_USER = true;
+	public static final double REP_COMBO_Y_MOD = .57;	
+
 	public static boolean TEXT_AS_IMAGES = true;  //Need to change ComboCardView superclass if you change this
-	public static boolean ASK_USERS_FRACTION_QS = true;
-	public static boolean MANIPS_OVERLAP = true;
-	public static boolean DEBUG_MODE = true;
-	public static boolean SHOW_COLOR_SLIDERS = DEBUG_MODE && false;
-	public static boolean NETWORK_MODE = false;
-	public static boolean SHOW_ME_HOW_ENABLED = true;
-	public static boolean SHOW_WORK_ON_COMPUTER = true;
 }

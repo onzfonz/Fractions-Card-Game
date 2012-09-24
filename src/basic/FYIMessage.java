@@ -4,7 +4,8 @@ import java.awt.Component;
 
 import javax.swing.JOptionPane;
 
-import tutorial.SwingWorker;
+import extras.SwingWorker;
+
 
 public class FYIMessage {
 	private SwingWorker worker;
