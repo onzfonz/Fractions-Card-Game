@@ -2,6 +2,8 @@ package pebblebag;
 
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +27,8 @@ public final class TugImages {
 	private static BufferedImage tugBackground;
 	private static BufferedImage redFlag;
 	private static BufferedImage tugRope;
+	private static BufferedImage stinkBomb;
+	private static BufferedImage airFresh;
 	
 	public TugImages() {
 		orangePebble = getOrangePebble();
@@ -38,6 +42,19 @@ public final class TugImages {
 		redFlag = getRedFlag();
 		tugRope = getTugRope();
 		lostMan = getLostMan();
+		stinkBomb = getStinkBomb();
+		airFresh = getAirFreshener();
+	}
+	
+	public static BufferedImage rotatePerson(BufferedImage man, double radians, boolean myside) {
+		AffineTransform tx = new AffineTransform();
+		if(myside) {
+			tx.rotate(-radians, man.getWidth()/2, man.getHeight()/2);
+		}else{
+			tx.rotate(radians, man.getWidth()/2, man.getHeight()/2);
+		}
+		AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+		return (op.filter(man, null));
 	}
 
 	public static BufferedImage getOrangePebble() {
@@ -93,6 +110,23 @@ public final class TugImages {
 	public static BufferedImage getTugRope() {
 		tugRope = retrieveImage(tugRope, Constants.TUG_ROPE_FILENAME);
 		return tugRope;
+	}
+	
+	public static BufferedImage getStinkBomb() {
+		stinkBomb = retrieveImage(stinkBomb, Constants.TUG_STINK_FILENAME);
+		return stinkBomb;
+	}
+	
+	public static BufferedImage getAirFreshener() {
+		airFresh = retrieveImage(airFresh, Constants.TUG_AIR_FILENAME);
+		return airFresh;
+	}
+	
+	public static BufferedImage getStinkOrAir(boolean isStinky) {
+		if(isStinky) {
+			return getStinkBomb();
+		}
+		return getAirFreshener();
 	}
 	
 	private static BufferedImage retrieveImage(BufferedImage img, String filename) {

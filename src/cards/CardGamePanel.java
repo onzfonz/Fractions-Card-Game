@@ -165,71 +165,71 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		debugControls.setVisible(Constants.DEBUG_MODE);
 		toolbox.add(debugControls);
 
-		newRound = createDebugButton(toolbox, "New Round");
+		newRound = Debug.createDebugButton(toolbox, "New Round");
 		newRound.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				gamePanel.newRound();  
 			}
 		});
 
-		newRound = createDebugButton(toolbox, "Add P1 Teammate");
+		newRound = Debug.createDebugButton(toolbox, "Add P1 Teammate");
 		newRound.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				gamePanel.addTeam(true);  
 			}
 		});
 
-		newRound = createDebugButton(toolbox, "Subtract P1 Teammate");
+		newRound = Debug.createDebugButton(toolbox, "Subtract P1 Teammate");
 		newRound.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				gamePanel.removeLatestTeam(true);  
 			}
 		});
 
-		newRound = createDebugButton(toolbox, "Add P1 Trick");
+		newRound = Debug.createDebugButton(toolbox, "Add P1 Trick");
 		newRound.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				gamePanel.addTrick(true); 
 			}
 		});
 
-		newRound = createDebugButton(toolbox, "Subtract P1 Trick");
+		newRound = Debug.createDebugButton(toolbox, "Subtract P1 Trick");
 		newRound.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				gamePanel.eliminateLatestTrick(true); 
 			}
 		});
 
-		newRound = createDebugButton(toolbox, "Give Computer Set Tricks");
+		newRound = Debug.createDebugButton(toolbox, "Give Computer Set Tricks");
 		newRound.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				gamePanel.setTrickHandDebug(false);
 			}
 		});
 
-		newRound = createDebugButton(toolbox, "Give Me Stinks");
+		newRound = Debug.createDebugButton(toolbox, "Give Me Stinks");
 		newRound.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				gamePanel.setTrickHandDebug(true);
 			}
 		});
 
-		newRound = createDebugButton(toolbox, "Give Me Airs");
+		newRound = Debug.createDebugButton(toolbox, "Give Me Airs");
 		newRound.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				gamePanel.setTrickHandToAirs(true);
 			}
 		});
 		
-		newRound = createDebugButton(toolbox, "End the Round");
+		newRound = Debug.createDebugButton(toolbox, "End the Round");
 		newRound.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				gamePanel.endOfRoundAnimation();
 			}
 		});
 
-		final JLabel redLabel = createDebugLabel(toolbox, "r");
-		final JSlider redSlider = createDebugSlider(toolbox, "Red", 0, 255, 128);
+		final JLabel redLabel = Debug.createDebugLabel(toolbox, "r");
+		final JSlider redSlider = Debug.createDebugSlider(toolbox, "Red", 0, 255, 128);
 		redSlider.addChangeListener( new ChangeListener() {
 			public void stateChanged(ChangeEvent ce) {
 				Color curColor = getSliderColor();
@@ -242,8 +242,8 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			}
 		});
 
-		final JLabel greenLabel = createDebugLabel(toolbox, "g");
-		final JSlider greenSlider = createDebugSlider(toolbox, "Green", 0, 255, 128);
+		final JLabel greenLabel = Debug.createDebugLabel(toolbox, "g");
+		final JSlider greenSlider = Debug.createDebugSlider(toolbox, "Green", 0, 255, 128);
 		greenSlider.addChangeListener( new ChangeListener() {
 			public void stateChanged(ChangeEvent ce) {
 				Color curColor = getSliderColor();
@@ -256,8 +256,8 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			}
 		});
 
-		final JLabel blueLabel = createDebugLabel(toolbox, "b");
-		final JSlider blueSlider = createDebugSlider(toolbox, "Blue", 0, 255, 128);
+		final JLabel blueLabel = Debug.createDebugLabel(toolbox, "b");
+		final JSlider blueSlider = Debug.createDebugSlider(toolbox, "Blue", 0, 255, 128);
 		blueSlider.addChangeListener( new ChangeListener() {
 			public void stateChanged(ChangeEvent ce) {
 				Color curColor = getSliderColor();
@@ -286,7 +286,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		JPanel top = new JPanel();
 		top.setLayout(new BoxLayout(top, BoxLayout.X_AXIS));
 
-		final JCheckBox showComp = createDebugCheckBox(top, "Show Computer", Constants.SHOW_COMPUTER_CARDS);
+		final JCheckBox showComp = Debug.createDebugCheckBox(top, "Show Computer", Constants.SHOW_COMPUTER_CARDS);
 		showComp.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Constants.SHOW_COMPUTER_CARDS = showComp.isSelected();
@@ -294,7 +294,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			}
 		});
 
-		final JCheckBox regMode = createDebugCheckBox(top, "Regular Mode", Constants.REGULAR_MODE);
+		final JCheckBox regMode = Debug.createDebugCheckBox(top, "Regular Mode", Constants.REGULAR_MODE);
 		regMode.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Constants.REGULAR_MODE = regMode.isSelected();
@@ -302,7 +302,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			}
 		});
 
-		final JCheckBox showManips = createDebugCheckBox(top, "Show Manips", Constants.SHOW_DECK_MANIPS);
+		final JCheckBox showManips = Debug.createDebugCheckBox(top, "Show Manips", Constants.SHOW_DECK_MANIPS);
 		showManips.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Constants.SHOW_DECK_MANIPS = showManips.isSelected();
@@ -310,7 +310,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			}
 		});
 
-		final JCheckBox askQs = createDebugCheckBox(top, "Ask User Questions", Constants.ASK_USERS_FRACTION_QS);
+		final JCheckBox askQs = Debug.createDebugCheckBox(top, "Ask User Questions", Constants.ASK_USERS_FRACTION_QS);
 		askQs.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Constants.ASK_USERS_FRACTION_QS = askQs.isSelected();
@@ -318,7 +318,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			}
 		});
 
-		textCommands = createDebugTextField(top, "Computer");
+		textCommands = Debug.createDebugTextField(top, "Computer");
 		textCommands.addKeyListener(this);
 
 		add(top, BorderLayout.NORTH);
@@ -409,48 +409,6 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		for(JComponent jc: controls) {
 			jc.setEnabled(enabled);
 		}
-	}
-
-	public JLabel createDebugLabel(JPanel b, String label) {
-		JLabel l = new JLabel(label);
-		l.setVisible(Constants.DEBUG_MODE);
-		b.add(l);
-		return l;
-	}
-
-	public JButton createDebugButton(JPanel b, String label) {
-		JButton temp = new JButton(label);
-		b.add(temp);
-		temp.setVisible(Constants.DEBUG_MODE);
-		return temp;
-	}
-
-	public JSlider createDebugSlider(JPanel b, String title, int low, int high, int reg) {
-		JLabel sliderTitle = new JLabel(title);
-		sliderTitle.setVisible(Constants.DEBUG_MODE);
-		b.add(sliderTitle);
-		JSlider temp = new JSlider(low, high, reg);
-		b.add(temp);
-		temp.setVisible(Constants.DEBUG_MODE);
-		return temp;
-	}
-
-	public JCheckBox createDebugCheckBox(JPanel p, String label, boolean initValue) {
-		JCheckBox temp = new JCheckBox(label);
-		temp.setSelected(initValue);
-		p.add(temp);
-		temp.setVisible(Constants.DEBUG_MODE);
-		return temp;
-	}
-
-	public JTextField createDebugTextField(JPanel p, String label) {
-		JLabel l = new JLabel(label);
-		JTextField temp = new JTextField();
-		p.add(temp);
-		p.add(l);
-		p.setVisible(Constants.DEBUG_MODE);
-		temp.setVisible(Constants.DEBUG_MODE);
-		return temp;
 	}
 
 	public void updateLabels(Player p) {

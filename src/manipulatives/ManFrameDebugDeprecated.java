@@ -1,8 +1,7 @@
 package manipulatives;
 // ManFrame.java
-/**
- Hosts a ManPanel.
- Implements the UI logic for save/saveAs/open/quit
+/* This is for the most part deprecated now,
+ * don't use this version, which we will put in extras
  */
 
 import java.awt.BorderLayout;
@@ -27,13 +26,13 @@ import extras.Debug;
 import extras.GameUtils;
 import extras.RandomGenerator;
 
-public class ManFrameDebug extends JFrame {
+public class ManFrameDebugDeprecated extends JFrame {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -36920913712532509L;
 	private static RandomGenerator rgen = RandomGenerator.getInstance();
-	private ManFrameDebug myFrame;
+	private ManFrameDebugDeprecated myFrame;
 	private int solution;
 	private ArrayList<ManListener> listeners;
 	private String question;
@@ -50,24 +49,24 @@ public class ManFrameDebug extends JFrame {
 			fileToOpen = new File(args[0]);
 		}
 
-		new ManFrameDebug(fileToOpen);
+		new ManFrameDebugDeprecated(fileToOpen);
 
 	}
 
 	private ManPanel manPanel;
 	private File saveFile; // the last place we saved, or null
 	
-	public ManFrameDebug(String q, int answer) {
+	public ManFrameDebugDeprecated(String q, int answer) {
 		this(q, answer, null);
 	}
 
-	public ManFrameDebug(File file) {
+	public ManFrameDebugDeprecated(File file) {
 		this("What is 1/3 of 30?", 6, file);
 	}
 
 	// Creates a new ManFrame
 	// If passed a non-null file, opens that file
-	public ManFrameDebug(String q, int answer, File file) {
+	public ManFrameDebugDeprecated(String q, int answer, File file) {
 		setTitle("Manipulatives");
 		myFrame = this;
 		solution = answer;
@@ -228,7 +227,7 @@ public class ManFrameDebug extends JFrame {
 		imageButton.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser chooser = createFileChooser();
-				int status = chooser.showSaveDialog(ManFrameDebug.this);
+				int status = chooser.showSaveDialog(ManFrameDebugDeprecated.this);
 				// depending on the os, it may help if the user
 				// gives the file a name ending in .png
 				if (status == JFileChooser.APPROVE_OPTION) {

@@ -387,6 +387,15 @@ public class Constants {
 	public static final int DEFAULT_Y = 0;
 	public static final int DEFAULT_PEN_THICKNESS = 4;
 	
+	//For the added story animations in PeopleSprayer and PeopleDisperser
+	public static final int MAX_SPEED = 5;
+	public static final int JUMP_VELOCITY = 10;
+	public static final int DISPERSER_TIMES = 160;
+	public static final double PROPENSITY_TO_FLIP = .03;
+	public static final int REVOLUTIONS = 5;
+	public static final int PARTS_PER_REVOLUTION = 20;
+
+	
 	//Card keywords
 	public static final String FNAME_REP = "Representation";
 	public static final String FNAME_MIDFORE = "MidForeground";
@@ -417,6 +426,8 @@ public class Constants {
 	public static final String TUG_BG_FILENAME = "tugbackground3.png";
 	public static final String TUG_FLAG_FILENAME = "flag1.png";
 	public static final String TUG_ROPE_FILENAME = "ropethin.png";
+	public static final String TUG_STINK_FILENAME = "stinkbomb.png";
+	public static final String TUG_AIR_FILENAME = "airfreshener.png";
 	public static final String MAN_IMG_PATH = BASE_IMG_PATH + "man.png";
 	public static final String PEN_ICON_IMG_PATH = IMG_PATH + "lineicon.png";
 	public static final String LINE_ICON_IMG_PATH = IMG_PATH + "pencilicon.png";
@@ -457,6 +468,7 @@ public class Constants {
 	public static final int MAX_PEBBLES_FOR_RESIZING = 6;
 	public static final int BETWEEN_GAME_PAUSE = 2500;
 	public static final int MINI_GAME_PAUSE = 300;
+	public static final int RESULT_ANIMATION_FIRE_WINDOW_PAUSE = 300;
 	public static final Font FONT_TINY = new Font("sans-serif", Font.BOLD, 16);
 	public static final Font FONT_SMALL = new Font("sans-serif", Font.BOLD, 24);
 	public static final Font FONT_REG = new Font("sans-serif", Font.BOLD, 32);

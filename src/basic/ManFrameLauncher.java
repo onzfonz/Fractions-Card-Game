@@ -59,7 +59,7 @@ public class ManFrameLauncher implements ActionListener {
 	}
 	
 	private void completelyFinishTimer() {
-		ManCardPanel manWindow = new ManCardPanel(question, view, card, netRep);
+		ManCardPanel manWindow = new ManCardPanel(question, view, card, netRep, gPanel);
 		PanelListener pl = gPanel.getPanelListener();
 		pl.manViewCreated(manWindow);
 		frameList.remove(null);

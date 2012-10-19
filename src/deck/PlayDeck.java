@@ -41,6 +41,13 @@ public class PlayDeck extends Deck {
 		}
 		return couldAddTrick;
 	}
+	
+	/**
+	 * Note: This method is player agnostic, meaning that if the player tries to apply a stink bomb
+	 * on itself, it would return true.  Also look at DeckView which calls this method using Delegation
+	 * @param c a trick card
+	 * @return a boolean telling you whether or not the card could be placed without adding it to the deck
+	 */
 
 	public boolean couldAddTrickCard(TrickCard c) {
 		boolean noRemainder = false;

@@ -32,6 +32,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import pebblebag.TugImages;
+
 import basic.Constants;
 import extras.CardGameUtils;
 import extras.Debug;
@@ -57,6 +59,8 @@ public class ManPanel extends JPanel  {
 	// remember the last dot for mouse tracking
 	private int lastX, lastY;
 	private ManModel lastDot;
+	private ManModel stinkAirObj;
+	private BufferedImage stinkAirImg;
 	private DoublePoint origPoint;
 	private Line newLine;
 	
@@ -68,7 +72,8 @@ public class ManPanel extends JPanel  {
 	private boolean redPaint;
 	private int pencilMode;
 	private int buttonPressed;
-	private Image img;
+	private BufferedImage img;
+	private BufferedImage alternateImg, alternateImg2;
 	private JLabel numberMen;
 	private JLabel message;
 	private ManPanelListener frame;
@@ -483,9 +488,31 @@ public class ManPanel extends JPanel  {
 		// Go through all the dots, drawing a circle for each
 		for (ManModel dotModel : dots) {
 			//g.drawImage(img, dotModel.getX() - MAN_WIDTH/2, dotModel.getY() - MAN_HEIGHT/2, MAN_WIDTH, MAN_HEIGHT, null);
-			g.drawImage(img, dotModel.getX()-Constants.MAN_WIDTH/2, dotModel.getY()-Constants.MAN_HEIGHT/2, null);
+			BufferedImage imgToDraw = img;
+			BufferedImage stinkyImg = TugImages.getStinkyMan();
+			BufferedImage freshImg = TugImages.getFreshenedMan();
+			if(dotModel.isStinky()) {
+				double radians = Math.PI/16;
+				if(alternateImg == null) {
+					alternateImg = TugImages.rotatePerson(stinkyImg, radians, true);
+				}
+				if(alternateImg2 == null) {
+					alternateImg2 = TugImages.rotatePerson(stinkyImg, radians, false);
+				}
+				imgToDraw = alternateImg2;
+				if(dotModel.inAlternatePlace()) {
+					imgToDraw = alternateImg;
+				}
+			}else if(dotModel.isFresh()) {
+				imgToDraw = freshImg;
+			}
+			g.drawImage(imgToDraw, dotModel.getX()-Constants.MAN_WIDTH/2, dotModel.getY()-Constants.MAN_HEIGHT/2, null);
 		}
-
+		
+		// Do the images
+		if(stinkAirObj != null) {
+			g.drawImage(stinkAirImg, stinkAirObj.getX(), stinkAirObj.getY(), null);
+		}
 		numberMen.setText(""+dots.size());
 		
 		// Draw the "requested" clip rect in red
@@ -582,6 +609,41 @@ public class ManPanel extends JPanel  {
 		message.setText(s);
 	}
 	
+	public void launchResultAnimation(int total, int num, int den, int numAffected, boolean isStinky) {
+		clearAll();
+		drawPeople(total, den);
+		PeopleSprayer pSpray = new PeopleSprayer(this, total, num, den, numAffected, isStinky);
+		Timer pTimer = new Timer(30, pSpray);
+		displayMessage(num + "/" + den + " are now " + ((isStinky)?"stinky":"fresh"));
+		pTimer.setInitialDelay(1500);
+		pSpray.setTimer(pTimer);
+		pTimer.start();
+	}
+	
+	public void fireAnimationDone() {
+		CardGameUtils.pause(Constants.RESULT_ANIMATION_FIRE_WINDOW_PAUSE);
+		frame.windowFinished();
+	}
+	
+	public void launchPeopleResultAnimation(int ppl, int regions, int numerator, int answer, boolean isStinky) {
+		assert(dots.size() == ppl);
+		for(int i = 0; i < dots.size(); i++) {
+			if(i%regions < numerator) {
+				ManModel man = dots.get(i);
+				if(isStinky) {
+					man.setStinked();
+				}else{
+					man.setFresh();
+				}
+			}
+		}
+		PeopleDisperser pDis = new PeopleDisperser(this, isStinky);
+		Timer disTimer = new Timer(25, pDis);
+		disTimer.setInitialDelay(1000);
+		pDis.setTimer(disTimer);
+		disTimer.start();
+	}
+	
 	public void launchDividingAnimation(int den, int ppl, int numer, int ans) {
 		clearAll();
 		PageDivider pDiv = new PageDivider(this, den, ppl, numer, ans);
@@ -640,6 +702,22 @@ public class ManPanel extends JPanel  {
 	public void addALine(int i, double theta, double r, DoublePoint center) {
 		DoublePoint offShoot = getPolarProjectedPoint(center, r, theta*i);
 		addLine(center, offShoot, lines);
+	}
+	
+	public void moveItem(int i, double theta, double r, DoublePoint center) {
+		DoublePoint newPlace = getPolarProjectedPoint(center, r, theta*i);
+		Debug.println("center is " + center + " and newPlace is " + newPlace + ", and theta is " + theta*i);
+		stinkAirObj.setCenteredXY(newPlace, stinkAirImg);
+	}
+	
+	public void moveAffectedPeople(boolean isStinky) {
+		for(ManModel m:dots) {
+			if(isStinky && m.isStinky()) {
+				m.franticMove();
+			}else if(!isStinky && m.isFresh()) {
+				m.jumpUpAndDown();
+			}
+		}
 	}
 	
 	public void addACircle(int i, double theta, double r, DoublePoint center, int den) {
@@ -787,6 +865,10 @@ public class ManPanel extends JPanel  {
 		return l/Math.sqrt(2);
 	}
 	
+	public double calculateShortestLineLengthFromCenter() {
+		return Math.min(getWidth()/2, getHeight()/2);
+	}
+	
 	private double calculatePersonDistance(double sep) {
 		return Constants.MAN_HEIGHT + sep * Constants.MAN_HEIGHT;
 	}
@@ -816,6 +898,16 @@ public class ManPanel extends JPanel  {
 		return temp;
 	}
 	
+	public void addItem(boolean isStink, BufferedImage img) {
+		stinkAirObj = new ManModel();
+		stinkAirObj.setXY(getWidth()/2-img.getWidth()/2, getHeight()/2-img.getHeight()/2);
+		stinkAirImg = img;
+	}
+	
+	public void removeItem() {
+		stinkAirObj = null;
+		stinkAirImg = null;
+	}
 	public String generateStatLine() {
 		int numDots = dots.size();
 		int numLines = getNumPencilLines(false);

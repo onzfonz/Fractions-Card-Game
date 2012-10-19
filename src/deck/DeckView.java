@@ -95,10 +95,15 @@ public class DeckView {
 		return couldAddTrickCard((TrickCard) cv.getCard());
 	}
 	
+	/**
+	 * Does not take into account player associated with deck or card.
+	 * @param tc trick card trying to be placed on the deck
+	 * @return boolean of whether or not the card could be placed
+	 */
 	public boolean couldAddTrickCard(TrickCard tc) {
 		return deck.couldAddTrickCard(tc);
 	}
-
+	
 	/* Right now it will not draw all cards itself
 	 * since there needs to be more housekeeping for it to work this way in gamepanel.
 	 * We need to change how trickCards are added and where they are kept, and how
@@ -254,6 +259,10 @@ public class DeckView {
 
 	public CardView getTeammateCard() {
 		return teammateCard;
+	}
+	
+	public CardView getTrickOnTop() {
+		return cardsPlayed.get(cardsPlayed.size()-1);
 	}
 
 	public int calculateDeck() {

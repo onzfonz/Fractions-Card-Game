@@ -37,7 +37,10 @@ import javax.swing.event.ChangeListener;
 import network.NetDelegate;
 import network.NetHelper;
 import basic.Constants;
+import basic.GamePanel;
+import basic.Player;
 import cards.CardView;
+import cards.TrickCard;
 import deck.DeckView;
 import extras.CardGameUtils;
 import extras.Debug;
@@ -57,7 +60,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 	private boolean userCanEdit;
 	private ArrayList<JComponent> controls;
 	private JTextField questionAnswer;
-	private boolean isPlaying;
+	private boolean isMessingAround;
 	
 	private JPanel box;
 	private JRadioButton makePpl;
@@ -78,6 +81,10 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 	private NetDelegate netRep;
 	private boolean clickedShowedMeHow;
 	private String answersTried;
+
+	private DeckView deckPresented;
+	private CardView cardPlayed;
+	private GamePanel gPanel;
 	
 	private static final int GLUE_NUMS = 10;
 	
@@ -103,24 +110,24 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 	}
 	
 	public ManCardPanel() {
-		this(Constants.MAN_FRAME_DEFAULT_PLAY, null, null, null);
+		this(Constants.MAN_FRAME_DEFAULT_PLAY, null, null, null, null);
 	}
 
-	public ManCardPanel(String q, int answer, DeckView dv, CardView cv, NetDelegate nr) {
-		this(q, answer, null, dv, cv, nr);
+	public ManCardPanel(String q, int answer, DeckView dv, CardView cv, NetDelegate nr, GamePanel gp) {
+		this(q, answer, null, dv, cv, nr, gp);
 	}
 
-	public ManCardPanel(String q, DeckView dv, CardView cv, NetDelegate nr) {
-		this(q, 0, dv, cv, nr);
+	public ManCardPanel(String q, DeckView dv, CardView cv, NetDelegate nr, GamePanel gp) {
+		this(q, 0, dv, cv, nr, gp);
 	}
 
 	public ManCardPanel(File file) {
-		this("Osvaldo, What is 1/3 of 51?", null, null, null);
+		this("Osvaldo, What is 1/3 of 51?", null, null, null, null);
 	}
 
 	// Creates a new ManFrame
 	// If passed a non-null file, opens that file
-	public ManCardPanel(String q, int answer, File file, DeckView dv, CardView cv, NetDelegate nr) {
+	public ManCardPanel(String q, int answer, File file, DeckView dv, CardView cv, NetDelegate nr, GamePanel gp) {
 		setLayout(new BorderLayout());
 		myFrame = this;
 		//solution = answer;
@@ -137,6 +144,11 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		manPanel = new ManPanel(800, 550, this);
 		manPanel.setToolTipText(Constants.TIP_MANIP_AREA);
 		controls.add(manPanel);
+
+		deckPresented = dv;
+		cardPlayed = cv;
+		gPanel = gp;
+		
 		if (file != null) manPanel.open(file);
 
 		manBox = new JPanel();
@@ -175,8 +187,8 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		createHorizontalGlue(questionBox, GLUE_NUMS/10);
 
 		String buttonTxt = Constants.BTN_MAN_ANSWER;
-		isPlaying = question.equals(Constants.MAN_FRAME_DEFAULT_PLAY);
-		if(isPlaying) {
+		isMessingAround = question.equals(Constants.MAN_FRAME_DEFAULT_PLAY);
+		if(isMessingAround) {
 			buttonTxt = Constants.BTN_BACK_TO_GAME;
 		}
 		questionBtn = new JButton(buttonTxt);
@@ -187,7 +199,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		controls.add(questionBtn);
 		questionBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(!isPlaying) {
+				if(!isMessingAround) {
 					checkUserAnswer();
 				}else{
 					fireToggleManip();
@@ -198,7 +210,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		notCoolManBtn = new JButton(Constants.MAN_FRAME_NO_ANSWER_BTN_TEXT);
 		notCoolManBtn.setToolTipText(Constants.TIP_NOT_WHOLE);
 		notCoolManBtn.setFont(Constants.FONT_REG);
-		notCoolManBtn.setVisible(!isPlaying);
+		notCoolManBtn.setVisible(!isMessingAround);
 		questionBox.add(notCoolManBtn);
 		createHorizontalGlue(questionBox, GLUE_NUMS);
 		controls.add(notCoolManBtn);
@@ -210,7 +222,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		add(questionBox, BorderLayout.NORTH);
 		JLabel addMany = new JLabel(new ImageIcon(CardGameUtils.getCardImageViaFilename("numberline-825.png")));
 		statusBox.setBackground(Color.WHITE);
-//		statusBox.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isPlaying);
+//		statusBox.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isMessingAround);
 		statusBox.add(addMany);
 		controls.add(addMany);
 
@@ -225,7 +237,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 
 		clearScreenButton = new JButton(Constants.BTN_MAN_CLEAR);
 		clearScreenButton.setToolTipText(Constants.TIP_CLEAR);
-		clearScreenButton.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isPlaying);
+		clearScreenButton.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isMessingAround);
 		clearScreenButton.setFont(Constants.FONT_SMALL);
 		box.add(clearScreenButton);
 		controls.add(clearScreenButton);
@@ -238,13 +250,14 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		launchDemo = new JButton(Constants.BTN_MAN_HELP);
 		launchDemo.setToolTipText(Constants.TIP_SHOW);
 		launchDemo.setFont(Constants.FONT_SMALL);
-		launchDemo.setVisible(Constants.SHOW_WORK_ON_COMPUTER && !isPlaying && Constants.SHOW_ME_HOW_ENABLED);
+		launchDemo.setVisible(Constants.SHOW_WORK_ON_COMPUTER && !isMessingAround && Constants.SHOW_ME_HOW_ENABLED);
 		box.add(launchDemo);
 		controls.add(launchDemo);
 		launchDemo.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				disableControls();
 				clickedShowedMeHow = true;
+				sendLogMessage("Help tried " + answersTried + "| " + manPanel.generateStatLine());
 				launchManipSimulation();
 			}
 		});
@@ -261,7 +274,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		drawLines = createRadioButton(lineIcon, lineIconUn, box, tools, Constants.TIP_LINE);
 		drawLines.setSelected(true);
 		manPanel.setPencilMode(false);
-		drawLines.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isPlaying);
+		drawLines.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isMessingAround);
 		drawLines.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				manPanel.setPencilMode(false);
@@ -271,7 +284,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		makePpl = createRadioButton(pplIcon, pplIconUn, box, tools, Constants.TIP_PPL);
 //		makePpl.setSelected(true);	
 //		manPanel.setPplMode(true);
-		makePpl.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isPlaying);
+		makePpl.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isMessingAround);
 		makePpl.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				manPanel.setPplMode(true);
@@ -281,7 +294,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		drawFreely = createRadioButton(pencilIcon, pencilIconUn, box, tools, Constants.TIP_PENCIL);
 //		drawFreely.setSelected(true);
 //		manPanel.setPencilMode(true);
-		drawFreely.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isPlaying);
+		drawFreely.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isMessingAround);
 		drawFreely.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				manPanel.setPencilMode(true);
@@ -341,7 +354,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 			}
 		});
 
-		manPanel.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isPlaying);
+		manPanel.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isMessingAround);
 		deckViewShown = new ManDeckViewPanel(dv, cv);
 		deckViewShown.setPreferredSize(new Dimension(Constants.ORIG_CARD_WIDTH, getHeight()));
 		add(deckViewShown, BorderLayout.EAST);
@@ -458,6 +471,19 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		//circleNGroups(num, den, solution);
 	}
 
+	public void launchResultAnimation() {
+		int num = GameUtils.extractNumerator(question);
+		int den = GameUtils.extractDenominator(question);
+		int ppl = GameUtils.extractPeople(question);
+		boolean isStink = false;
+		if(cardPlayed != null) {
+			isStink = ((TrickCard) cardPlayed.getCard()).isStink();
+		}else if(deckPresented != null){
+			isStink = ((TrickCard) deckPresented.getTrickOnTop().getCard()).isStink();
+		}
+		manPanel.launchResultAnimation(ppl, num, den, solution, isStink);
+	}
+
 	private void populateWithNPeople(int ppl, int den) {
 		String s = Constants.MAN_HELP_PLACE_PREFIX + ppl + Constants.MAN_HELP_PLACE_SUFFIX;
 		manPanel.drawPeople(ppl, den);
@@ -500,7 +526,11 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 			manPanel.displayMessage(Constants.CORRECT);
 			String c = (clickedShowedMeHow)? "y": "n";
 			sendLogMessage("Done tried " + answersTried + "| " + manPanel.generateStatLine() + "| shownHow? " + c);
-			fireWindowDone();
+			if(solution != -1 && legalMove()) {
+				launchResultAnimation();
+			}else{
+				fireWindowDone();
+			}
 		}else{
 			String response = Constants.ERROR_WRONG_ANSWER + Constants.SENTENCE_SEP + Constants.ERROR_TRY_ONCE_MORE;
 			String prefix = ", ";
@@ -509,11 +539,32 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 				prefix = "";
 			}
 			answersTried += prefix + num;
+			//Want to here fire off a message that you tried and got the wrong answer.
+			sendLogMessage("Oops tried " + num + "| " + manPanel.generateStatLine());
 			JOptionPane.showMessageDialog(myFrame,
 					response,
 					Constants.ERROR_NOT_QUITE,
 					JOptionPane.ERROR_MESSAGE);
 		}
+	}
+	
+	/* Strategy is:
+	 * Check if it's a computer.  Computer will always send a legal move
+	 * We now know it's a human player, make sure they are placing it correctly
+	 * (ie they aren't placing a stink bomb on their own deck)
+	 * Finally check if it's fractionally possible to play that card.
+	 */
+	private boolean legalMove() {
+		boolean cardPlayedByHuman = gPanel.isMyTurn();
+		if(!cardPlayedByHuman) return true;  //computer always makes a legal move
+		Player deckPlayer = deckPresented.getPlayer();
+		boolean humansDeck = deckPlayer.isHuman();
+		if(!(cardPlayed.isStink() && !humansDeck || cardPlayed.isAir() && humansDeck)) return false;
+		return deckPresented.couldAddTrickCard(cardPlayed);
+	}
+
+	public void windowFinished() {
+		fireWindowDone();
 	}
 	
 	private JRadioButton createRadioButton(ImageIcon selected, ImageIcon unselected, JPanel box, ButtonGroup tools, String tipText) {

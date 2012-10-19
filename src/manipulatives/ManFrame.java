@@ -1,5 +1,9 @@
 package manipulatives;
-// ManFrame.java
+/*
+ * ManFrame.java
+ * -------------
+ * This is only for testing purposes!  You don't actually use this.  You use CardGamePanel instead.
+ */
 /**
  Hosts a ManPanel.
  Implements the UI logic for save/saveAs/open/quit
@@ -14,6 +18,7 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -30,6 +35,7 @@ import javax.swing.UIManager;
 
 import basic.Constants;
 import cards.CardView;
+import cards.TrickCard;
 import deck.DeckView;
 import extras.CardGameUtils;
 import extras.Debug;
@@ -49,6 +55,8 @@ public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
 	private boolean userCanEdit;
 	private ArrayList<JComponent> controls;
 	private JTextField questionAnswer;
+	private DeckView deckPresented;
+	private CardView cardPlayed;
 
 	public static void main(String[] args) {
 		try {
@@ -78,7 +86,7 @@ public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
 	}
 
 	public ManFrame(File file) {
-		this("1/3 of 51?", null, null);
+		this("2/3 of 51?", null, null);
 	}
 
 	// Creates a new ManFrame
@@ -96,6 +104,9 @@ public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
 		manPanel = new ManPanel(800, 600, this);
 		manPanel.setToolTipText(Constants.TIP_MANIP_AREA);
 		controls.add(manPanel);
+		deckPresented = dv;
+		cardPlayed = cv;
+
 		if (file != null) manPanel.open(file);
 
 		JPanel manBox = new JPanel();
@@ -210,9 +221,9 @@ public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
 				launchManipSimulation();
 			}
 		});
-		
+
 		ButtonGroup tools = new ButtonGroup();
-		
+
 		ImageIcon lineIcon = createImageIcon(Constants.PEN_ICON_IMG_PATH);
 		ImageIcon pencilIcon = createImageIcon(Constants.LINE_ICON_IMG_PATH);
 		ImageIcon pplIcon = createImageIcon(Constants.PPL_ICON_IMG_PATH);
@@ -227,14 +238,14 @@ public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
 				manPanel.setPencilMode(false);
 			}
 		});
-		
+
 		JRadioButton makePpl = createRadioButton(pplIcon, pplIconUn, box, tools, Constants.TIP_PPL);
 		makePpl.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				manPanel.setPplMode(true);
 			}
 		});
-		
+
 		JRadioButton drawFreely = createRadioButton(pencilIcon, pencilIconUn, box, tools, Constants.TIP_PENCIL);
 		drawFreely.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -242,11 +253,23 @@ public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
 			}
 		});
 
+		JButton animateResultBtn = Debug.createDebugButton(box, "animate stinky");
+		animateResultBtn.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				disableControls();
+				launchResultAnimation();
+			}
+		});
+
 		ManDeckViewPanel deckViewShown = new ManDeckViewPanel(dv, cv);
 		deckViewShown.setPreferredSize(new Dimension(Constants.ORIG_CARD_WIDTH, getHeight()));
 		add(deckViewShown, BorderLayout.EAST);
 
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		if(!Constants.DEBUG_MODE) {
+			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		}else{
+			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		}
 
 		pack();
 		setVisible(true);
@@ -266,20 +289,20 @@ public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
 		}
 	}
 
-	public String stripQuestion(String q) {
-		int leftPar = q.indexOf("(");
-		int rightPar = q.indexOf(")");
+	public String stripQuestion(String pregunta) {
+		int leftPar = pregunta.indexOf("(");
+		int rightPar = pregunta.indexOf(")");
 		if(leftPar == -1 || rightPar == -1) {
-			return q;
+			return pregunta;
 		}
-		String leftPart = q.substring(0, leftPar-1);
-		String rightPart = q.substring(rightPar+2);
-		String decimal = q.substring(leftPar+1, rightPar);
+		String leftPart = pregunta.substring(0, leftPar-1);
+		String rightPart = pregunta.substring(rightPar+2);
+		String decimal = pregunta.substring(leftPar+1, rightPar);
 		int num = GameUtils.extractNumerator(question);
-		int numPos = q.indexOf(""+num);
-		int denPos = q.indexOf(" of ");
-		leftPart = q.substring(0, numPos);
-		rightPart = q.substring(denPos);
+		int numPos = pregunta.indexOf(""+num);
+		int denPos = pregunta.indexOf(" of ");
+		leftPart = pregunta.substring(0, numPos);
+		rightPart = pregunta.substring(denPos);
 		return leftPart+decimal+rightPart;
 	}
 
@@ -292,6 +315,17 @@ public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
 		//manPanel.launchPeopleAddAnimation(ppl, den, num, solution);
 		//populateWithNPeople(ppl, den);
 		//circleNGroups(num, den, solution);
+	}
+
+	public void launchResultAnimation() {
+		int num = GameUtils.extractNumerator(question);
+		int den = GameUtils.extractDenominator(question);
+		int ppl = GameUtils.extractPeople(question);
+		boolean isStink = false;
+		if(cardPlayed != null) {
+			isStink = ((TrickCard) cardPlayed.getCard()).isStink();
+		}
+		manPanel.launchResultAnimation(ppl, num, den, solution, isStink);
 	}
 
 	private void populateWithNPeople(int ppl, int den) {
@@ -314,7 +348,7 @@ public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
 	private void drawMessage(String s) {
 		manPanel.displayMessage(s);
 	}
-	
+
 	private void checkUserAnswer() {
 		int num = 0;
 		try{
@@ -334,7 +368,8 @@ public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
 	private void compareToAnswer(int num) {
 		if(num == solution) {
 			manPanel.displayMessage(Constants.CORRECT);
-			fireWindowDone();
+			disableControls();
+			launchResultAnimation();
 		}else{
 			String response = Constants.ERROR_WRONG_ANSWER + Constants.SENTENCE_SEP + Constants.ERROR_TRY_ONCE_MORE;
 			if(solution == -1) {
@@ -347,6 +382,10 @@ public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
 		}
 	}
 	
+	public void windowFinished() {
+		fireWindowDone();
+	}
+
 	private JRadioButton createRadioButton(ImageIcon selected, ImageIcon unselected, JPanel box, ButtonGroup tools, String tipText) {
 		JRadioButton temp = new JRadioButton(unselected);
 		temp.setToolTipText(tipText);
@@ -356,7 +395,7 @@ public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
 		box.add(temp);
 		return temp;
 	}
-	
+
 	private ImageIcon createImageIcon(String path) {
 		BufferedImage bi = CardGameUtils.getCardImage(path);
 		return new ImageIcon(bi);
@@ -367,7 +406,7 @@ public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
 			l.manipWindowDone(null, this);
 		}
 	}
-	
+
 	private String addUnselectedPath(String s) {
 		int pos = s.indexOf(".png");
 		return s.substring(0, pos) + "unselected" + s.substring(pos);
