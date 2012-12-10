@@ -24,7 +24,7 @@ public class CardGameUtils {
 	public static BufferedImage getCardImage(String path) {
 		BufferedImage img = null;
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		Debug.println("image path: " + path);
+		Debug.printlnVerbose("image path: " + path);
 		InputStream imageURL = cl.getResourceAsStream(path);
 		try{
 			img = ImageIO.read(imageURL);

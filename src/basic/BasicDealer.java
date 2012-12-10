@@ -32,12 +32,12 @@ public class BasicDealer implements Dealer{
 	}
 	
 	public BasicDealer() {
-		this(Constants.FNAME_TRICK_DECK, Constants.FNAME_TEAM_DECK);
+		this(Constants.FNAME_TRICK_DECK, Constants.FNAME_TEAM_DECK, Constants.FNAME_TEAM_DECK_ALT);
 	}
 	
-	public BasicDealer(String tricksName, String teamsName) {
+	public BasicDealer(String tricksName, String teamsName, String teamsNameAlt) {
 		tricks = new TricksDeck(tricksName);
-		teammates = new TeammatesDeck(teamsName);
+		teammates = new TeammatesDeck(teamsName, teamsNameAlt);
 		tricks.shuffle();
 		teammates.shuffle();
 	}

@@ -57,8 +57,7 @@ public class GroupCircler implements ActionListener {
 		if(gaveAnswer) {
 			mPanel.displayMessage(Constants.MAN_MSG_HOW_MANY);
 		}
-		mPanel.repaint();
-		mPanel.enableControls();
+		mPanel.explanationDone();
 	}
 	
 	private void restartTimer() {

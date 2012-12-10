@@ -206,13 +206,13 @@ public class LogGame implements SQLType {
 		if(parts.get(0) != null) {
 			String[] nums = parts.get(0).split(",");
 			for(int i = 0; i < nums.length; i++) {
-				addUserToLog(uid, qaid, "QTried", nums[i], parts.get(1), parts.get(2), parts.get(3), parts.get(4), acts, parsed, order++);
+				addUserToLog(uid, qaid, DBUtils.LOG_QTRIED, nums[i], parts.get(1), parts.get(2), parts.get(3), parts.get(4), acts, parsed, order++);
 			}
 		}
 		if(parts.get(4).equals("y")) {
-			addUserToLog(uid, qaid, "QShown", null, parts.get(1), parts.get(2), parts.get(3), parts.get(4), acts, parsed, order++);
+			addUserToLog(uid, qaid, DBUtils.LOG_QSHOWN, null, parts.get(1), parts.get(2), parts.get(3), parts.get(4), acts, parsed, order++);
 		}
-		addUserToLog(uid, qaid, "QDone", null, parts.get(1), parts.get(2), parts.get(3), parts.get(4), acts, parsed, order);
+		addUserToLog(uid, qaid, DBUtils.LOG_QDONE, null, parts.get(1), parts.get(2), parts.get(3), parts.get(4), acts, parsed, order);
 		lastQaId = qaid;
 	}
 	

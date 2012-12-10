@@ -2,8 +2,9 @@ package tugstory;
 
 import java.awt.image.BufferedImage;
 
+import extras.GameImages;
+
 import manipulatives.ManModel;
-import pebblebag.TugImages;
 
 public class TugPersonView {
 	private BufferedImage normal;
@@ -19,9 +20,9 @@ public class TugPersonView {
 	public TugPersonView(BufferedImage reg, BufferedImage lost, boolean side) {
 		normal = reg;
 		mySide = side;
-		rotated = TugImages.rotatePerson(reg, Math.PI/8, side);
-		this.fallen = TugImages.rotatePerson(lost, -1 * Math.PI/2, !side);
-		this.lost = TugImages.rotatePerson(lost, Math.PI/2, !side);
+		rotated = GameImages.rotatePerson(reg, Math.PI/8, side);
+		this.fallen = GameImages.rotatePerson(lost, -1 * Math.PI/2, !side);
+		this.lost = GameImages.rotatePerson(lost, Math.PI/2, !side);
 		showLost = false;
 		model = new ManModel();
 	}

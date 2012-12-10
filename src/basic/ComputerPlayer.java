@@ -10,19 +10,21 @@ import java.util.ArrayList;
 
 import cards.CardView;
 import cards.TrickCard;
+import extras.CardGameUtils;
 import extras.Debug;
+import extras.GameUtils;
 
 
 public class ComputerPlayer extends Player {
-	public ComputerPlayer(BasicDealer dlr) {
+	public ComputerPlayer(Dealer dlr) {
 		super(dlr);
 	}
 	
-	public ComputerPlayer(BasicDealer dlr, PlayerListener pl) {
+	public ComputerPlayer(Dealer dlr, PlayerListener pl) {
 		super(dlr, pl);
 	}
 	
-	public ComputerPlayer(BasicDealer dlr, PlayerListener pl, boolean startRound) {
+	public ComputerPlayer(Dealer dlr, PlayerListener pl, boolean startRound) {
 		super(dlr, pl, startRound, false);
 	}
 	
@@ -33,14 +35,17 @@ public class ComputerPlayer extends Player {
 	 * arrayList.
 	 */
 	
-	public boolean chooseTrickCardToPlay(Player opponent) {
+	public boolean chooseTrickCardToPlay(Player opponent, boolean isImmediate) {
 		//I have a list of cards, each of those would need to be placed
 		//I would need to keep track of whether the card could be placed
 		ArrayList<PossibleMove> allMoves = getAllPossibleMoves(opponent);
 		PossibleMove computerMove = chooseMoveToMake(allMoves);
 		boolean couldMakeMove = computerMove != null;
+		if(!isImmediate) {
+			CardGameUtils.pause(Constants.BETWEEN_GAME_PAUSE/3);	
+		}
 		if(couldMakeMove) {
-			fireCardAnimation(computerMove, opponent, Constants.THOUGHT_MOVE);
+			fireCardAnimation(computerMove, opponent, Constants.THOUGHT_MOVE, isImmediate);
 			//performMove(computerMove, opponent);
 		}else{
 			Debug.println("Couldn't make a turn");
@@ -57,17 +62,6 @@ public class ComputerPlayer extends Player {
 	}
 	
 	protected ArrayList<PossibleMove> getAllPossibleMoves(Player opponent) {
-		ArrayList<PossibleMove> allMoves = new ArrayList<PossibleMove>();
-		for(CardView cv:trickHand) {
-			TrickCard tc = (TrickCard) cv.getCard();
-			if(tc.isCombo()) {
-				buildCardMoves(allMoves, cv, tc.getFirstCard(), opponent);
-				buildCardMoves(allMoves, cv, tc.getSecondCard(), opponent);
-			}else{
-				buildCardMoves(allMoves, cv, tc, opponent);
-			}
-		}
-		Debug.println("Generated " + allMoves.size() + " moves for Computer's Hand");
-		return allMoves;
+		return GameUtils.getAllPossibleMoves(this, opponent);
 	}	
 }

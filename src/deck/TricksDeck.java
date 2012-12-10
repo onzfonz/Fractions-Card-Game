@@ -40,7 +40,9 @@ public class TricksDeck extends Deck {
 			String l = bf.readLine(); //throw away first line.
 			l = bf.readLine();
 			while (l != null && !l.equals("")){
-				processOneType(l);
+				if(!l.equals(Constants.FILE_CONTENT_SPACING)) {
+					processOneType(l);
+				}
 				l = bf.readLine();
 			}
 		}catch(IOException e) {

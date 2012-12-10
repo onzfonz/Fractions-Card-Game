@@ -27,7 +27,7 @@ public abstract class Deck {
 		shuffle();
 	}
 	
-	protected void resetDeck() {
+	public void resetDeck() {
 		cards = (ArrayList) cardsCopy.clone();
 	}
 	
@@ -65,7 +65,7 @@ public abstract class Deck {
 	}
 	
 	protected boolean cardsExist() {
-		return cards != null && cards.size() > 1;
+		return cards != null && cards.size() >= 1;
 	}
 	
 	protected Card getCard(int index) {

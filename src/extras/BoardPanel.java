@@ -1,12 +1,13 @@
 package extras;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
 
-import javax.swing.*;
+import javax.swing.JPanel;
 
-import basic.BasicDealer;
+import basic.Dealer;
 import basic.Game;
 import basic.Player;
-
 import deck.PlayDeck;
 
 public class BoardPanel extends JPanel {
@@ -50,7 +51,7 @@ public class BoardPanel extends JPanel {
 	
 	public void addTrick(int i) {
 		Player p = game.getPlayer(i);
-		BasicDealer d = game.getDealer();
+		Dealer d = game.getDealer();
 		PlayDeck pd = p.getPlayDeck(0);
 		pd.addTrickCard(d.dealTrickCard());
 		repaint();
@@ -58,7 +59,7 @@ public class BoardPanel extends JPanel {
 	
 	public void addTeam(int i) {
 		Player p = game.getPlayer(i);
-		BasicDealer d = game.getDealer();
+		Dealer d = game.getDealer();
 		p.addTeammateCard(d.dealTeammateCard());
 		repaint();
 	}

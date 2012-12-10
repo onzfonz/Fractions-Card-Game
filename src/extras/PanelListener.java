@@ -4,8 +4,11 @@ import manipulatives.ManCardPanel;
 import pebblebag.IceCreamTruckView;
 import tugstory.TugPanel;
 import basic.Player;
+import cards.CardView;
 
 import combo.ChooseComboCardPanel;
+
+import deck.DeckView;
 
 public interface PanelListener {
 	public void updateLabels(Player p);
@@ -22,4 +25,5 @@ public interface PanelListener {
 	public boolean iceViewDone(IceCreamTruckView iPanel);
 	public void tugViewCreated(TugPanel tPanel);
 	public boolean tugViewDone(TugPanel tPanel);
+	public void suggestDoneWithTurn();
 }

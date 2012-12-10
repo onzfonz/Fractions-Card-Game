@@ -14,15 +14,15 @@ public class NetHelper {
 		Debug.println(Constants.NETWORK_SEND_DEBUG + cmd + ":" + args);
 	}
 	
-	public static void sendNetMove(NetDelegate n, int c, int d) {
+	public static void sendNetMove(NetDelegate n, int c, int d, String extraInfo) {
 		if(n != null) {
-			n.sendCommand(Constants.CMD_MOVE, c + Constants.CMD_MOVE_SEP + d);
+			n.sendCommand(Constants.CMD_MOVE, c + Constants.CMD_MOVE_SEP + d + Constants.CMD_LOG_SPACE + extraInfo);
 		}
 	}
 	
-	public static void sendNetComboMove(NetDelegate n, int c, int d, int comboOption) {
+	public static void sendNetComboMove(NetDelegate n, int c, int d, int comboOption, String extraInfo) {
 		if(n != null) {
-			n.sendCommand(Constants.CMD_MOVE, c + "c" + comboOption + Constants.CMD_MOVE_SEP + d);
+			n.sendCommand(Constants.CMD_MOVE, c + "c" + comboOption + Constants.CMD_MOVE_SEP + d + Constants.CMD_LOG_SPACE + extraInfo);
 		}
 	}
 	

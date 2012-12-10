@@ -1,6 +1,6 @@
 package basic;
 /*
- * File: BasicDealer.java
+ * File: ServerDealer.java
  * -----------------
  * This class is the one responsible for creating and shuffling the two decks of cards
  * The teammate deck and the tricks deck.
@@ -16,7 +16,7 @@ import deck.TricksDeck;
 
 
 public class ServerDealer{
-	private BasicDealer bd;
+	private Dealer bd;
 	
 	public static void main(String args[]) {
 		ServerDealer d = new ServerDealer();
@@ -27,11 +27,11 @@ public class ServerDealer{
 	}
 	
 	public ServerDealer() {
-		bd = new BasicDealer();
+		bd = DealerFactory.getNewDealer();
 	}
 	
-	public ServerDealer(String tricksName, String teamsName) {
-		bd = new BasicDealer(tricksName, teamsName);
+	public ServerDealer(String tricksName, String teamsName, String teamsNameAlt) {
+		bd = DealerFactory.getNewDealer(tricksName, teamsName, teamsNameAlt);
 	}
 	
 	public String dealTeammateCard() {

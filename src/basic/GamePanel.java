@@ -5,13 +5,17 @@ package basic;
  * 
  */
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,12 +34,18 @@ import javax.swing.WindowConstants;
 import manipulatives.ManCardPanel;
 import manipulatives.ManFrame;
 import manipulatives.ManListener;
+import manipulatives.ManModel;
+import manipulatives.ManPanelUtils;
+import manipulatives.ManipMover;
+import manipulatives.ManipPanelListener;
 import network.NetDelegate;
 import network.NetHelper;
 import pebblebag.IceCreamTruckView;
 import pebblebag.IceWindowListener;
+import pebblebag.TruckMover;
 import tugstory.TugListener;
 import tugstory.TugPanel;
+import cards.CardDiscarder;
 import cards.CardView;
 import cards.TeammateCard;
 import cards.TeammateCardFactory;
@@ -48,10 +58,13 @@ import combo.ComboListener;
 import deck.DeckView;
 import deck.PlayDeck;
 import extras.Debug;
+import extras.GameImages;
+import extras.GameUtils;
+import extras.GraphicUtils;
 import extras.PanelListener;
 import extras.RandomGenerator;
 
-public class GamePanel extends JPanel implements PlayerListener, ComponentListener, IceWindowListener, ManListener, ComboListener, TugListener {
+public class GamePanel extends JPanel implements PlayerListener, ComponentListener, IceWindowListener, ManListener, ComboListener, TugListener, ManipPanelListener {
 
 	/* Panel will have
 	 * opponent's decks in play up top
@@ -98,6 +111,13 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	private String title;
 	private boolean leftButtonDown;
 	private boolean iceCreamBeingPlayed;
+	private boolean cardsSuggested;
+	private Color suggestionOverlay;
+	private boolean kidsRunningToTruck;
+	private ManModel truckModel;
+	private boolean launchingWindow;
+	private String questionFormed;
+	private boolean firstShadow;
 
 	private static final int PLAYDECK_OFFSET = 60;
 	//private static final int MINIMUM_CARD_DISPLACEMENT = 15;
@@ -118,6 +138,9 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		manipPlayerTurn = rgen.nextBoolean();
 		leftButtonDown = false;
 		iceCreamBeingPlayed = false;
+		cardsSuggested = true;
+		firstShadow = true;
+		suggestionOverlay = new Color(10, 10, 10, 128);
 		resetPanel();
 		addStatusBox();
 
@@ -129,12 +152,18 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 					CardView cv = findCardView(e.getX(), e.getY());
 					makeSelectedCard(cv);
 					if(currentCard != null) {
+						if(isTeammateCard(currentCard)) {
+							suggestCards();
+						}else{
+							unSuggestCards();
+						}
 						origX = currentCard.getX();
 						origY = currentCard.getY();
 						lastX = e.getX();
 						lastY = e.getY();
 						bigCard = currentCard;
 					}else{
+						suggestCards();
 						bigCard = null;
 					}
 				}
@@ -213,6 +242,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	}
 
 	private void launchWindowOrTryToPlaceCard() {
+		logPossibleMove();
 		if(Constants.ASK_USERS_FRACTION_QS && (currentCard.isAir() || currentCard.isStink())) {
 			launchManipWindow(currentDeck, currentCard);
 			cardUsed = currentCard;
@@ -224,6 +254,14 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			tryAndPlaceCardOnDeck(currentDeck, currentCard);
 		}
 	}
+	
+	private void logPossibleMove() {
+		String cardText = currentCard.toStream();
+		String deckText = currentDeck.toStream();
+		String name = parsePlayerManipName();
+		String modifier = (isOurUser(currentDeck.getPlayer()))? " on own deck ":" on oppo deck ";
+		NetHelper.logMessage(netRep, name, "attempting to place " + cardText + modifier + deckText);
+	}
 
 	private void tryAndPlaceCardOnDeck(DeckView dv, CardView cv) {
 		Player p = dv.getPlayer();
@@ -232,6 +270,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		int deckIndex = p.indexOfDeck(dv);
 		int cardIndex = getTrickIndex(cv);
 		Debug.println("deck: " + deckIndex + "; card: " + cardIndex);
+		String moveStream = generateMoveStream(currentGame.getHumanPlayer(), currentGame.getOpposingPlayer(), cv, dv);
 		boolean addedToDeck = p.addToPlayDeck(dv, cv, currentGame.getHumanPlayer());
 		if(addedToDeck) {
 			CardView oldCard = cv;
@@ -241,9 +280,9 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 				p.removeTrickFromHand(oldCard);
 				if(Constants.NETWORK_MODE) {
 					if(cv.isCombo()) {
-						NetHelper.sendNetComboMove(netRep, cardIndex, deckIndex, cv.getOptionChosen());
+						NetHelper.sendNetComboMove(netRep, cardIndex, deckIndex, cv.getOptionChosen(), moveStream);
 					}else{
-						NetHelper.sendNetMove(netRep, cardIndex, deckIndex);	
+						NetHelper.sendNetMove(netRep, cardIndex, deckIndex, moveStream);	
 					}
 				}
 			}
@@ -279,6 +318,72 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			}
 		}
 		return ind;
+	}
+	
+	private String generateMoveStream(Player p, Player opponent, CardView cv, DeckView dv) {
+		//if you want to make it move, you can just say:
+		//return cv.toStream();
+		TrickCard tc = (TrickCard) cv.getCard();
+		if(cv.isCombo()) {
+			tc = cv.getCards().get(cv.getOptionChosen());
+		}
+		ArrayList<PossibleMove> allPossibleMoves = GameUtils.getAllPossibleMoves(p, opponent);
+		if(allPossibleMoves == null || allPossibleMoves.size() == 0) return "no moves";
+		PossibleMove bestOne = PossibleMove.getBestMove(allPossibleMoves, tc, dv);
+		PossibleMove myMove = PossibleMove.getSpecifiedMove(allPossibleMoves, tc, dv);
+		String stream = generatePossibleMovesStream(allPossibleMoves);
+		stream += " best - [" + bestOne.toString() + "]";
+		return stream + " diff - " + (bestOne.getDamage() - myMove.getDamage());
+	}
+	
+	private String generatePossibleMovesStream(ArrayList<PossibleMove> moves) {
+		String s = "possibilities - [";
+		for(PossibleMove pm:moves) {
+			s+=pm.toString() + ", ";
+		}
+		return s.substring(0, s.length()-2)+"]";
+	}
+
+	private void unSuggestCards() {
+		for(CardView cv:playersTrickCards) {
+			cv.setSuggested(false);
+		}
+		cardsSuggested = false;
+		repaint();
+	}
+
+	private void suggestCards() {
+		int numSuggested = 0;
+		for(CardView cv:playersTrickCards) {
+			if(!cv.isTeammateCard() && !containsCard(cv) && legalCardMove(cv)) {
+				cv.setSuggested(true);
+				numSuggested++;
+			}
+		}
+		if(numSuggested == 0) {
+			panel.suggestDoneWithTurn();
+		}
+		cardsSuggested = true;
+		repaint();
+	}
+
+	private boolean containsCard(CardView cv) {
+		for(DeckView dv:decksInPlay) {
+			ArrayList<CardView> cards = dv.getAllCards();
+			if(cards.contains(cv)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean legalCardMove(CardView cv) {
+		for(DeckView dv:decksInPlay) {
+			if(GameUtils.legalHumanCardMove(dv, cv)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void startGame(boolean againstComputer) {
@@ -379,8 +484,8 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	public void setTrickHandDebug(boolean isForPlayer) {
 		Player p = getCorrectPlayer(isForPlayer);
 		p.clearTrickHand();
-		TrickCard t1 = new TrickCard(Constants.HALF_STINK_FILENAME, 1, 2, "Stink");
-		for(int i = 0; i < 4; i++) {
+		TrickCard t1 = new TrickCard(Constants.POINT_5_FILENAME, 1, 2, "Stink");
+		for(int i = 0; i < Constants.TRICK_HAND_SIZE; i++) {
 			p.addTrickCardToHand(t1);
 		}
 	}
@@ -389,7 +494,16 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		Player p = getCorrectPlayer(isForPlayer);
 		p.clearTrickHand();
 		TrickCard t1 = new TrickCard(Constants.THREE_QTRS_AIR_FILENAME, 3, 4, "Air");
-		for(int i = 0; i < 4; i++) {
+		for(int i = 0; i < Constants.TRICK_HAND_SIZE; i++) {
+			p.addTrickCardToHand(t1);
+		}
+	}
+
+	public void setTrickHandToIces(boolean isForPlayer) {
+		Player p = getCorrectPlayer(isForPlayer);
+		p.clearTrickHand();
+		TrickCard t1 = new TrickCard(Constants.THREE_QTRS_AIR_FILENAME, 2, 0, "Ice");
+		for(int i = 0; i < Constants.TRICK_HAND_SIZE; i++) {
 			p.addTrickCardToHand(t1);
 		}
 	}
@@ -424,11 +538,11 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	public int getPlayerPoints() {
 		return currentGame.getHumanPlayer().getPoints();
 	}
-	
+
 	public int getPlayerRoundTotal() {
 		return currentGame.getMyRound();
 	}
-	
+
 	public void removeTeam(boolean isForPlayer, DeckView dv) {
 		Player p = getCorrectPlayer(isForPlayer);
 		p.removePlayDeckFromHand(dv);
@@ -436,23 +550,6 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 
 	public void removeTeam(DeckView dv) {
 		dv.getPlayer().removePlayDeckFromHand(dv);
-	}
-
-	private void removeIceRadiosFromDeck(DeckView dv) {
-		ArrayList<CardView> tcs = getIceRadios(dv);
-		removeCardsFromImages(tcs);
-		dv.getPlayer().removeIceRadiosFromDeck(dv);
-	}
-
-	private ArrayList<CardView> getIceRadios(DeckView dv) {
-		ArrayList<CardView> tcs = dv.getAllCards();
-		ArrayList<CardView> iceRadios = new ArrayList<CardView>();
-		for(CardView cv: tcs) {
-			if(cv.isRadio() || cv.isIceCream()) {
-				iceRadios.add(cv);
-			}
-		}
-		return iceRadios;
 	}
 
 	public void removeLatestTeam(boolean isForPlayer) {
@@ -491,7 +588,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	}
 
 	private void repaintCard(CardView card) {
-		if(!card.isHighlighted()) {
+		if(!card.hasRectangle()) {
 			repaint(card.getX(), card.getY(), (int) card.getSize().getWidth()+1, (int) card.getSize().getHeight()+1);
 		}else{
 			repaint(card.getX()-2, card.getY()-2, (int) card.getSize().getWidth()+3, (int) card.getSize().getHeight()+3);
@@ -597,6 +694,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			if(!isTeammateCard(cv)) {
 				List<CardView> hand = findStackForCard(cv);
 				placeCardOnTopOfStack(cv, hand);
+				cv.setHighlightColor(legalCardMove(cv));
 			}else{
 				playersTrickCards.add(cv);
 			}
@@ -698,7 +796,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			Dimension d = getPanelSize();
 			//double maxDeckHeight = d.getHeight()-(2*teamCardHeightPlusMargin(decks))-oppoTrickHeight(); 
 			double maxDeckHeight = deckHeight();
-			Debug.println("maxDeckHeight: " + maxDeckHeight + ", teamCardNMargin: " + teamCardHeightPlusMargin(decks) + ", totalHeight: " + getPanelSize().getHeight() + ", oppoTrickCard: " + oppoTrickHeight() + ", trickCard: " + playerTrickHeight());
+			Debug.printlnVerbose("maxDeckHeight: " + maxDeckHeight + ", teamCardNMargin: " + teamCardHeightPlusMargin(decks) + ", totalHeight: " + getPanelSize().getHeight() + ", oppoTrickCard: " + oppoTrickHeight() + ", trickCard: " + playerTrickHeight());
 			d.setSize(d.getWidth(), maxDeckHeight);
 			int numDecks = decks.size();
 			int numDecksHuman = 0;
@@ -754,10 +852,10 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			cv.setLocation(x, y);
 		}
 	}
-	
+
 	private int initialYCoord() {
 		return 0;
-//		return (int) (statusBox.getPreferredSize().getHeight());
+		//		return (int) (statusBox.getPreferredSize().getHeight());
 	}
 
 	private int calculateXCoord(Dimension d, int pos, int numObjects, CardView cv) {
@@ -874,11 +972,20 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Helpers.acquireSem(Helpers.cardDist);
+		paintDiscardPile(g);
 		paintDecks(g);
 		paintTrickHand(g);
 		paintOpponentTricks(g);
 		paintBigCard(g);
+		paintPossibleIceCreamTruck(g);
 		Helpers.releaseSem(Helpers.cardDist);
+	}
+
+	private void paintPossibleIceCreamTruck(Graphics g) {
+		if(kidsRunningToTruck && truckModel != null) {
+			BufferedImage img = GameImages.getIceCreamTruck();
+			g.drawImage(img, truckModel.getX(), truckModel.getY(), null);
+		}
 	}
 
 	private void paintBigCard(Graphics g) {
@@ -887,15 +994,42 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		}
 	}
 
+	private void paintDiscardPile(Graphics g) {
+		BufferedImage dPile = GameImages.getDiscardPile();
+		int x = calcDiscardPileX(dPile);
+		int y = calcDiscardPileY(dPile);
+		g.drawImage(dPile, x, y, null);
+	}
+
+	public int calcDiscardPileX(BufferedImage img) {
+		return calcDiscardPileX(img.getWidth());
+	}
+
+	public int calcDiscardPileY(BufferedImage img) {
+		return calcDiscardPileY(img.getHeight());
+	}
+
+	public int calcDiscardPileX(int imgWidth) {
+		int x = CardView.bigCardX(getWidth());
+		x += Constants.HUGE_CARD_WIDTH/2-imgWidth/2;
+		return x;
+	}
+
+	public int calcDiscardPileY(int imgHeight) {
+		int y = statusBox.getHeight();
+		y+= ((getHeight()/2-y)/2)-imgHeight/2;
+		return y;
+	}
+
 	private void paintTrickHand(Graphics g) {
 		int i = 0;
-//		for(Iterator<CardView> iter = currentTrickCardsLeft.iterator(); iter.hasNext();) {
-//			CardView cv = iter.next();
-//			cv.setZOrder(i);
-//			cv.drawCard(g);
-//			i++;
-//		}
-		
+		//		for(Iterator<CardView> iter = currentTrickCardsLeft.iterator(); iter.hasNext();) {
+		//			CardView cv = iter.next();
+		//			cv.setZOrder(i);
+		//			cv.drawCard(g);
+		//			i++;
+		//		}
+
 		for(int index = 0; index < currentTrickCardsLeft.size(); index++) {
 			CardView cv = currentTrickCardsLeft.get(index);
 			cv.setZOrder(i);
@@ -926,11 +1060,33 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		int y = 0;
 		for(DeckView dv:decksInPlay) {
 			if(dv.getPlayer().isHuman()) {
-				y = dv.getY()-Constants.LINE_THICKNESS;
-				break;
+				y = Math.max(y, dv.getY()-Constants.LINE_THICKNESS);
 			}
 		}
-		drawDashedLine(g, 0, getWidth()-Constants.HUGE_CARD_WIDTH, y);
+		int xLimit = getWidth()-Constants.HUGE_CARD_WIDTH;
+		drawDashedLine(g, 0, xLimit, y);
+		double xCenter = ((xLimit / 2.0) + (getWidth()/2))/2;
+		drawPanelText(g, Constants.THEIR_LABEL, xCenter, y/2-statusBox.getHeight()/2/*y-Constants.LINE_THICKNESS*/, true);
+		drawPanelText(g, Constants.YOUR_LABEL, xCenter, y+(getHeight()-y)/2/*y+Constants.LINE_THICKNESS*/, false);
+		if(cardsSuggested) {
+			drawDarkerOverlay(g, xLimit, y);
+		}
+	}
+
+	public Color getSuggestionOverlay() {
+		return suggestionOverlay;
+	}
+
+	public void setSuggestionOverlay(Color c) {
+		suggestionOverlay = new Color(c.getRed(), c.getGreen(), c.getBlue(), 128);
+		repaint();
+	}
+
+	private void drawDarkerOverlay(Graphics g, int x, int y) {
+		Color origColor = g.getColor();
+		g.setColor(suggestionOverlay);
+		g.fillRect(0, statusBox.getHeight(), x, y-statusBox.getHeight());
+		g.setColor(origColor);
 	}
 
 	private void drawDashedLine(Graphics g, int x1, int x2, int y) {
@@ -942,6 +1098,39 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 				}
 			}
 		}
+	}
+
+	private void drawPanelText(Graphics g, String text, double x, int y, boolean isTop) {
+		Font curFont = Constants.FONT_REG;
+		Font oldFont = g.getFont();
+		Color oldColor = g.getColor();
+		g.setFont(curFont);
+		g.setColor(Constants.STATUS_FOREGROUND);
+		FontMetrics fm = g.getFontMetrics(curFont);
+		int w = fm.stringWidth(text);
+		List<DeckView> decks = getAssociatedDecks(isTop);
+		if(decks.size() == 1) {
+			x -= decks.get(0).getTeammateCard().getWidth()*2;
+		}
+		if(isTop) {
+			int h = fm.getAscent();
+			y=y+h;
+		}else{
+			y = y - fm.getDescent();
+		}
+		g.drawString(text, (int) (x-w/2.0), y);
+		g.setColor(oldColor);
+		g.setFont(oldFont);
+	}
+
+	private List<DeckView> getAssociatedDecks(boolean isOpponent) {
+		List<DeckView> decks = new ArrayList<DeckView>();
+		for(DeckView dv:decksInPlay) {
+			if(dv.getPlayer().isHuman() != isOpponent) {
+				decks.add(dv); //humanDeck - isOppo false while isHuman true
+			}
+		}
+		return decks;
 	}
 
 	public void trickDeckChanged(Player p) {
@@ -960,6 +1149,11 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			cv.setFaceUp(Constants.SHOW_COMPUTER_CARDS);
 		}
 		trickDeckChanged(p);
+		if(playersTrickCards.size() == 1 && isOurUser(p)) {
+			playDeckChanged(p);
+		}else if(opponentsTrickCards.size() == 1 && !isOurUser(p)) {
+			playDeckChanged(p);
+		}
 	}
 
 	public void trickCardRemoved(Player p, CardView cv) {
@@ -988,8 +1182,16 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		playDeckChanged(p);
 	}
 
-	public void cardAnimationLaunched(PossibleMove cMove, Player computer, Player opponent, String message) {
+	public void deckNeedsRepaint(Player p, DeckView pd) {
+		repaint();
+	}
+
+	public void cardAnimationLaunched(PossibleMove cMove, Player computer, Player opponent, String message, boolean isImmediate) {
 		String prefix = "";
+		int pause = Constants.BETWEEN_GAME_PAUSE;
+		if(!isImmediate) {
+			pause *= 3;
+		}
 		if(isOurUser(computer)) {
 			prefix = Constants.YOU_ARE;
 		}else{
@@ -1004,7 +1206,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		DeckView dv = cMove.getDeck();
 		CardMover cm = new CardMover(this, cMove, computer, opponent, cv, dv);
 		Timer cardTimer = new Timer(20, cm);
-		cardTimer.setInitialDelay(Constants.BETWEEN_GAME_PAUSE);
+		cardTimer.setInitialDelay(pause);
 		cm.setTimer(cardTimer);
 		cardTimer.start();
 	}
@@ -1019,12 +1221,12 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		}
 	}
 
-	public boolean computerMove() {
+	public boolean computerMove(boolean isImmediate) {
 		boolean computerHadMove = true;
 		Player p = currentGame.getHumanPlayer();
 		if(!Constants.NETWORK_MODE) {
 			ComputerPlayer oppo = (ComputerPlayer) currentGame.getOpposingPlayer();
-			if(!oppo.chooseTrickCardToPlay(p)) {
+			if(!oppo.chooseTrickCardToPlay(p, isImmediate)) {
 				status.setText(Constants.STATUS_OPPO_NO_MOVES);
 				computerHadMove = false;
 			}
@@ -1193,11 +1395,11 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		combo.addListener(this);
 		panel.comboViewCreated(combo);
 	}
-	
+
 	public void endOfRoundAnimation() {
 		launchEndRoundFrame();
 	}
-	
+
 	private void launchEndRoundFrame() {
 		disableUser();
 		TugPanel tPanel = new TugPanel(getPlayerRoundTotal(), getOppositionRoundTotal());
@@ -1208,6 +1410,42 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 
 	public void setPebbleWindow(IceCreamTruckView pebWin) {
 		pebbleWindow = pebWin;
+	}
+
+	private void launchManipsMove(DeckView impactedDeck) {
+		ManipMover mMover = new ManipMover(this, impactedDeck.getManipulatives(), impactedDeck);
+		Timer mTimer = new Timer(Constants.ANIMATION_MS_PAUSE, mMover);
+		mMover.setTimer(mTimer);
+		mTimer.start();
+	}
+
+	private void launchTruckMove(DeckView impactedDeck) {
+		TruckMover tMover = new TruckMover(this, impactedDeck.getManipulatives(), impactedDeck, truckModel);
+		Timer mTimer = new Timer(Constants.ANIMATION_MS_PAUSE, tMover);
+		tMover.setTimer(mTimer);
+		mTimer.start();
+	}
+
+	private void launchManipsMoveToIceCream(DeckView impactedDeck) {
+		impactedDeck.setManipsDesiredLocation(calcDiscardPileX(impactedDeck.getTeammateCard().getWidth()), calcDiscardPileY(impactedDeck.calculateDeckHeight()));
+		impactedDeck.setManipsDiscarded(true);
+		setupMovingIceCreamTruck(impactedDeck);
+		launchTruckMove(impactedDeck);
+	}
+
+	private void setupMovingIceCreamTruck(DeckView impactedDeck) {
+		truckModel = new ManModel();
+		//		truckModel.setX(calcDiscardPileX(GameImages.getIceCreamTruck()));
+		truckModel.setX(0);
+		//		truckModel.setY(calcDiscardPileY(GameImages.getIceCreamTruck()));
+		truckModel.setY(impactedDeck.getY());
+
+		//		truckModel.setDesiredX(truckModel.getX() + getWidth()/2);
+		truckModel.setDesiredX(truckModel.getX() + (int) (getWidth()*1.3));
+		Debug.println("setDesiredTruckX to " + truckModel.getDesiredX());
+		Debug.println("setDesiredTruckY to " + truckModel.getDesiredY());
+		truckModel.setDesiredY(truckModel.getY());
+		kidsRunningToTruck = true;
 	}
 
 	private void launchCompManipWindow(DeckView dv) {
@@ -1242,18 +1480,66 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 
 	private void launchManipWindow(String question, DeckView dv, CardView cv) {
 		if(Constants.ASK_USERS_FRACTION_QS) {
-			disableUser();
-			//Need to setup a Timer here;
-			manipPlayerTurn = !manipPlayerTurn;
-			status.setText(Constants.STATUS_CALC_FRACTION);
-			ManFrameLauncher mfl = new ManFrameLauncher(this, question, manWindows, dv, cv, netRep);
-			Timer t = new Timer(0, mfl);
-			t.setInitialDelay(Constants.BETWEEN_GAME_PAUSE);
-			mfl.setTimer(t);
-			t.start();
+			launchManipsMoveOut(question, dv, cv);
 		}else{
 			makeSuccessfulDragChanges();
 		}
+	}
+
+	private void launchManipsMoveOut(String question, DeckView dv, CardView cv) {
+		launchingWindow = true;
+		disableUser();
+		manipPlayerTurn = !manipPlayerTurn;
+		questionFormed = question;
+		status.setText(Constants.STATUS_CALC_FRACTION);
+		if(ManPanelUtils.isShadowOnly(dv, cv)) {
+			launchingWindow = false;
+			disableUser();
+			repaint();
+			launchManipWindowNTimer(questionFormed, dv, cv);
+			if(firstShadow && !Constants.DEBUG_MODE) {
+				new FYIMessage(this, Constants.INFO_SHADOW_PLAYER);
+				firstShadow=false;
+			}
+		}else{
+			setManipsDesiredOut(dv, cv);
+			ArrayList<ManModel> manips = dv.getManipulatives();
+			ManipMover mMove = new ManipMover(this, manips, dv);
+			Timer mTimer = new Timer(Constants.ANIMATION_MS_PAUSE, mMove);
+			mTimer.setInitialDelay(Constants.BETWEEN_GAME_PAUSE);
+			mMove.setTimer(mTimer);
+			mTimer.start();
+		}
+	}
+
+	private void setManipsDesiredOut(DeckView dv, CardView cv) {
+		int desiredX = (int) (getWidth()*1.2);
+		//		int desiredY = getHeight()/2;
+		int desiredY = 0;
+		//dv.setManipsDesiredLocation((int) (getWidth()*1.2), getHeight()/2);
+		if(cv == null) {
+			cv = dv.getTrickOnTop();
+		}
+		if(cv != null && !cv.isStink()) {
+			dv.setManipsDesiredLocation(desiredX, desiredY);
+			return;
+		}
+		for(ManModel m:dv.getManipulatives()) {
+			if(m.isStinky()) {
+				m.setDesiredLocation(m.getX(), m.getY());
+			}else{
+				m.setDesiredLocation(desiredX, desiredY);
+			}
+		}
+	}
+
+	private void launchManipWindowNTimer(String question, DeckView dv, CardView cv) {
+		//Need to setup a Timer here;
+		ManFrameLauncher mfl = new ManFrameLauncher(this, question, manWindows, dv, cv, netRep);
+		Timer t = new Timer(0, mfl);
+		t.setInitialDelay(Constants.BETWEEN_GAME_PAUSE);
+		mfl.setTimer(t);
+		t.start();
 	}
 
 	private void launchManipWindow(DeckView dv, CardView cv) {
@@ -1315,14 +1601,16 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			Debug.println("Returning from enableUser prematurely: myTurn: " + myTurn + ", windowSize " + manWindows.size());
 			return;
 		}
-		showDeckExtras(true);
+		showDeckExtras(true, false);
 		if(cardHidden != null) {
 			//cardHidden.setVisible(true);
 			cardHidden = null;
 		}
 		status.setText(decideTurn(true));
 		userCanInteract = true;
-		panel.enableControls();
+		if(panel != null) {
+			panel.enableControls();
+		}
 	}
 
 	private String decideTurn(boolean ourTurn) {
@@ -1335,11 +1623,11 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	public String parsePlayerTurnName() {
 		return parsePlayerTurn(firstPlayerTurn);
 	}
-	
+
 	public String parsePlayerManipName() {
 		return parsePlayerTurn(manipPlayerTurn);
 	}
-	
+
 	private String parsePlayerTurn(boolean turn) {
 		if(title == null || title.equals("")) {
 			return "Your ";
@@ -1372,7 +1660,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			enableUser();
 		}else{
 			disableUser();
-			showDeckExtras(true);
+			showDeckExtras(true, false);
 			status.setText(decideTurn(false));
 			panel.opponentTurn();
 		}
@@ -1380,7 +1668,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	}
 
 	public void disableUser() {
-		showDeckExtras(false);
+		showDeckExtras(false, false);
 		cardHidden = currentCard;
 		if(cardHidden != null) {
 			//cardHidden.setVisible(false);
@@ -1389,9 +1677,19 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		panel.disableControls();
 	}
 
-	private void showDeckExtras(boolean visible) {
-		for(DeckView dv:decksInPlay) {
-			dv.showLabel(visible);
+	private void showDeckExtras(boolean visible, boolean changed) {
+		showDeckExtras(visible, changed, null);
+	}
+
+	private void showDeckExtras(boolean visible, boolean change, DeckView impactedDeck) {
+		if(!launchingWindow) {
+			for(DeckView dv:decksInPlay) {
+				dv.showLabel(visible, change);
+			}
+		}
+		if(impactedDeck != null && !impactedDeck.isManipsDiscarded()) {
+			impactedDeck.recalculateManips(true);
+			launchManipsMove(impactedDeck);
 		}
 	}
 
@@ -1517,10 +1815,10 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			}
 		}
 	}
-	
+
 	@Override public Dimension getPreferredSize() {
 		Dimension d = super.getPreferredSize();
-//		d.setSize(d.getWidth(), d.getHeight()-statusBox.getPreferredSize().getHeight());
+		//		d.setSize(d.getWidth(), d.getHeight()-statusBox.getPreferredSize().getHeight());
 		return d;
 	}
 
@@ -1541,6 +1839,29 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 
 	}
 
+	private void launchIceRadiosRemovedAnimation(DeckView dv, boolean ranToTruck, int msStartDelay) {
+		ArrayList<CardView> tcs = null;
+		if(!ranToTruck) {
+			tcs = getIceRadios(dv);
+		}
+		CardDiscarder cDisc = new CardDiscarder(this, tcs, dv);
+		Timer cTimer = new Timer(Constants.ANIMATION_MS_PAUSE, cDisc);
+		cTimer.setInitialDelay(msStartDelay);
+		cDisc.setTimer(cTimer);
+		cTimer.start();
+	}
+
+	private ArrayList<CardView> getIceRadios(DeckView dv) {
+		ArrayList<CardView> tcs = dv.getAllCards();
+		ArrayList<CardView> iceRadios = new ArrayList<CardView>();
+		for(CardView cv: tcs) {
+			if(cv.isRadio() || cv.isIceCream()) {
+				iceRadios.add(cv);
+			}
+		}
+		return iceRadios;
+	}
+
 	public void iceCreamTruckViewStarted(IceCreamTruckView pf) {
 		panel.iceViewCreated(pf);
 	}
@@ -1550,19 +1871,24 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		panel.iceViewDone(pf);
 		boolean ourTurn = false;
 		if(isOurUser(dv.getPlayer())){
-			enableUser();
 			ourTurn = true;
 		}
 		String msg = "";
 		if(didKidsRunToTruck) {
-			removeTeam(dv);
 			msg = Constants.STATUS_FALL;
+			launchManipsMoveToIceCream(dv);
 		}else{
-			removeIceRadiosFromDeck(dv);
 			msg = Constants.STATUS_NO_FALL;
+			launchIceRadiosRemovedAnimation(dv, didKidsRunToTruck, Constants.ANIMATION_DELAY/3);
 		}
-		showDeckExtras(true);
-		status.setText(Constants.STATUS_THEY + msg + Constants.STATUS_FOR_THE + Constants.STATUS_FIB + Constants.SENTENCE_SEP + decideTurn(ourTurn));
+		status.setText(Constants.STATUS_THEY + msg + Constants.STATUS_FOR_THE + Constants.STATUS_FIB + Constants.SENTENCE_SEP + decideTurn(ourTurn));		
+	}
+
+	private void finishIceCreamActions(DeckView dv) {
+		if(isOurUser(dv.getPlayer())){
+			enableUser();
+		}
+		showDeckExtras(true, true, dv);
 		iceCreamBeingPlayed = false;
 		if(!Constants.NETWORK_MODE && !isOurUser(dv.getPlayer())) {
 			panel.possibleComputerTurn();
@@ -1570,6 +1896,17 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		repaint();
 	}
 
+	public void fireCardDiscardAnimationDone(ArrayList<CardView> tcs, DeckView dv, boolean ranToTruck) {
+		if(ranToTruck) {
+			removeTeam(dv);
+		}else{
+			removeCardsFromImages(tcs);
+			dv.getPlayer().removeIceRadiosFromDeck(dv);
+		}
+		finishIceCreamActions(dv);
+	}
+
+	/* This method is now deprecated */
 	//@Override
 	public void manipWindowDone(DeckView dv, ManFrame mf) {
 		mf.dispose();
@@ -1577,7 +1914,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		makeSuccessfulDragChanges();
 		if(manWindows.size() == 0) {
 			//TODO: This one is tricky because shadow players trick cards and stink bombs all go through here.
-			tidyUpCalculationClosing();
+			tidyUpCalculationClosing(null);
 		}
 		repaint();
 	}
@@ -1587,7 +1924,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		panel.manViewDone(mcp);
 		makeSuccessfulDragChanges();
 		if(manWindows.size() == 0) {
-			tidyUpCalculationClosing();
+			tidyUpCalculationClosing(mcp.getDeckAffected());
 		}
 		repaint();
 	}
@@ -1596,10 +1933,10 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		panel.toggleManipView();
 	}
 
-	public void tidyUpCalculationClosing() {
+	public void tidyUpCalculationClosing(DeckView deck) {
 		boolean shouldChangeText = status != null && (status.getText().length() < 5 || !status.getText().substring(0, Constants.ERROR_SORRY.length()).equals(Constants.ERROR_SORRY));
 		String formerText = status.getText();
-		System.out.println(shouldChangeText + ", " + status.getText());
+		Debug.println(shouldChangeText + ", " + status.getText());
 		if(isMyTurn()) {
 			enableUser();
 			Debug.println("enabling user");
@@ -1609,7 +1946,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		}else{
 			status.setText(formerText);
 		}
-		showDeckExtras(true);
+		showDeckExtras(true, true, deck);
 	}
 
 	public boolean isMyTurn() {
@@ -1630,7 +1967,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		//Only happens with user, so this will go away
 		//enableUser();
 	}
-	
+
 	public void tugPanelDone(TugPanel tf) {
 		panel.tugViewDone(tf);
 	}
@@ -1661,7 +1998,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			if(didIt) timeToDrawPebs.release();
 		}
 	}
-	
+
 	public void timeToMoveBagAround(String arg) {
 		int commaPos = arg.indexOf(",");
 		int x = Integer.parseInt(arg.substring(0, commaPos));
@@ -1676,12 +2013,40 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	public void titleUpdated(String s) {
 		title = s;
 	}
-	
+
 	public String getTitle() {
 		return title;
 	}
 
 	public PanelListener getPanelListener() {
 		return panel;
+	}
+
+	public void fireAnimationDone(DeckView impactedDeck) {
+		// do the launchFreshenedPoof thing
+		if(aboutToLaunchWindow()) {
+			launchingWindow = false;
+			launchManipWindowNTimer(questionFormed, impactedDeck, currentCard);
+		}else if(impactedDeck.justFreshened()) {
+			impactedDeck.launchFreshenedPoof();
+		}else if(impactedDeck.isManipsDiscarded()) {
+			destroyIceCreamTruck();
+			launchIceRadiosRemovedAnimation(impactedDeck, true, Constants.ANIMATION_DELAY);
+		}
+	}
+
+	private boolean aboutToLaunchWindow() {
+		return launchingWindow;
+	}
+
+	public void destroyIceCreamTruck() {
+		truckModel = null;
+		kidsRunningToTruck = false;
+	}
+
+	public void tickPassedInTruckMover(DeckView impactedDeck, int tickNum) {
+		if(kidsRunningToTruck && truckModel != null) {
+			GraphicUtils.incrementalMove(truckModel, TruckMover.MAX_MOVES - tickNum);
+		}
 	}
 }

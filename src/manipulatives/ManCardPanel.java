@@ -12,6 +12,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -38,10 +41,12 @@ import network.NetDelegate;
 import network.NetHelper;
 import basic.Constants;
 import basic.GamePanel;
-import basic.Player;
 import cards.CardView;
+import cards.TeammateCard;
+import cards.TeammateCardFactory;
 import cards.TrickCard;
 import deck.DeckView;
+import deck.PlayDeck;
 import extras.CardGameUtils;
 import extras.Debug;
 import extras.GameUtils;
@@ -77,6 +82,9 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 	private JButton questionBtn;
 	private JButton notCoolManBtn;
 	private JLabel questionLabel;
+	private JLabel numeratorLabel;
+	private JLabel denominatorLabel;
+	private JLabel peopleLabel;
 	private JPanel questionBox;
 	private NetDelegate netRep;
 	private boolean clickedShowedMeHow;
@@ -101,6 +109,10 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		}
 
 		JFrame f = new JFrame("ManCardPanel Test");
+		
+//		TeammateCard team = TeammateCardFactory.createCard(Constants.CHEAT_SHADOW_CARD);
+//		DeckView dv = new DeckView(new PlayDeck(team), null);
+//		ManCardPanel mcp = new ManCardPanel("What is 1/2 of 8?", 4, dv, null, null, null);
 		ManCardPanel mcp = new ManCardPanel(fileToOpen);
 		f.setLayout(new BorderLayout());
 		f.add(mcp, BorderLayout.CENTER);
@@ -122,7 +134,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 	}
 
 	public ManCardPanel(File file) {
-		this("Osvaldo, What is 1/3 of 51?", null, null, null, null);
+		this("Osvaldo, What is 1/2 (.5) of 10?", null, null, null, null);
 	}
 
 	// Creates a new ManFrame
@@ -141,7 +153,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		netRep = nr;
 		sendStartLogMessage();
 		answersTried = "";
-		manPanel = new ManPanel(800, 550, this);
+		manPanel = new ManPanel(800, 550, dv, cv, this);
 		manPanel.setToolTipText(Constants.TIP_MANIP_AREA);
 		controls.add(manPanel);
 
@@ -168,10 +180,47 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		questionBox.setLayout(new BoxLayout(questionBox, BoxLayout.X_AXIS));
 
 		createHorizontalGlue(questionBox, GLUE_NUMS);
-		questionLabel = new JLabel(stripQuestion(question), JLabel.CENTER);
-		questionLabel.setFont(Constants.FONT_REG);
-		questionBox.add(questionLabel);
+		String qtext = stripQuestion(question);
+		int numer = GameUtils.extractNumerator(qtext);
+		int denom = GameUtils.extractDenominator(qtext);
+		int ppl = GameUtils.extractPeople(qtext);
+		int prefixEndPos = GameUtils.extractNumeratorPos(qtext);
+		int suffixStartPos = GameUtils.extractPplEndPos(qtext);
+		String qprefix = qtext.substring(0, prefixEndPos);
+		String endfix = qtext.substring(suffixStartPos);
 		
+		if(qtext.indexOf(".") == -1) {
+			questionLabel = new JLabel(qprefix, JLabel.CENTER);
+			addLabelToMainQuestion(questionLabel, questionBox);
+		
+			numeratorLabel = new JLabel(""+numer, JLabel.CENTER);
+			addLabelToMainQuestion(numeratorLabel, questionBox);
+			
+			JLabel divideLbl = new JLabel("/", JLabel.CENTER);
+			addLabelToMainQuestion(divideLbl, questionBox);
+		
+			denominatorLabel = new JLabel(""+denom, JLabel.CENTER);
+			addLabelToMainQuestion(denominatorLabel, questionBox);
+		
+			JLabel ofLbl = new JLabel(" of ", JLabel.CENTER);
+			addLabelToMainQuestion(ofLbl, questionBox);
+		
+			peopleLabel = new JLabel(""+ppl, JLabel.CENTER);
+			addLabelToMainQuestion(peopleLabel, questionBox);
+		
+			JLabel suffixLbl = new JLabel(endfix, JLabel.CENTER);
+			addLabelToMainQuestion(suffixLbl, questionBox);
+		}else{
+			String qtextprefix = qtext.substring(0, GameUtils.extractPplStartPos(qtext));
+			questionLabel = new JLabel(qtextprefix, JLabel.CENTER);
+			addLabelToMainQuestion(questionLabel, questionBox);
+			numeratorLabel = new JLabel("", JLabel.CENTER);
+			denominatorLabel = numeratorLabel;
+			peopleLabel = new JLabel(""+ppl, JLabel.CENTER);
+			addLabelToMainQuestion(peopleLabel, questionBox);
+			JLabel suffixLbl = new JLabel(endfix, JLabel.CENTER);
+			addLabelToMainQuestion(suffixLbl, questionBox);
+		}
 		createHorizontalGlue(questionBox, GLUE_NUMS/3);
 		
 		questionAnswer = new JTextField(3);
@@ -353,6 +402,30 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 				currentArea = (String) areaOption.getSelectedItem();
 			}
 		});
+		
+		addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if(e.getButton() == MouseEvent.BUTTON1) {
+					Debug.println("mancard pressed" + (e.getX()-launchDemo.getWidth()) + ", " + (e.getY()-notCoolManBtn.getHeight()));
+					manPanel.manPanelMousePressed(e.getX()-launchDemo.getWidth(), e.getY()-notCoolManBtn.getHeight(), e.getButton());
+				}
+			}
+			
+			public void mouseReleased(MouseEvent e) {
+				if(e.getButton() == MouseEvent.BUTTON1){
+					manPanel.manPanelMouseReleased(e.getX()-launchDemo.getWidth(), e.getY()-notCoolManBtn.getHeight());
+				}
+			}
+		});
+		
+		addMouseMotionListener(new MouseMotionAdapter() {
+			public void mouseDragged(MouseEvent e) {
+				if(e.getModifiers() == MouseEvent.BUTTON1_MASK) {
+					Debug.println("mancard dragged" + (e.getX()-launchDemo.getWidth()) + ", " + (e.getY()-notCoolManBtn.getHeight()));
+					manPanel.manPanelMouseDragged(e.getX()-launchDemo.getWidth(), e.getY()-notCoolManBtn.getHeight(), e.getButton());
+				}
+			}
+		});
 
 		manPanel.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isMessingAround);
 		deckViewShown = new ManDeckViewPanel(dv, cv);
@@ -363,14 +436,31 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		changeElemsToColor(Constants.MANIP_CENTER_BACKGROUND, Constants.OPTION_CENTER);
 		changeElemsToColor(Constants.COLOR_SKIN_TONE, Constants.OPTION_NORTH);
 		changeElemsToColor(Constants.COLOR_SKIN_TONE, Constants.OPTION_EAST);
+		
+		if(ManPanelUtils.isShadowOnly(dv, cv)) {
+			changeElemsToColor(Constants.MANIP_SHADOW_LEFT_BACKGROUND, Constants.OPTION_WEST);
+			changeElemsToColor(Constants.MANIP_SHADOW_LEFT_BACKGROUND, Constants.OPTION_NORTH);
+			changeElemsToColor(Constants.MANIP_SHADOW_LEFT_BACKGROUND, Constants.OPTION_EAST);
+			changeElemsToColor(Constants.MANIP_SHADOW_CENTER_BACKGROUND, Constants.OPTION_CENTER);
+		}
 		setVisible(true);
+	}
+	
+	private void addLabelToMainQuestion(JLabel label, JPanel p) {
+		label.setFont(Constants.FONT_REG);
+		p.add(label);
 	}
 
 	public void disableControls() {
 		userCanEdit = false;
+		setControls(userCanEdit);
+	}
+	
+	private void setControls(boolean canControl) {
 		for(JComponent jc:controls) {
-			jc.setEnabled(false);
+			jc.setEnabled(canControl);
 		}
+		manPanel.setMouseClicks(canControl);
 	}
 	
 	private void createHorizontalGlue(JPanel jp, int numTimes) {
@@ -381,9 +471,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 
 	public void enableControls() {
 		userCanEdit = true;
-		for(JComponent jc:controls) {
-			jc.setEnabled(true);
-		}
+		setControls(userCanEdit);
 	}
 	
 	public JLabel createDebugLabel(JPanel b, String label) {
@@ -391,6 +479,10 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		l.setVisible(Constants.DEBUG_MODE);
 		b.add(l);
 		return l;
+	}
+	
+	public DeckView getDeckAffected() {
+		return deckPresented;
 	}
 	
 	private Color getBackgroundColorForBase() {
@@ -453,7 +545,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		String rightPart = q.substring(rightPar+2);
 		String decimal = q.substring(leftPar+1, rightPar);
 		int num = GameUtils.extractNumerator(question);
-		int numPos = q.indexOf(""+num);
+		int numPos = q.indexOf(""+num+"/");
 		int denPos = q.indexOf(" of ");
 		leftPart = q.substring(0, numPos);
 		rightPart = q.substring(denPos);
@@ -482,6 +574,13 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 			isStink = ((TrickCard) deckPresented.getTrickOnTop().getCard()).isStink();
 		}
 		manPanel.launchResultAnimation(ppl, num, den, solution, isStink);
+	}
+	
+	public void launchShadowResultAnimation() {
+		int num = GameUtils.extractNumerator(question);
+		int den = GameUtils.extractDenominator(question);
+		int ppl = GameUtils.extractPeople(question);
+		manPanel.launchShadowResultAnimation(ppl, num, den, solution);
 	}
 
 	private void populateWithNPeople(int ppl, int den) {
@@ -520,14 +619,16 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		}
 		compareToAnswer(num);
 	}
-
+	
 	private void compareToAnswer(int num) {
 		if(num == solution) {
 			manPanel.displayMessage(Constants.CORRECT);
 			String c = (clickedShowedMeHow)? "y": "n";
 			sendLogMessage("Done tried " + answersTried + "| " + manPanel.generateStatLine() + "| shownHow? " + c);
-			if(solution != -1 && legalMove()) {
+			if(solution != -1 && legalMove() && !ManPanelUtils.isShadowOnly(deckPresented, cardPlayed)) {
 				launchResultAnimation();
+			}else if(ManPanelUtils.isShadowOnly(deckPresented, cardPlayed)) {
+				launchShadowResultAnimation();
 			}else{
 				fireWindowDone();
 			}
@@ -555,12 +656,9 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 	 * Finally check if it's fractionally possible to play that card.
 	 */
 	private boolean legalMove() {
-		boolean cardPlayedByHuman = gPanel.isMyTurn();
+		boolean cardPlayedByHuman = cardPlayed != null;
 		if(!cardPlayedByHuman) return true;  //computer always makes a legal move
-		Player deckPlayer = deckPresented.getPlayer();
-		boolean humansDeck = deckPlayer.isHuman();
-		if(!(cardPlayed.isStink() && !humansDeck || cardPlayed.isAir() && humansDeck)) return false;
-		return deckPresented.couldAddTrickCard(cardPlayed);
+		return GameUtils.legalHumanCardMove(deckPresented, cardPlayed);
 	}
 
 	public void windowFinished() {
@@ -629,10 +727,6 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		sendLogMessage("Started" + rest);
 	}
 	
-	//This is where we have to combine or make the string
-	private void createLogMessage() {
-		
-	}
 
 	//@Override
 	public void keyPressed(KeyEvent arg0) {
@@ -647,6 +741,26 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 
 	//@Override
 	public void keyTyped(KeyEvent arg0) {
+	}
+	
+	public void fireDenomExplained() {
+		denominatorLabel.setForeground(Constants.LOUD_BUTTON_TEXT_COLOR);
+	}
+	
+	public void fireNumerExplained() {
+		peopleLabel.setForeground(Constants.DEFAULT_BUTTON_TEXT_COLOR);
+		numeratorLabel.setForeground(Constants.LOUD_BUTTON_TEXT_COLOR);
+	}
+	
+	public void firePplExplained() {
+		denominatorLabel.setForeground(Constants.DEFAULT_BUTTON_TEXT_COLOR);
+		peopleLabel.setForeground(Constants.LOUD_BUTTON_TEXT_COLOR);
+	}
+	
+	public void fireExplainDone() {
+		denominatorLabel.setForeground(Constants.DEFAULT_BUTTON_TEXT_COLOR);
+		numeratorLabel.setForeground(Constants.DEFAULT_BUTTON_TEXT_COLOR);
+		peopleLabel.setForeground(Constants.DEFAULT_BUTTON_TEXT_COLOR);
 	}
 }
 

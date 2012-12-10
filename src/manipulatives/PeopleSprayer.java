@@ -6,7 +6,8 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.Timer;
 
-import pebblebag.TugImages;
+import extras.GameImages;
+
 
 import basic.Constants;
 
@@ -35,7 +36,7 @@ public class PeopleSprayer implements ActionListener {
 		regions = den;
 		answer = numAffected;
 		stink = isStinky;
-		stinkBomb = TugImages.getStinkOrAir(isStinky);
+		stinkBomb = GameImages.getStinkOrAir(isStinky);
 	}
 	
 	public void setTimer(Timer t) {
@@ -70,7 +71,7 @@ public class PeopleSprayer implements ActionListener {
 		mPanel.removeItem();
 		mPanel.repaint();
 		//launch another Animation, like the stinky animation
-		mPanel.launchPeopleResultAnimation(ppl, regions, numerator, answer, stink);
+		mPanel.launchPeopleTransformAnimation(ppl, regions, numerator, answer, stink);
 	}
 	
 	private void restartTimer() {

@@ -226,14 +226,25 @@ public class PlayDeck extends Deck {
 	public int[] calculateStinksAndAirsSeparately() {
 		return calculateStinksAndAirsSeparately(cards, team.getValue());
 	}
+	
+	public int[] calculateStinksAndAirsSeparately(boolean calcAllAirs) {
+		return calculateStinksAndAirsSeparately(cards, team.getValue(), calcAllAirs);
+	}
 
 	public int calculateDeck() {
-		int totalLeft = calculateStinksAndAirs();
+		return calculateStinksAndAirs();
 		//		if(kidsRunToTruck()) {
 		//			return 0;
 		//		}else{
-		return totalLeft;
 		//		}
+	}
+	
+	public int calculateDeckMinusTop() {
+		ArrayList<TrickCard> tcs = new ArrayList<TrickCard>();
+		for(int i = 0; i < cards.size()-1; i++) {
+			tcs.add((TrickCard) cards.get(i));
+		}
+		return calculateStinksAndAirs(tcs, team.getValue());
 	}
 
 	public int calculatePotentialScore() {
@@ -248,6 +259,7 @@ public class PlayDeck extends Deck {
 
 	}
 
+	/* expected as in the expectation after many tries.  so a 2:2 ice would be calculated as 1/2 */
 	public static int calculateExpectedAfterIces(int totalLeft, ArrayList<TrickCard> ices) {
 		double numLeft = totalLeft;
 		for(TrickCard ice:ices) {
@@ -260,6 +272,9 @@ public class PlayDeck extends Deck {
 		return GameUtils.solveEasyFraction(t.getNumerator(), t.getDenominator(), teammates);
 	}
 
+	/* What we are calculating here is expected value after many many tries,
+	 * We are not making a chance decision and then subtracting all of the units or keeping them.
+	 */
 	private static double applyHypoIceFraction(double teammates, TrickCard t) {
 		return (teammates / ((double) (t.getDenominator()+t.getNumerator()))* t.getDenominator());
 	}
@@ -284,12 +299,16 @@ public class PlayDeck extends Deck {
 	}
 
 	public static int[] calculateStinksAndAirsSeparately(ArrayList<TrickCard> tcs, int curPosse) {
+		return calculateStinksAndAirsSeparately(tcs, curPosse, false);
+	}
+	
+	public static int[] calculateStinksAndAirsSeparately(ArrayList<TrickCard> tcs, int curPosse, boolean drawAllAirs) {
 		int posseLeft = curPosse;
-		int[] stinksAirs = new int[2];
+		int[] stinkAirs = new int[2];
 		for(TrickCard tc: tcs) {
-			posseLeft = playCardOnTeam(posseLeft, curPosse, tc, stinksAirs);
+			posseLeft = playCardOnTeam(posseLeft, curPosse, tc, stinkAirs, drawAllAirs);
 		}
-		return stinksAirs;
+		return stinkAirs;
 	}
 
 	public static int calculateAlmostAllStinkAndAirs(ArrayList<TrickCard> tcs, int curPosse) {
@@ -306,6 +325,10 @@ public class PlayDeck extends Deck {
 	}
 
 	public static int playCardOnTeam(int posse, int maxPosse, TrickCard tc, int[] stinkAir) {
+		return playCardOnTeam(posse, maxPosse, tc, stinkAir, false);
+	}
+	
+	public static int playCardOnTeam(int posse, int maxPosse, TrickCard tc, int[] stinkAir, boolean drawAllAirs) {
 		if(tc.isStink()) {
 			int result = applyFraction(posse, tc);
 			if(stinkAir != null) {
@@ -322,8 +345,10 @@ public class PlayDeck extends Deck {
 				stinkAir[0] -= result;
 				stinkAir[1] += result;
 				stinkAir[0] = Math.max(0, stinkAir[0]);
-				stinkAir[1] = Math.min(stinkAir[1], oldStink);
-				
+				stinkAir[1] = Math.min(stinkAir[1], maxPosse);
+				if(!drawAllAirs) {
+					stinkAir[1] = Math.min(stinkAir[1], oldStink);
+				}
 			}
 			posse += result;
 			posse = Math.min(maxPosse, posse);
@@ -433,6 +458,12 @@ public class PlayDeck extends Deck {
 		String str = team.toString() + ", with ";
 		str += cards;
 		return str;
+	}
+	
+	public boolean equals(Object o) {
+		if(!(o instanceof PlayDeck)) return false;
+		PlayDeck pd = (PlayDeck) o;
+		return pd.calculateDeck() == calculateDeck();
 	}
 
 	public static void main(String[] args) {

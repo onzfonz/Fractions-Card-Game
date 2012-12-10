@@ -70,13 +70,13 @@ public class ComboCardView extends CardView{
 		TrickCard c = (TrickCard) getCard();
 		String type = c.getType();
 		if(comboSelected != -1 && !c.isCombo()) {
-			Debug.println("drawing option with option:" + comboSelected + ", combo type: " + type + ", height: " + height);
+			Debug.printlnVerbose("drawing option with option:" + comboSelected + ", combo type: " + type + ", height: " + height);
 			drawACircle(g, x, y, width, height, comboSelected);
 		}
 	}
 	
 	public static void drawACircle(Graphics g, int x, int y, int width, int height, int option) {
-		GraphicUtils.drawThickRectangle(x + (width/2)*option, y+height/4, width/2, height/2, 4, Color.RED, g);
+		GraphicUtils.drawThickRectangle(x + (width/2)*option, y+height/4, width/2, height/2, 4, Constants.POSSIBLE_MOVE_COLOR, g);
 //		GraphicUtils.drawThickOval(x + (width/2)*option, y+height/4, width/2, height/2, 4, Color.RED, g);
 	}
 }

@@ -19,6 +19,7 @@ package pebblebag;
  * PebbleModel object will be one that has an ice cream Card followed by the number of Radios that it has.
  */
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -34,6 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import manipulatives.ManDeckViewPanel;
 import network.NetDelegate;
 import network.NetHelper;
 import basic.Constants;
@@ -56,8 +58,10 @@ public class PebblePanel extends JPanel implements PebbleListener {
 	private ArrayList<PebbleBagView> plays;
 	private PebbleView currentPebble;
 	private RandomGenerator rgen;
-	private JLabel statusLine1;
-	private JLabel statusLine2;
+	private JLabel statusLineDrawsLeft;
+	private JLabel statusLineDirections;
+	private JLabel statusLineOrange;
+	private JLabel statusLinePurple;
 	private boolean userCanClick;
 	private boolean playerIsShakingBag;
 	private boolean playerShouldStartShaking;
@@ -71,6 +75,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 	private PebblePanelListener listener;
 	private String participant;
 	private boolean leftButtonDown;
+	private ManDeckViewPanel deckViewShown;
 
 	/* Need to have a good shake pebble method
 	 * that will have the pebbles randomly move in their locations
@@ -84,15 +89,16 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		shakingDone = new Semaphore(0, true);
 		pebbleMoving = new Semaphore(0, true);
 		PlayDeck pd = dv.getPlayDeck();
-		setupPanel(pd, w, h, playerStarts, f);
+				
+		setupPanel(dv, pd, w, h, playerStarts, f);
 	}
 
 	//This is only really for testing purposes - should not support this!
 	PebblePanel(PlayDeck pd, int w, int h, boolean playerStarts, IceCreamTruckView f) {
-		setupPanel(pd, w, h, playerStarts, f);
+		setupPanel(null, pd, w, h, playerStarts, f);
 	}
 
-	private void setupPanel(PlayDeck pd, int w, int h, boolean playerStarts, IceCreamTruckView f) {
+	private void setupPanel(DeckView dv, PlayDeck pd, int w, int h, boolean playerStarts, IceCreamTruckView f) {
 		rgen = RandomGenerator.getInstance();
 		numIceCreamsPlayed = 0;
 		plays = new ArrayList<PebbleBagView>();
@@ -107,14 +113,12 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		JPanel southBox = new JPanel();
 		southBox.setLayout(new BoxLayout(southBox, BoxLayout.Y_AXIS));
 		add(southBox, BorderLayout.SOUTH);
-		statusLine1 = new JLabel(" ");
-		statusLine1.setFont(Constants.FONT_SMALL);
-		southBox.add(statusLine1);
-
-		statusLine2 = new JLabel(" ");
-		statusLine2.setFont(Constants.FONT_SMALL);
-		southBox.add(statusLine2);
-
+	
+		statusLineDirections = createLabelInBox(" ", southBox, Constants.DEFAULT_BUTTON_TEXT_COLOR);
+		statusLineOrange = createLabelInBox("Orange = Lose", southBox, Constants.COLOR_ORANGE);
+		statusLinePurple = createLabelInBox("Purple = Safe", southBox, Constants.COLOR_PURPLE);
+		statusLineDrawsLeft = createLabelInBox(" ", southBox, Constants.DEFAULT_BUTTON_TEXT_COLOR);
+		
 		setPreferredSize(new Dimension(w, h));
 		ArrayList<TrickCard> cards = pd.getTrickCards();
 		int index = firstIceInDeck(cards);
@@ -125,6 +129,10 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		updateStatusMessage(playerStarts);
 		beginInsertingAnimation();
 		playerShouldStartShaking = playerStarts;
+
+		deckViewShown = new ManDeckViewPanel(dv, null);
+		deckViewShown.setPreferredSize(new Dimension(Constants.ORIG_CARD_WIDTH, getHeight()));
+		add(deckViewShown, BorderLayout.EAST);
 
 		addMouseListener( new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
@@ -193,6 +201,16 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		});
 	}
 	
+	private JLabel createLabelInBox(String text, JPanel box, Color c) {
+		JLabel tempLabel = new JLabel(text);
+		tempLabel.setFont(Constants.FONT_SMALL);
+		tempLabel.setForeground(c);
+		if(box != null) {
+			box.add(tempLabel);
+		}
+		return tempLabel;
+	}
+	
 	private int keepObjectInXBoundary(int xCoord, boolean isBag) {
 		int size = Constants.PEBBLE_SIZE;
 		if(isBag) {
@@ -206,7 +224,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		if(isBag) {
 			size = Constants.PEBBLE_BAG_SIZE/2;
 		}
-		return CardGameUtils.keepInBoundary(yCoord, size, 0, getHeight()-statusLine1.getHeight()-statusLine2.getHeight());
+		return CardGameUtils.keepInBoundary(yCoord, size, 0, getHeight()-statusLineDrawsLeft.getHeight()-statusLineDirections.getHeight());
 	}
 
 	public int numPlays() {
@@ -503,7 +521,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 	public void doneShakingTheBag(boolean isHumanPlayer) {
 		getCurrentPebbleBag().doneShakingTheBag();
 		updateStatusMessage(!isHumanPlayer);
-		listener.bagShakingDone();
+		notifyBagShakingDone();
 		pebbleMoving.release();
 		Debug.println("released pebblemover from doneshakingbag");
 	}
@@ -523,7 +541,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		}else if(pbv != null && pbv.bagNeedsShaking()) {
 			if(isPlayersTurn) {
 				s2 += participant + ", please shake the bag.";
-				listener.bagShakingStarted();
+				notifyBagShakingStarted();
 			}else{
 				s2 += "Opponent shakes the bag.";
 			}
@@ -537,8 +555,8 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		if(plays.size() == 0) {
 			s1 = "No Ice Cream Trucks.";
 		}
-		statusLine1.setText(s1);
-		statusLine2.setText(s2);
+		statusLineDrawsLeft.setText(s1);
+		statusLineDirections.setText(s2);
 		repaint();
 	}
 
@@ -577,6 +595,18 @@ public class PebblePanel extends JPanel implements PebbleListener {
 
 	public void removeBagListener(IceWindowListener bl) {
 		listeners.remove(bl);
+	}
+	
+	private void notifyBagShakingStarted() {
+		if(listener != null) {
+			listener.bagShakingStarted();
+		}
+	}
+	
+	private void notifyBagShakingDone() {
+		if(listener != null) {
+			listener.bagShakingDone();
+		}
 	}
 
 	public void paintComponent(Graphics g) {

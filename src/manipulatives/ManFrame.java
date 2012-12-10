@@ -101,7 +101,7 @@ public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
 		listeners = new ArrayList<ManListener>();
 		controls = new ArrayList<JComponent>();
 		userCanEdit = true;
-		manPanel = new ManPanel(800, 600, this);
+		manPanel = new ManPanel(800, 600, dv, cv, this);
 		manPanel.setToolTipText(Constants.TIP_MANIP_AREA);
 		controls.add(manPanel);
 		deckPresented = dv;
@@ -429,6 +429,26 @@ public class ManFrame extends JFrame implements KeyListener, ManPanelListener {
 
 	//@Override
 	public void keyTyped(KeyEvent arg0) {
+	}
+
+	public void fireDenomExplained() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void fireNumerExplained() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void firePplExplained() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void fireExplainDone() {
+		// TODO Auto-generated method stub
+		
 	}
 }
 

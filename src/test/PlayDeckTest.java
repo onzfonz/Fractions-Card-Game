@@ -46,6 +46,7 @@ public class PlayDeckTest extends TestCase {
 	
 	public PlayDeckTest(String name) {
 		super(name);
+		Constants c = new Constants();
 		p1 = new PlayDeck(new TeammateCard("", "Johnson Family", "", 8));
 		p2 = new PlayDeck(new TeammateCard("", "Music Geeks", "", 6));
 		p3 = new PlayDeck(new TeammateCard("", "Basketball Team", "", 12));

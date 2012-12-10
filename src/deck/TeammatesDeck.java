@@ -16,36 +16,52 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import basic.Constants;
-
+import cards.Card;
 import cards.TeammateCard;
 
 public class TeammatesDeck extends Deck {
+	private TeammatesDeck alternateDeck;
+	private int numDraws;
+	
 	public static void main(String[] args) {
 		System.out.println("creatingTeammatesDeck");
 		TeammatesDeck teammates = new TeammatesDeck(Constants.FNAME_TEAM_DECK);
 		System.out.println(teammates.drawTopCard().getName());
 	}
 	
+	public TeammatesDeck(String aFileName, String bFileName) {
+		this(aFileName);
+		alternateDeck = new TeammatesDeck(bFileName);
+		alternateDeck.shuffle();
+		numDraws = 0;
+	}
+	
 	public TeammatesDeck(String aFileName) {
+		cards = new ArrayList<TeammateCard>();
+		setupDeck(aFileName, cards);
+		createBackup();
+	}
+	
+	public void setupDeck(String aFileName, ArrayList<TeammateCard> cardList) {
 		BufferedReader bf = null;
 		//File aFile = new File(aFileName);
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		InputStream is = cl.getResourceAsStream(aFileName);
 		bf = new BufferedReader(new InputStreamReader(is));
-		cards = new ArrayList<TeammateCard>();
-		processLineByLine(bf);
-		createBackup();
+		processLineByLine(bf, cardList);
 	}
 	
 	/* method for initializing deck by reading in deck contents from a file
 	 * each line has number of certain cards to hold.
 	 */
-	private void processLineByLine(BufferedReader bf) {
+	private void processLineByLine(BufferedReader bf, ArrayList<TeammateCard> cardList) {
 		try {
 			String l = bf.readLine();  //first use a Scanner to get each line
 			l = bf.readLine();
 			while (l != null && !l.equals("")){
-				processLine(l);
+				if(!l.equals(Constants.FILE_CONTENT_SPACING)) {
+					processLine(l, cardList);
+				}
 				l = bf.readLine();
 			}
 		}catch(IOException e) {
@@ -61,7 +77,7 @@ public class TeammatesDeck extends Deck {
 	 * it will break if that doesn't work.
 	 * 
 	 */
-	protected void processLine(String aLine){
+	protected void processLine(String aLine, ArrayList<TeammateCard> cardList){
 		//use a second Scanner to parse the content of each line 
 		Scanner scanner = new Scanner(aLine);
 		scanner.useDelimiter(",");
@@ -74,8 +90,19 @@ public class TeammatesDeck extends Deck {
 		int numCards = getNextInt(scanner);
 		
 		for(int i = 0; i < numCards; i++) {
-			cards.add(new TeammateCard(img, name, desc, value));
+			cardList.add(new TeammateCard(img, name, desc, value));
 		}
+	}
+	
+	public Card drawTopCard() {
+		Card myCard;
+		if(numDraws < Constants.NUM_PLAYERS*Constants.TEAM_HAND_SIZE*Constants.NUM_ROUNDS_B4_SHADOW && alternateDeck != null) {
+			myCard = alternateDeck.drawTopCard();
+		}else{
+			myCard = super.drawTopCard();
+		}
+		numDraws++;
+		return myCard;
 	}
 	
 	private String getNextStr(Scanner s) {

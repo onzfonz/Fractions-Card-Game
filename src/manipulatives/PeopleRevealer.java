@@ -12,16 +12,20 @@ import extras.GameImages;
 import basic.Constants;
 
 
-public class PeopleDisperser implements ActionListener {
+public class PeopleRevealer implements ActionListener {
 	private ManPanel mPanel;
 	private int ticks;
 	private Timer timer;
-	private boolean stink;
+	private int alpha;
+	private double alphaDx;
 	
-	public PeopleDisperser(ManPanel p, boolean isStinky) {
+	private static int MAX_TICKS = 100;
+	
+	public PeopleRevealer(ManPanel p) {
 		mPanel = p;
 		ticks = 0;
-		stink = isStinky;
+		alpha = 255;
+		alphaDx = alpha / (double) MAX_TICKS;
 	}
 	
 	public void setTimer(Timer t) {
@@ -31,13 +35,15 @@ public class PeopleDisperser implements ActionListener {
 	//@Override
 	public void actionPerformed(ActionEvent e) {
 		if(ticks == 0) {
-			//what to do at the start?
+			
 		}
-		mPanel.moveAffectedPeople(stink);
+		alpha = Math.max(alpha, 0);
+		mPanel.setManipsAlpha(alpha);
+		alpha -= alphaDx;
 		mPanel.repaint();
 		ticks++;
 		//theta += delta;
-		if(ticks >= Constants.DISPERSER_TIMES) {
+		if(ticks >= MAX_TICKS || alpha < 0) {
 			completelyFinishTimer();
 		}
 	}
@@ -46,7 +52,7 @@ public class PeopleDisperser implements ActionListener {
 		ticks = 0;
 		timer.stop();
 		mPanel.repaint();
-		mPanel.fireAnimationDone();
+		mPanel.launchPeopleRevealedAnimation();
 		//launch another Animation, like the stinky animation
 	}
 	

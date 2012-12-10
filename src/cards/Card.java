@@ -54,4 +54,5 @@ public abstract class Card implements Transferable{
 	}
 	
 	public abstract String toReadableText();
+	public abstract String toStream();
 }

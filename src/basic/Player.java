@@ -17,25 +17,26 @@ import cards.TrickCard;
 import deck.DeckView;
 import deck.PlayDeck;
 import extras.Debug;
+import extras.GameUtils;
 
 
 public class Player {
 	protected ArrayList<CardView> trickHand;
 	protected ArrayList<DeckView> decks;
-	protected BasicDealer d;
+	protected Dealer d;
 	protected int points;
 	private ArrayList<PlayerListener> listeners;
 	private boolean isHuman;
 	
-	public Player(BasicDealer dlr) {
+	public Player(Dealer dlr) {
 		this(dlr, null);
 	}
 	
-	public Player(BasicDealer dlr, PlayerListener pl) {
+	public Player(Dealer dlr, PlayerListener pl) {
 		this(dlr, pl, false, true);
 	}
 	
-	public Player(BasicDealer dlr, PlayerListener pl, boolean startRound, boolean human) {
+	public Player(Dealer dlr, PlayerListener pl, boolean startRound, boolean human) {
 		d = dlr;
 		listeners = new ArrayList<PlayerListener>();
 		if(pl != null) {
@@ -303,50 +304,18 @@ public class Player {
 		return null;
 	}
 	
-	protected void buildCardMoves(ArrayList<PossibleMove> movesSoFar, CardView cv, TrickCard tc, Player opponent) {
-		ArrayList<DeckView> oppoDecks = opponent.getAllDecks();
-		ArrayList<PossibleMove> someMoves = null;
-		if(tc.isAir() || tc.isRadio()) {
-			someMoves = buildPossibleMoves(cv, tc, decks);
-		}else{
-			someMoves = buildPossibleMoves(cv, tc, oppoDecks);
-		}
-		movesSoFar.addAll(someMoves);
-	}
-	
-	protected ArrayList<PossibleMove> buildPossibleMoves(CardView cv, TrickCard tc, ArrayList<DeckView> dvs) {
-		ArrayList<PossibleMove> moves = new ArrayList<PossibleMove>();
-		for(int i = 0; i < dvs.size(); i++) {
-			DeckView dv = dvs.get(i);
-			PossibleMove m = couldBePlayed(dv, cv, tc);
-			if(m != null) {
-				moves.add(m);
-			}
-		}
-		return moves;
-	}
-	
 	//Assumes that there is an IceCream Truck ready to be placed here
 	public void playARadio(DeckView dv) {
 		CardView radio = getARadio();
 		PossibleMove move = couldBePlayed(dv, radio);
 		if(move != null) {
-			fireCardAnimation(move, null, "played a radio to defend against the Ice Cream Truck!");
+			fireCardAnimation(move, null, "played a radio to defend against the Ice Cream Truck!", true);
 		}
 	}
 	
 	//Want something that would check to see if it was possible to add the card
 	protected PossibleMove couldBePlayed(DeckView dv, CardView cv) {
-		return couldBePlayed(dv, cv, (TrickCard) cv.getCard());
-	}
-	
-	protected PossibleMove couldBePlayed(DeckView dv, CardView cv, TrickCard tc) {
-		PossibleMove move = null;
-		if(dv.getPlayer().couldAddToPlayDeck(dv, tc, this)) {
-			int difference = dv.getPotentialScoreChange(cv);
-			move = new PossibleMove(dv, cv, tc, difference);
-		}
-		return move;
+		return GameUtils.couldBePlayed(dv, cv, (TrickCard) cv.getCard(), this);
 	}
 	
 	public void assembleMove(String cardIndex, int deckIndex, Player opponent) {
@@ -358,7 +327,7 @@ public class Player {
 		}
 		DeckView dv = p.getDeckView(deckIndex);
 		PossibleMove pm = new PossibleMove(dv, cv, tc, -1);
-		fireCardAnimation(pm, opponent, Constants.DECIDED_MOVE);
+		fireCardAnimation(pm, opponent, Constants.DECIDED_MOVE, true);
 	}
 	
 	private CardView extractCard(String cardIndex) {
@@ -428,11 +397,11 @@ public class Player {
 		return PlayDeck.numRadios(PlayDeck.convertListToTrickCards(trickHand));
 	}
 	
-	protected ArrayList<CardView> getTrickHand() {
+	public ArrayList<CardView> getTrickHand() {
 		return trickHand;
 	}
 	
-	protected ArrayList<DeckView> getAllDecks() {
+	public ArrayList<DeckView> getAllDecks() {
 		return decks;
 	}
 	
@@ -474,6 +443,12 @@ public class Player {
 	 * it wouldn't be in the spirit of MVC, since you are telling it exactly what to remove or add.  You need to look at CardView
 	 * to see what it does to make your decision.
 	 */
+	
+	public void fireDeckRepaint(DeckView dv) {
+		for(PlayerListener l:listeners) {
+			l.deckNeedsRepaint(this, dv);
+		}
+	}
 	
 	private void firePlayDeckChanged() {
 		for(PlayerListener l:listeners) {
@@ -557,9 +532,10 @@ public class Player {
 		}
 	}
 	
-	protected void fireCardAnimation(PossibleMove cMove, Player opponent, String message) {
+	protected void fireCardAnimation
+	(PossibleMove cMove, Player opponent, String message, boolean isImmediate) {
 		for(PlayerListener l:listeners) {
-			l.cardAnimationLaunched(cMove, this, opponent, message);
+			l.cardAnimationLaunched(cMove, this, opponent, message, isImmediate);
 		}
 	}
 }

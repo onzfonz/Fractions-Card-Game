@@ -72,7 +72,7 @@ public class ManFrameDebugDeprecated extends JFrame {
 		solution = answer;
 		listeners = new ArrayList<ManListener>();
 		question = q;
-		manPanel = new ManPanel(800, 600, null);
+		manPanel = new ManPanel(800, 600, null, null, null);
 		if (file != null) manPanel.open(file);
 
 		JPanel manBox = new JPanel();

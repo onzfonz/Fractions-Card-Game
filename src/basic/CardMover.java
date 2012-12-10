@@ -8,6 +8,7 @@ import javax.swing.Timer;
 import cards.CardView;
 import deck.DeckView;
 import extras.Debug;
+import extras.GraphicUtils;
 
 public class CardMover implements ActionListener {
 	private GamePanel gPanel;
@@ -73,7 +74,7 @@ public class CardMover implements ActionListener {
 	}
 	
 	public double increment(double cur, int desired) {
-		return Math.round((desired-cur)/(MAX_MOVES-numTimesMoved));
+		return GraphicUtils.incrementalMove(cur, desired, MAX_MOVES-numTimesMoved);
 	}
 
 }

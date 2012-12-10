@@ -38,6 +38,32 @@ public class Debug {
 		println(o.toString());
 	}
 	
+	public static void printlnVerbose(String s) {
+		if(Constants.DEBUG_MODE && Constants.VERBOSE_MODE) {
+			System.out.println(s);
+		}
+	}
+	
+	public static void printlnVerbose(int n) {
+		println(n + "");
+	}
+	
+	public static void printlnVerbose(double d) {
+		println(d + "");
+	}
+	
+	public static void printlnVerbose(boolean f) {
+		println(f + "");
+	}
+	
+	public static void printlnVerbose(char c) {
+		println(c + "");
+	}
+	
+	public static void printlnVerbose(Object o) {
+		println(o.toString());
+	}
+	
 	public static JLabel createDebugLabel(JPanel b, String label) {
 		JLabel l = new JLabel(label);
 		l.setVisible(Constants.DEBUG_MODE);

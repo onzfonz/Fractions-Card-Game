@@ -62,15 +62,15 @@ public class LogUser implements SQLType{
 	}
 	
 	public boolean finishedQuestion() {
-		return ulogtype.equals("QDone");
+		return ulogtype.equals(DBUtils.LOG_QDONE);
 	}
 	
 	public boolean isAttempt() {
-		return ulogtype.equals("QTried");
+		return ulogtype.equals(DBUtils.LOG_QTRIED);
 	}
 	
 	public boolean wasShown() {
-		return ulogtype.equals("QShown");
+		return ulogtype.equals(DBUtils.LOG_QSHOWN);
 	}
 	
 	public String[] toSQLString() {

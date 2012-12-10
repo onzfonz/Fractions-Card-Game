@@ -4,8 +4,12 @@
  * This is a simple struct that will allow us to hold more than one thing
  */
 package basic;
-import deck.*;
-import cards.*;
+import java.util.ArrayList;
+
+import cards.CardView;
+import cards.TrickCard;
+import deck.DeckView;
+import deck.PlayDeck;
 
 public class PossibleMove {
 	private DeckView deckToPlaceOn;
@@ -38,5 +42,43 @@ public class PossibleMove {
 
 	public int getDamage() {
 		return potentialDamage;
+	}
+	
+	public static PossibleMove getBestMove(ArrayList<PossibleMove> moves, TrickCard tc, DeckView dv) {
+		PossibleMove bestPm = null;
+		assert(moves != null && moves.size() > 0);
+		for(PossibleMove pm: moves) {
+			if(shouldBecomeBestMove(pm, bestPm, tc, dv)) {
+				bestPm = pm;
+			}
+		}
+		return bestPm;
+	}
+	
+	public static PossibleMove getSpecifiedMove(ArrayList<PossibleMove> moves, TrickCard tc, DeckView dv) {
+		PossibleMove myPm = null;
+		assert(moves != null & moves.size() > 0);
+		for(PossibleMove pm: moves) {
+			if(isMyMove(pm, tc, dv)) {
+				return pm;
+			}
+		}
+		assert(myPm != null);
+		return myPm;
+	}
+	
+	private static boolean shouldBecomeBestMove(PossibleMove pm, PossibleMove bestPm, TrickCard tc, DeckView dv) {
+		return bestPm == null || pm.getDamage() > bestPm.getDamage() || (pm.getDamage() == bestPm.getDamage() && pm.getTrickCard() == tc && pm.getDeck() == dv);
+	}
+	
+	private static boolean isMyMove(PossibleMove pm, TrickCard tc, DeckView dv) {
+		return pm != null && pm.getTrickCard().equals(tc) && pm.getDeck().getPlayDeck().equals(dv.getPlayDeck());
+	}
+	
+	public String toString() {
+		TrickCard tc = getTrickCard();
+		String s = tc.toReadableStream() + " on ";
+		PlayDeck pd = getDeck().getPlayDeck();
+		return s + pd.calculateDeck()+"("+pd.initialDeckValue()+")";
 	}
 }

@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import basic.Constants;
 import basic.PebbleBag;
 import cards.TrickCard;
+import extras.GameImages;
 import extras.RandomGenerator;
 
 public class PebbleBagView {
@@ -293,7 +294,7 @@ public class PebbleBagView {
 	}
 	
 	public void drawBag(Graphics g) {
-		g.drawImage(TugImages.getPebbleBag(), x, y, null);
+		g.drawImage(GameImages.getPebbleBag(), x, y, null);
 		for(PebbleView pv:pebbles) {
 			g.drawImage(pv.getPebbleImage(), x + pv.getX(), y + pv.getY(), null);
 		}

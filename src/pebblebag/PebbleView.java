@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import basic.Constants;
 
+import extras.GameImages;
 import extras.RandomGenerator;
 
 public class PebbleView {
@@ -27,12 +28,12 @@ public class PebbleView {
 
 	public BufferedImage getPebbleImage() {
 		if(isHidden){
-			return TugImages.getHiddenPebble();
+			return GameImages.getHiddenPebble();
 		}else{
 			if(kidsRunToTruck) {
-				return TugImages.getOrangePebble();
+				return GameImages.getOrangePebble();
 			}else{
-				return TugImages.getPurplePebble();
+				return GameImages.getPurplePebble();
 			}
 		}
 	}

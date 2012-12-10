@@ -2,11 +2,15 @@ package deck;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import pebblebag.TugImages;
+import javax.swing.Timer;
+
+import manipulatives.DoublePoint;
+import manipulatives.ManModel;
 import basic.Constants;
 import basic.Player;
 import cards.Card;
@@ -16,7 +20,9 @@ import cards.ShadowCardView;
 import cards.TeammateCard;
 import cards.TrickCard;
 import extras.Debug;
+import extras.GameImages;
 import extras.GraphicUtils;
+import extras.RandomGenerator;
 
 /* This will be a delegation style class
  * that will have a playdeck and all that it entails,
@@ -30,7 +36,23 @@ public class DeckView {
 	protected Player player;
 	protected boolean legalAdd;
 	protected boolean labelShown;
-	
+	protected boolean justFreshened;
+	protected boolean hasLaunchedFreshPoof;
+	private int numFrames;
+	private int totalFrames;
+	private FreshPoofer poofer;
+	protected ArrayList<ManModel> manips;
+	protected RandomGenerator rgen;
+	protected boolean manipsDiscarded;
+
+	public boolean isManipsDiscarded() {
+		return manipsDiscarded;
+	}
+
+	public void setManipsDiscarded(boolean manipsDiscarded) {
+		this.manipsDiscarded = manipsDiscarded;
+	}
+
 	private boolean highlighted;
 
 	public DeckView(TeammateCard c, Player p) {
@@ -43,7 +65,14 @@ public class DeckView {
 		cardsPlayed = new ArrayList<CardView>();
 		deck = new PlayDeck(c);
 		highlighted = false;
+		justFreshened = false;
 		labelShown = true;
+		hasLaunchedFreshPoof = false;
+		numFrames = -1;
+		manips = new ArrayList<ManModel>();
+		createManipModels();
+		recalculateManips(false);
+		rgen = RandomGenerator.getInstance();
 	}
 
 	public DeckView(PlayDeck pd, Player p) {
@@ -55,6 +84,15 @@ public class DeckView {
 			cardsPlayed.add(cv);
 		}
 	}
+	
+	private void createManipModels() {
+		TeammateCard tc = (TeammateCard) (teammateCard.getCard());
+		int numManips = tc.getValue();
+		for(int i = 0; i < numManips; i++) {
+			ManModel man = new ManModel();
+			manips.add(man);
+		}
+	}
 
 	public ArrayList<CardView> getAllCards() {
 		ArrayList<CardView> wholeDeck = (ArrayList<CardView>) cardsPlayed.clone();
@@ -63,22 +101,23 @@ public class DeckView {
 	}
 
 	public boolean addTrickCard(TrickCard c) {
-		boolean couldAddCard = deck.addTrickCard(c);
-		if(couldAddCard) {
-			CardView cv = CardViewFactory.createCard(c);
-			cardsPlayed.add(cv);
-		}
-		return couldAddCard;
+		return addTrickCard(null, c);
 	}
 
 	public boolean addTrickCard(CardView cv) {
 		return addTrickCard(cv, (TrickCard) cv.getCard());
 	}
-	
+
 	public boolean addTrickCard(CardView cv, TrickCard tc) {
 		boolean couldAddCard = deck.addTrickCard(tc);
 		if(couldAddCard) {
+			if(cv == null) {
+				cv = CardViewFactory.createCard(tc);
+			}
 			cardsPlayed.add(cv);
+			if(tc.isAir()) {
+				justFreshened = true;
+			}
 		}
 		return couldAddCard;
 	}
@@ -94,7 +133,7 @@ public class DeckView {
 	public boolean couldAddTrickCard(CardView cv) {
 		return couldAddTrickCard((TrickCard) cv.getCard());
 	}
-	
+
 	/**
 	 * Does not take into account player associated with deck or card.
 	 * @param tc trick card trying to be placed on the deck
@@ -103,7 +142,7 @@ public class DeckView {
 	public boolean couldAddTrickCard(TrickCard tc) {
 		return deck.couldAddTrickCard(tc);
 	}
-	
+
 	/* Right now it will not draw all cards itself
 	 * since there needs to be more housekeeping for it to work this way in gamepanel.
 	 * We need to change how trickCards are added and where they are kept, and how
@@ -122,21 +161,22 @@ public class DeckView {
 		if(highlightedCard != null) {
 			highlightedCard.drawCard(g);
 		}
-		if(isHighlighted()) {
-			Color rectColor = Color.red;
+		if(isHighlighted() || isLegalAdd()) {
+			Color rectColor = Constants.BAD_MOVE_COLOR;
 			if(isLegalAdd()) {
-				rectColor = Color.green;
+				rectColor = Constants.GOOD_MOVE_COLOR;
 			}
 			drawDeckRectangle(g, rectColor);
 		}
-		if(labelShown && Constants.SHOW_DECK_MANIPS) {
+		/* something here to override the labelShown */
+		if((labelShown || isManipsDiscarded()) && Constants.SHOW_DECK_MANIPS) {
 			drawManipulatives(g);
 		}
 		if(labelShown && Constants.SHOW_DECK_LABEL_NUMBER) {
 			drawDeckNumber(g);
 		}
 	}
-	
+
 	public void drawAbsoluteDeck(Graphics g, CardView cardPlayed, double width, double height) {
 		String message = "";
 		if(getPlayer().isHuman()) {
@@ -146,7 +186,11 @@ public class DeckView {
 		}
 		Font origFont = g.getFont();
 		g.setFont(Constants.FONT_SMALL);
-		g.drawString(message, Constants.DECK_VIEW_MARGIN, (int) height-Constants.DECK_VIEW_MARGIN);
+		FontMetrics fm = g.getFontMetrics();
+//		g.drawString(message, Constants.DECK_VIEW_MARGIN, (int) height-Constants.DECK_VIEW_MARGIN);
+		int offset = fm.getHeight();
+		g.drawString(message, Constants.DECK_VIEW_MARGIN, offset);
+		
 		g.setFont(origFont);
 		ArrayList<CardView> allCards = getAllCards();
 		if(cardPlayed != null) {
@@ -156,7 +200,7 @@ public class DeckView {
 		cardDelta = Math.min(cardDelta, Constants.ORIG_CARD_HEIGHT);
 		for(int i = 0; i < allCards.size(); i++) {
 			CardView cv = allCards.get(i);
-			cv.drawCard(g, 0, (int) (i*cardDelta), (int) width, (int) height);
+			cv.drawCard(g, 0, (int) (i*cardDelta)+offset*2, (int) width, (int) (height-2*offset));
 		}
 	}
 
@@ -170,23 +214,31 @@ public class DeckView {
 		g.setFont(oldFont);
 	}
 	
+	public String toStream() {
+		return deck.toString();
+	}
+
 	public int getX() {
 		return getTeammateCard().getX();
 	}
-	
+
 	public int getY() {
 		return getTeammateCard().getY() ;
 	}
-	
+
 	public int getCenterY(){
 		return getY() + (int) calculateDeckHeight()/2;
 	}
-	
+
 	public int getCenterX() {
 		return getX() + (int) (getCardWidth()/2);
 	}
+	
+	public ArrayList<ManModel> getManipulatives() {
+		return manips;
+	}
 
-	private void drawManipulatives(Graphics g) {
+	/*private void drawManipulativesOld(Graphics g) {
 		int x = getCardWidth() + getX();
 		int y = getY();
 		BufferedImage manip = TugImages.getMan();
@@ -199,37 +251,198 @@ public class DeckView {
 		//TODO: Take away this hack to do something a little nicer.  Use something like the x coordinate to figure
 		//out the spacing needed to be able to move around.
 		int numOnSide = Math.max(4, getCardWidth()/manip.getWidth());
-		if(numOnSide != 0) {
-			int numTotal = deck.initialDeckValue();
-			int numSoFar = 0;
-			int numLeft = calculateDeck();
-			int[] stinkAirs = deck.calculateStinksAndAirsSeparately();
-			stinkAirs[1] = Math.min(numTotal, stinkAirs[1]);
-			for(; numSoFar < numTotal-(stinkAirs[0]+stinkAirs[1]); numSoFar++) {
+		int numTotal = deck.initialDeckValue();
+		int numSoFar = 0;
+		int numLeft = calculateDeck();
+		int[] stinkAirs = deck.calculateStinksAndAirsSeparately(true);
+		stinkAirs[1] = Math.min(numTotal, stinkAirs[1]);
+		for(; numSoFar < numTotal-(stinkAirs[0]+stinkAirs[1]); numSoFar++) {
+			drawOneMan(g, x, y, numSoFar, numOnSide, (int) (stinkManip.getWidth()*Constants.MANIP_SCALE), (int) (stinkManip.getHeight()*Constants.MANIP_SCALE), manip);
+		}
+		for(; numSoFar < numTotal-stinkAirs[0]; numSoFar++) {
+			if(justFreshened) {
+				drawOneMan(g, x, y, numSoFar, numOnSide, (int) (stinkManip.getWidth()*Constants.MANIP_SCALE), (int) (stinkManip.getHeight()*Constants.MANIP_SCALE), freshManip);
+				launchFreshenedPoof();
+			}else{
 				drawOneMan(g, x, y, numSoFar, numOnSide, (int) (stinkManip.getWidth()*Constants.MANIP_SCALE), (int) (stinkManip.getHeight()*Constants.MANIP_SCALE), manip);
 			}
-			for(; numSoFar < numTotal-stinkAirs[0]; numSoFar++) {
-				drawOneMan(g, x, y, numSoFar, numOnSide, (int) (stinkManip.getWidth()*Constants.MANIP_SCALE), (int) (stinkManip.getHeight()*Constants.MANIP_SCALE), freshManip);
-			}
-			for(; numSoFar < numTotal; numSoFar++) {
-				drawOneMan(g, x, y, numSoFar, numOnSide, (int) (stinkManip.getWidth()*Constants.MANIP_SCALE), (int) (stinkManip.getHeight()*Constants.MANIP_SCALE), stinkManip);
-			}
+		}
+		for(; numSoFar < numTotal; numSoFar++) {
+			drawOneMan(g, x, y, numSoFar, numOnSide, (int) (stinkManip.getWidth()*Constants.MANIP_SCALE), (int) (stinkManip.getHeight()*Constants.MANIP_SCALE), stinkManip);
+		}
+		//need to incorporate launchFreshenedPoof();
+		if(numFrames >= 0) {
+			drawFreshenedGraphic(g, x, y, numOnSide, manip);
+		}
+	}*/
+	
+	private void drawManipulatives(Graphics g) {
+		int x = getCardWidth() + getX();
+		int y = getY();
+		BufferedImage manip = GameImages.getMan();
+		int numOnSide = calculateNumOnSide(manip);
+//		Debug.println("getCardWidth is: " + getCardWidth() + ", while manip width is " + manip.getWidth());
+		for(ManModel man:manips) {
+			drawOneMan(g, man);
+		}
+		
+		//need to incorporate launchFreshenedPoof();
+		if(numFrames >= 0) {
+			drawFreshenedGraphic(g, x, y, numOnSide, manip);
+		}
+	}
+
+	private void recalculateManModels(boolean isDesired) {
+		//int x = getCardWidth() + getX();
+		//int y = getY();
+		int x = 0;
+		int y = 0;
+		
+		BufferedImage manImg = GameImages.getMan();
+		int numOnSide = calculateNumOnSide(manImg);
+		int numTotal = deck.initialDeckValue();
+		int numSoFar = 0;
+		//This may need to be rewritten so that 
+		//when you have a 1/2 stink and 3/4 air, you get 6 airs, not 4.
+		int[] stinkAirs = deck.calculateStinksAndAirsSeparately(true);
+		stinkAirs[1] = Math.min(numTotal, stinkAirs[1]);
+		for(; numSoFar < numTotal-(stinkAirs[0]+stinkAirs[1]); numSoFar++) {
+			setDesiredOrCurrentLocation(manips, x, y, numSoFar, numOnSide, manImg, isDesired);
+		}
+		for(; numSoFar < numTotal-stinkAirs[0]; numSoFar++) {
+			setDesiredOrCurrentLocation(manips, x, y, numSoFar, numOnSide, manImg, isDesired);
+			manips.get(numSoFar).setFresh();
+		}
+		for(; numSoFar < numTotal; numSoFar++) {
+			setDesiredOrCurrentLocation(manips, x, y, numSoFar, numOnSide, manImg, isDesired);
+			manips.get(numSoFar).setStinked();
 		}
 	}
 	
+	public void setManipsDesiredLocation(int x, int y) {
+		Debug.println("setting manips to x:" + x + ", " + y);
+		for(ManModel m:manips) {
+			m.setDesiredX(x);
+			m.setDesiredY(y);
+		}
+	}
+	
+	/*currently this is not working correctly*/
+	private int calculateNumOnSide(BufferedImage manImg) {
+		Debug.printlnVerbose("numOnSide? card width:" + getCardWidth() + " , manimg.getwidth():" + manImg.getWidth() + " = " + getCardWidth()/manImg.getWidth());
+//		return Math.max(4, getCardWidth()/manImg.getWidth());
+		return Constants.NUM_MANIPS_PER_ROW;
+	}
+
+	private void setDesiredOrCurrentLocation(ArrayList<ManModel> manModels, int baseX, int baseY, int numSoFar, int numOnSide, BufferedImage manImage, boolean isDesired) {
+		ManModel m = manModels.get(numSoFar);
+		int newX = calcManipX(baseX, numSoFar, numOnSide, manImage.getWidth());
+		int newY = calcManipY(baseY, numSoFar, numOnSide, manImage.getHeight());
+		Debug.println("setting manipulative to: " + newX + ", " + newY);
+		if(isDesired) {
+			m.setDesiredX(newX);
+			m.setDesiredY(newY);
+			m.setX(m.getDesiredX()+Constants.PANEL_WIDTH);
+			m.setY(m.getDesiredY()+rgen.nextInt(calculateDeckHeight()*-1, calculateDeckHeight()));
+		}else{
+			m.setX(newX);
+			m.setY(newY);
+		}
+	}
+
+	private void drawFreshenedGraphic(Graphics g, int x, int y, int numInLine, BufferedImage img) {
+		int width = teammateCard.getWidth()+numInLine*img.getWidth();
+		int centerX = x;
+		int height = calculateDeckHeight();
+		int centerY = y + height/3;
+		int circleWidth = width/2-2*numFrames;
+		Color orig = g.getColor();
+		double ratio = 256.0 / totalFrames;
+		g.setColor(new Color(40, 177, 221, 256 - (int)(ratio*numFrames)));
+		DoublePoint centerPt = new DoublePoint(centerX, centerY);
+		poofer.graphicDrawn();
+		for(int i = 0; i < 5; i++) {
+			DoublePoint newPt = GraphicUtils.getPolarProjectedPoint(centerPt, numFrames*2, (360/5)*i);
+			int xCoord = (int) (newPt.getX()-circleWidth/2);
+			int yCoord = (int) (newPt.getY()-circleWidth/2);
+			g.fillOval(xCoord, yCoord, circleWidth, circleWidth);
+		}
+		g.setColor(orig);
+	}
+
+	public void beginFreshenedGraphic(int numTicks) {
+		numFrames = 0;
+		totalFrames = numTicks;
+	}
+
+	public void advanceFreshenedGraphic() {
+		numFrames++;
+		if(justFreshened && numFrames > totalFrames / 3) {
+			justFreshened = false;
+			unFreshModels(manips);
+			player.fireDeckRepaint(this);
+		}
+	}
+	
+	private void unFreshModels(ArrayList<ManModel> models) {
+		for(ManModel m:models) {
+			if(m.isFresh()) {
+				m.setRegular();
+			}
+		}
+	}
+
+	public void endFreshenedGraphic() {
+		numFrames = -1;
+		hasLaunchedFreshPoof = false;
+		Debug.println("just finished the poof timer");
+		player.fireDeckRepaint(this);
+		poofer = null;
+	}
+
 	private void drawOneMan(Graphics g, int x, int y, int numSoFar, int numOnSide, BufferedImage manImage) {
 		drawOneMan(g, x, y, numSoFar, numOnSide, manImage.getWidth(), manImage.getHeight(), manImage);
 	}
-	
+
 	private void drawOneMan(Graphics g, int x, int y, int numSoFar, int numOnSide, int width, int height, BufferedImage manImage) {
-		int manX = x + (numSoFar%numOnSide)*width;
-		int manY = y + (numSoFar/numOnSide)*height;
+		int manX = calcManipX(x, numSoFar, numOnSide, width);
+		int manY = calcManipY(y, numSoFar, numOnSide, height);
 		//Debug.println("Drawing men at " + manX + ", " + manY + "with dimensions: " + manImage.getWidth() + ", " + manImage.getHeight());
 		g.drawImage(manImage, manX, manY, width, height, null);
+	}
+	
+	private void drawOneMan(Graphics g, ManModel man) {
+		int x = getCardWidth() + getX();
+		int y = getY();
+		BufferedImage imgToUse = GameImages.getMan();
+		if(man.isFresh()) {
+			imgToUse = GameImages.getFreshenedMan();
+		}else if(man.isStinky()) {
+			imgToUse = GameImages.getStinkyMan();
+		}
+		g.drawImage(imgToUse, x + man.getX(), y + man.getY(), null);
+	}
+
+	private int calcManipX(int baseX, int numSoFar, int numOnSide, int width) {
+		return baseX + (numSoFar%numOnSide)*width;
+	}
+
+	private int calcManipY(int baseY, int numSoFar, int numOnSide, int height) {
+		return baseY + (numSoFar/numOnSide)*height;
 	}
 
 	private int getCardWidth() {
 		return (int) getTeammateCard().getSize().getWidth();
+	}
+
+	public void launchFreshenedPoof() {
+		if(hasLaunchedFreshPoof) return;
+		hasLaunchedFreshPoof = true;
+		poofer = new FreshPoofer(player, this);
+		Timer poofTimer = new Timer(20, poofer);
+		poofTimer.setInitialDelay((int) (Constants.BETWEEN_GAME_PAUSE*1.2));
+		poofer.setTimer(poofTimer);
+		poofTimer.start();
 	}
 
 	private void drawDeckRectangle(Graphics g, Color c) {
@@ -260,13 +473,21 @@ public class DeckView {
 	public CardView getTeammateCard() {
 		return teammateCard;
 	}
-	
+
 	public CardView getTrickOnTop() {
 		return cardsPlayed.get(cardsPlayed.size()-1);
 	}
 
 	public int calculateDeck() {
 		return deck.calculateDeck();
+	}
+
+	public int calculateDeckMinusTop() {
+		return deck.calculateDeckMinusTop();
+	}
+
+	public int initialDeckValue() {
+		return deck.initialDeckValue();
 	}
 
 	public int getPotentialScoreChange(CardView cv) {
@@ -297,7 +518,19 @@ public class DeckView {
 		return legalAdd;
 	}
 
-	public void showLabel(boolean lS) {
+	public void showLabel(boolean lS, boolean hasChanged) {
 		labelShown = lS;
+		/*might not be the appropriate place, if so, clear the hasChanged variable */
+		/*if(hasChanged) {
+			recalculateManModels();
+		}*/
+	}
+
+	public void recalculateManips(boolean isDesired) {
+		recalculateManModels(isDesired);
+	}
+	
+	public boolean justFreshened() {
+		return justFreshened;
 	}
 }

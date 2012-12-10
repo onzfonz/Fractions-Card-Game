@@ -16,7 +16,10 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import pebblebag.TugImages;
+import extras.GameImages;
+
+import basic.Constants;
+
 
 public class TugPanel extends JPanel {
 	private int myside;
@@ -31,6 +34,7 @@ public class TugPanel extends JPanel {
 	private TugPersonView regImage;
 	private int peopleFallenCounter;
 	private int ticksPassedTugging;
+	private boolean donePulling;
 	
 	public static final int TUG_WIDTH = 900;
 	public static final int TUG_HEIGHT = 640;
@@ -50,12 +54,13 @@ public class TugPanel extends JPanel {
 		
 		mypeeps = setupPeople(myside, true);
 		oppopeeps = setupPeople(theirside, false);
-		regImage = new TugPersonView(TugImages.getMan(), TugImages.getLostMan(), true);
+		regImage = new TugPersonView(GameImages.getMan(), GameImages.getLostMan(), true);
 		flagI = 0;
 		peopleFallenCounter = 0;
 		flagX = TUG_WIDTH/2 - regImage.getNormalImage().getWidth()/8;
-		ropeX = TUG_WIDTH/2 - TugImages.getTugRope().getWidth()/2;
+		ropeX = TUG_WIDTH/2 - GameImages.getTugRope().getWidth()/2;
 		listeners = new ArrayList<TugListener>();
+		donePulling = false;
 		setLayout(new BorderLayout());
 		//		add(new JLabel(""+myside), BorderLayout.WEST);
 		//		add(new JLabel(""+opposide), BorderLayout.EAST);
@@ -64,7 +69,7 @@ public class TugPanel extends JPanel {
 	public ArrayList<TugPersonView> setupPeople(int num, boolean onMyTeam) {
 		ArrayList<TugPersonView> peeps = new ArrayList<TugPersonView>();
 		for(int i = 0; i < num; i++) {
-			peeps.add(new TugPersonView(TugImages.getMan(), TugImages.getLostMan(), onMyTeam));
+			peeps.add(new TugPersonView(GameImages.getMan(), GameImages.getLostMan(), onMyTeam));
 		}
 		return peeps;
 	}
@@ -183,6 +188,7 @@ public class TugPanel extends JPanel {
 			getPeopleUpright(oppopeeps, mypeeps.size());
 			makePeopleJump(oppopeeps);
 		}
+		donePulling = true;
 	}
 	
 	public void makeOneSetFall() {
@@ -235,12 +241,14 @@ public class TugPanel extends JPanel {
 	 */
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g.drawImage(TugImages.getTugBackground(), 0, 0, getWidth(), getHeight(), null);
+		g.drawImage(GameImages.getTugBackground(), 0, 0, getWidth(), getHeight(), null);
 		int theY = getHeight()/2;
 		BufferedImage buf = regImage.getNormalImage();
 		drawRope(g, getWidth(), theY, buf);
 		drawSides(g, theY, buf);
-//		drawLabels(g);
+		if(donePulling) {
+			drawText(g);
+		}
 	}
 	
 	private int calcManY(TugPersonView tpv, int y) {
@@ -293,9 +301,28 @@ public class TugPanel extends JPanel {
 		}
 	}
 
-	private void drawLabels(Graphics g) {
-		g.drawString("You", getWidth()/8, getHeight()/4);
-		g.drawString("Them", (int) (getWidth()*.625), getHeight()/4);
+	private void drawText(Graphics g) {
+		Color oldColor = g.getColor();
+		g.setFont(Constants.FONT_LARGE);
+		g.setColor(Constants.STATUS_FOREGROUND);
+		String finalMsg = determineFinalMessage();
+		drawLabelMessage(g, finalMsg, !doILose());
+		g.setColor(oldColor);
+	}
+	
+	private String determineFinalMessage() {
+		if(isItATie()) {
+			return "It's a tie";
+		}
+		return calcDifference() + " point" + ((calcDifference()==1)? "":"s") + "!";
+	}
+	
+	private void drawLabelMessage(Graphics g, String message, boolean ourSide) {
+		int xPos = (int) (getWidth()*.05);
+		if(!ourSide) {
+			xPos = (int) (getWidth()*.7);
+		}
+		g.drawString(message, xPos, (int) (getHeight()/2.5));
 	}
 
 	private void drawRope(Graphics g, int length, int y, BufferedImage man) {
@@ -306,11 +333,11 @@ public class TugPanel extends JPanel {
 //		g.fillRect(flagX, y+man.getHeight()/2, man.getWidth()/4, man.getHeight()/2);
 //		g.setColor(c);
 		//new method with images
-		BufferedImage rope = TugImages.getTugRope();
+		BufferedImage rope = GameImages.getTugRope();
 		flagX = length/2 - regImage.getNormalImage().getWidth()/8 + flagI * length/TUG_WIDTH;
 		ropeX = length/2 - rope.getWidth()/2 + flagI * length/TUG_WIDTH;
 		g.drawImage(rope, ropeX, y+man.getHeight()/2, null);
-		g.drawImage(TugImages.getRedFlag(), length/2+(flagI), y+man.getHeight()/2, null);
+		g.drawImage(GameImages.getRedFlag(), length/2+(flagI), y+man.getHeight()/2, null);
 	}
 
 	/* Need to have a good shake pebble method
@@ -322,7 +349,7 @@ public class TugPanel extends JPanel {
 		JFrame frame = new JFrame("Tug Panel");
 
 		//TODO: Modify the images so that the lines are better marked on the floor.
-		TugPanel pPanel = new TugPanel(14, 14);
+		TugPanel pPanel = new TugPanel(14, 11);
 		frame.add(pPanel);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();

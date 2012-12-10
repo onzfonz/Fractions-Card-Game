@@ -22,5 +22,6 @@ public interface PlayerListener {
 	public void radioPlayed(Player player, DeckView p, Player cvOwner);
 	public void stinkBombPlayed(Player player, DeckView p, Player cvOwner);
 	public void scoreUpdated(Player p);
-	public void cardAnimationLaunched(PossibleMove cMove, Player computer, Player opponent, String message);
+	public void cardAnimationLaunched(PossibleMove cMove, Player computer, Player opponent, String message, boolean isImmediate);
+	public void deckNeedsRepaint(Player p, DeckView dv);
 }

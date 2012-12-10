@@ -75,17 +75,19 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 
 		windows.add(lobbyPanel, LOBBY_PANEL);
 		windows.add(gamePanel, GAME_PANEL);
-		if(Constants.NETWORK_MODE) {
+		if(Constants.NETWORK_MODE && !Constants.DEBUG_MODE) {
 			alertMsg = new FYIMessage(null, Constants.INFO_STARTING);
 		}
 		add(windows);
 		initialize();
-		askNamesAndSend("");
+		askNamesAndSend("", "DPlayer1 & DPlayer2");
 		if(!Constants.NETWORK_MODE) {
 			makeWindowShowUp();
 			moveToGame();
 		}else{
-			alertMsg.killMessage();
+			if(alertMsg != null) {
+				alertMsg.killMessage();
+			}
 		}
 	}
 
@@ -141,8 +143,8 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 		parentPanel.add(game);
 	}
 
-	private void askNamesAndSend(String prefix) {
-		String id = "DPlayer1 & DPlayer2";
+	private void askNamesAndSend(String prefix, String names) {
+		String id = names;
 		if(!Constants.DEBUG_MODE) {
 			String s = (String)JOptionPane.showInputDialog(this, prefix + Constants.INFO_NET_ASK_NAME, "Name", JOptionPane.QUESTION_MESSAGE, null, null, "");
 
@@ -271,7 +273,7 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 				moveToLobby();
 				makeWindowShowUp();
 			}else{
-				askNamesAndSend(Constants.INFO_ERR_NAMES_TAKEN);
+				askNamesAndSend(Constants.INFO_ERR_NAMES_TAKEN, "DPlayer 3 & DPlayer4");
 				return;
 			}
 		}

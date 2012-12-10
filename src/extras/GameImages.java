@@ -1,4 +1,4 @@
-package pebblebag;
+package extras;
 
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -15,7 +15,7 @@ import basic.Constants;
 
 
 
-public final class TugImages {
+public final class GameImages {
 	private static BufferedImage orangePebble;
 	private static BufferedImage purplePebble;
 	private static BufferedImage hiddenPebble;
@@ -29,8 +29,12 @@ public final class TugImages {
 	private static BufferedImage tugRope;
 	private static BufferedImage stinkBomb;
 	private static BufferedImage airFresh;
+	private static BufferedImage trashCan;
+	private static BufferedImage trashCanOpen;
+	private static BufferedImage discardPile;
+	private static BufferedImage iceCreamTruck;
 	
-	public TugImages() {
+	public GameImages() {
 		orangePebble = getOrangePebble();
 		purplePebble = getPurplePebble();
 		hiddenPebble = getHiddenPebble();
@@ -44,6 +48,10 @@ public final class TugImages {
 		lostMan = getLostMan();
 		stinkBomb = getStinkBomb();
 		airFresh = getAirFreshener();
+		trashCan = getTrashCan();
+		trashCanOpen = getTrashCanOpen();
+		discardPile = getDiscardPile();
+		iceCreamTruck = getIceCreamTruck();
 	}
 	
 	public static BufferedImage rotatePerson(BufferedImage man, double radians, boolean myside) {
@@ -120,6 +128,26 @@ public final class TugImages {
 	public static BufferedImage getAirFreshener() {
 		airFresh = retrieveImage(airFresh, Constants.TUG_AIR_FILENAME);
 		return airFresh;
+	}
+	
+	public static BufferedImage getTrashCan() {
+		trashCan = retrieveImage(trashCan, Constants.TRASH_CAN_FILENAME);
+		return trashCan;
+	}
+	
+	public static BufferedImage getTrashCanOpen() {
+		trashCanOpen = retrieveImage(trashCanOpen, Constants.TRASH_CAN_OPEN_FILENAME);
+		return trashCanOpen;
+	}
+	
+	public static BufferedImage getDiscardPile() {
+		discardPile = retrieveImage(discardPile, Constants.DISCARD_PILE_FILENAME);
+		return discardPile;
+	}
+	
+	public static BufferedImage getIceCreamTruck() {
+		iceCreamTruck = retrieveImage(iceCreamTruck, Constants.ICE_CREAM_TRUCK_ICON_FILENAME);
+		return iceCreamTruck;
 	}
 	
 	public static BufferedImage getStinkOrAir(boolean isStinky) {

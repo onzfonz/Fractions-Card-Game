@@ -28,7 +28,13 @@ import extras.GameUtils;
 import extras.StringUtils;
 
 public class DBUtils {
-    public static final String DB_PROTOCOL = "jdbc:derby://localhost:1527/";
+	//Logging Constants
+	public static final String LOG_QTRIED = "QTried";
+	public static final String LOG_QDONE = "QDone";
+	public static final String LOG_QSHOWN = "QShown";
+	public static final String LOG_QSTARTED = "QStarted";
+	    
+	public static final String DB_PROTOCOL = "jdbc:derby://localhost:1527/";
     public static final String DB_DRIVER = "org.apache.derby.jdbc.ClientDriver";  
     
     public static final int[] SQL_TYPES_CARDS = {Types.SMALLINT, Types.VARCHAR, Types.VARCHAR, Types.SMALLINT, Types.SMALLINT, Types.SMALLINT};
@@ -56,11 +62,11 @@ public class DBUtils {
     public static final String SQL_PID_FROM_UIDS = "select pid from pairs where uid1 = (select uid from users where uname = ?) AND uid2 = (select uid from users where uname = ?)";
     public static final String SQL_PID_FROM_UID = "select pid from pairs where uid1 = (select uid from users where uname = ?) AND uid2 is null";
     public static final String SQL_B_USERS = "select uid, u3cset, u4cset, mqtot, zqtot, (mq12 + mq13 + mq14 + mq15 + mq16 + mq17), (zq12 + zq13 + zq14 + zq15 + zq16 + zq17) from users where treatment = 'B'";
-    public static final String SQL_SHOWN = "select qid from userlogs where uid = ? AND ulogtype = 'QShown'";
-    public static final String SQL_WRONG_Q = "select qid from userlogs where uid = ? AND ulogtype = 'QStarted' AND qid IN (select qid from questions where qans = -1)";
-    public static final String SQL_TRIED = "select qid, ulogattempt from userlogs where uid = ? AND ulogtype = 'QTried'";
+    public static final String SQL_SHOWN = "select qid from userlogs where uid = ? AND ulogtype = '"+LOG_QSHOWN+"'";
+    public static final String SQL_WRONG_Q = "select qid from userlogs where uid = ? AND ulogtype = '"+LOG_QSTARTED+"' AND qid IN (select qid from questions where qans = -1)";
+    public static final String SQL_TRIED = "select qid, ulogattempt from userlogs where uid = ? AND ulogtype = '"+LOG_QTRIED+"'";
     public static final String SQL_GAMES = "select gid from games where pid1 IN (select pid from pairs where uid1 = ? OR uid2 = ?) OR pid2 IN (select pid from pairs where uid1 = ? OR uid2 = ?)";
-    public static final String SQL_NUM_QS = "select qid from userlogs where uid = ? AND ulogtype = 'QDone'";
+    public static final String SQL_NUM_QS = "select qid from userlogs where uid = ? AND ulogtype = '"+LOG_QDONE+"'";
     public static final String SQL_QID_ULOGS = "select * from userlogs where qid = ?";
     public static final String SQL_SHADOW_ULOGS = "select * from userlogs where qaid in (select distinct qaid from pairlogs where qaid is not null and plogcontent like '%Shadow%') and uid = ?";
 
@@ -91,7 +97,7 @@ public class DBUtils {
     
     public static final String QATYPE = "QuestionAns";
     
-    private static Pattern namesPattern;
+	private static Pattern namesPattern;
     private static Pattern namesPattern2;
     private static Pattern infoPattern;
     private static Pattern warningPattern;

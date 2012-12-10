@@ -29,6 +29,7 @@ public class CardView {
 	protected Card card;
 	ArrayList<BufferedImage> images;
 	protected boolean highlighted;
+	protected boolean suggested;
 	protected boolean faceUp;
 	protected boolean visible;
 	protected boolean isCombo;
@@ -40,6 +41,7 @@ public class CardView {
 	protected int y;
 	protected int xScale;
 	protected int yScale;
+	protected Color currentColorHighlight;
 
 	public CardView(Card c){ 
 		this(c, true);
@@ -70,6 +72,7 @@ public class CardView {
 		}
 		isCombo = isComboCard();
 		setSize(new Dimension(width, height));
+		setDefaultHighlight();
 	}
 
 	public CardView(Card c, boolean visible) {
@@ -172,6 +175,44 @@ public class CardView {
 		}
 		return false;
 	}
+	
+	public boolean isDefenseCard() {
+		if(card instanceof TrickCard) {
+			return ((TrickCard) card).isDefense();
+		}
+		return false;
+	}
+	
+	public boolean isAttackCard() {
+		if(card instanceof TrickCard) {
+			return ((TrickCard) card).isAttack();
+		}
+		return false;
+	}
+	
+	public boolean isTeammateCard() {
+		return card instanceof TeammateCard;
+	}
+	
+	public boolean canBeAttackCard() {
+		ArrayList<TrickCard> tcs = getCards();
+		for(TrickCard tc:tcs) {
+			if(tc.isAttack()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean canBeDefenseCard() {
+		ArrayList<TrickCard> tcs = getCards();
+		for(TrickCard tc:tcs) {
+			if(tc.isDefense()) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public Card getCard() {
 		return card;
@@ -214,6 +255,30 @@ public class CardView {
 	public boolean isHighlighted() {
 		return highlighted;
 	}
+	
+	public boolean hasRectangle() {
+		return isHighlighted() || isSuggested();
+	}
+	
+	public void setSuggested(boolean value) {
+		suggested = value;
+	}
+	
+	public void setHighlightColor(boolean isLegal) {
+		if(isLegal) {
+			currentColorHighlight = Constants.GOOD_MOVE_COLOR;
+		}else{
+			currentColorHighlight = Constants.BAD_MOVE_COLOR;
+		}
+	}
+	
+	public void setDefaultHighlight() {
+		currentColorHighlight = Constants.HIGHLIGHTED_MOVE_COLOR;
+	}
+	
+	public boolean isSuggested() {
+		return suggested;
+	}
 
 	public void setFaceUp (boolean value) {
 		faceUp = value;
@@ -251,9 +316,13 @@ public class CardView {
 		if(visible) {
 			if(useScaledImage) {
 				drawImages(g, x, y, xScale, yScale);
-				if(highlighted) {
+				if(isHighlighted() || isSuggested()) {
+					Color c = Constants.SUGGEST_MOVE_COLOR;
+					if(isHighlighted()) {
 					//drawThickRectangle(Math.abs(getWidth()/2-scaledImg.getWidth(null)/2), Math.abs(getHeight()/2-.getHeight(null)/2), Math.min(b.getWidth(null)-1, getWidth()-1), Math.min(b.getHeight(null)-1, getHeight()-1), 4, g);
-					GraphicUtils.drawThickRectangle(x, y, (int) getSize().getWidth(), (int) getSize().getHeight(), 4, Color.red, g);
+						c = getCorrectColor();
+					}
+					GraphicUtils.drawThickRectangle(x, y, (int) getSize().getWidth(), (int) getSize().getHeight(), 4, c, g);
 				}
 			}else{
 				drawImages(g, x, y);
@@ -293,7 +362,15 @@ public class CardView {
 	}
 
 	public void drawBigCard(Graphics g, int width, int height) {
-		drawImages(g, width-Constants.HUGE_CARD_WIDTH, height-Constants.HUGE_CARD_HEIGHT, Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT);
+		drawImages(g, bigCardX(width), bigCardY(height), Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT);
+	}
+	
+	public static int bigCardX(int width) {
+		return width - Constants.HUGE_CARD_WIDTH;
+	}
+	
+	public static int bigCardY(int height) {
+		return height - Constants.HUGE_CARD_HEIGHT;
 	}
 
 	private ArrayList<String> buildImageFilenames(Card c) {
@@ -339,6 +416,10 @@ public class CardView {
 			names.add(Constants.FNAME_COMBO_REP + s);
 		}
 
+	}
+	
+	private Color getCorrectColor() {
+		return currentColorHighlight;
 	}
 
 	private void addBasicTrickFilenames(TrickCard tc, ArrayList<String> names) {
@@ -437,6 +518,10 @@ public class CardView {
 	
 	public String toReadableText() {
 		return card.toReadableText();
+	}
+	
+	public String toStream() {
+		return card.toStream();
 	}
 
 	/* containers are commented out since we cannot simple make a JComponent that has a cardView

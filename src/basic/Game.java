@@ -12,13 +12,13 @@ import cards.TrickCard;
 
 public class Game {
 	
-	private BasicDealer d;
+	private Dealer d;
 	private Player p1;
 	private Player opponent;
 	private GamePanel board;
 	
 	public Game(GamePanel p) {
-		d = new BasicDealer();
+		d = DealerFactory.getNewDealer();
 		p1 = new Player(d);
 		opponent = new Player(d);
 		board = p;
@@ -26,13 +26,13 @@ public class Game {
 	}
 	
 	public Game(GamePanel p, PlayerListener pl) {
-		d = new BasicDealer();
+		d = DealerFactory.getNewDealer();
 		opponent = new ComputerPlayer(d, pl, true);
 		p1 = new Player(d, pl, true, true);
 	}
 	
 	public Game(GamePanel p, PlayerListener pl, boolean againstComputer) {
-		d = new BasicDealer();
+		d = DealerFactory.getNewDealer();
 		if(againstComputer) {
 			opponent = new ComputerPlayer(d, pl, againstComputer);
 		}else{
@@ -129,7 +129,7 @@ public class Game {
 		return p == opponent;
 	}
 	
-	public BasicDealer getDealer() {
+	public Dealer getDealer() {
 		return d;
 	}
 	

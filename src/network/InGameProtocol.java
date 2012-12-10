@@ -57,8 +57,8 @@ public class InGameProtocol {
 	
 	public void dealOutCards() {
 		List<String> names = getPlayerNames();
-		dealTricksToThreads(names);
 		dealTeamsToThreads(names);
+		dealTricksToThreads(names);
 		enablePlayerTurn();
 	}
 	

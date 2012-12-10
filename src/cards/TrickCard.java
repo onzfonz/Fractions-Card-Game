@@ -50,6 +50,10 @@ public class TrickCard extends Card {
 		return isAir() || isRadio();
 	}
 	
+	public boolean isAttack() {
+		return isStink() || isIceCream();
+	}
+	
 	public boolean isMoney() {
 		return matchesCategory("money");
 	}
@@ -174,8 +178,26 @@ public class TrickCard extends Card {
 		return prefix + readableType();
 	}
 	
+	public boolean equals(Object o) {
+		if(!(o instanceof TrickCard)) return false;
+		TrickCard tc = (TrickCard) o;
+		return getType().equals(tc.getType()) && getNumerator() == tc.getNumerator() && getDenominator() == tc.getDenominator() && isDecimal == tc.isDecimal;
+	}
+	
 	public String toStream() {
 		return trickType + ", " + imgName + ", " + num + ", " + den;
+	}
+	
+	public String toReadableStream() {
+		String s = toFraction();
+		if(isIceCream()) {
+			s = toIce();
+		}
+		s+=" ";
+		if(isDecimal) {
+			s+="("+getValue()+") ";
+		}
+		return s + trickType;
 	}
 	
 	public String toFraction() {

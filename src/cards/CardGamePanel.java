@@ -66,6 +66,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	private FYIMessage shufflin;
 	private String currentLayout;
 	private JButton manipButton;
+	private JButton doneWithTurnButton;
 	private JComboBox sliderOption;
 	private JPanel toolbox;
 
@@ -126,17 +127,33 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		if(Constants.NETWORK_MODE){
 			passBtnText = Constants.BTN_PASS;
 		}
-		newRound = new JButton(passBtnText);
-		newRound.setToolTipText(Constants.TIP_DONE_TURN);
-		newRound.setFont(Constants.FONT_TINY);
-		final JButton doneTurn = newRound;
-		controls.add(newRound);
-		toolbox.add(newRound);
-		newRound.addActionListener( new ActionListener() {
+		doneWithTurnButton = new JButton(passBtnText);
+		doneWithTurnButton.setToolTipText(Constants.TIP_DONE_TURN);
+		doneWithTurnButton.setFont(Constants.FONT_TINY);
+		final JButton doneTurn = doneWithTurnButton;
+		controls.add(doneWithTurnButton);
+		toolbox.add(doneWithTurnButton);
+		manipButton = new JButton(Constants.BTN_LAUNCH_MANIP);
+		manipButton.setToolTipText(Constants.TIP_MANIP);
+		manipButton.setFont(Constants.FONT_TINY);
+		manipButton.setVisible(Constants.HAVE_MANIP_BUTTON);
+		final JButton manipBtn = manipButton;
+		//controls.add(newRound);
+		toolbox.add(manipButton);
+		manipButton.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				toggleManipLayout();
+			}
+		});
+
+		doneWithTurnButton.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				doneTurn.setForeground(Constants.DEFAULT_BUTTON_TEXT_COLOR);
+				doneTurn.setFont(Constants.FONT_TINY);
+				repaint();
 				if(gamePanel.gameStarted()) {
 					/* one possibility is to remove this */
-					if(!gamePanel.computerMove()) {
+					if(!gamePanel.computerMove(true)) {
 						askToFinishRound();
 					}else{
 						NetHelper.sendNetNoMoves(netRep);
@@ -144,18 +161,6 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 				}else{
 					JOptionPane.showMessageDialog(gamePanel, Constants.ERROR_NO_GAME_YET, "", JOptionPane.ERROR_MESSAGE);
 				}
-			}
-		});
-
-		manipButton = new JButton(Constants.BTN_LAUNCH_MANIP);
-		manipButton.setToolTipText(Constants.TIP_MANIP);
-		manipButton.setFont(Constants.FONT_TINY);
-		manipButton.setVisible(Constants.HAVE_MANIP_BUTTON);
-		//controls.add(newRound);
-		toolbox.add(manipButton);
-		manipButton.addActionListener( new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				toggleManipLayout();
 			}
 		});
 
@@ -200,7 +205,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			}
 		});
 
-		newRound = Debug.createDebugButton(toolbox, "Give Computer Set Tricks");
+		newRound = Debug.createDebugButton(toolbox, "Give Computer Stinks");
 		newRound.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				gamePanel.setTrickHandDebug(false);
@@ -221,6 +226,27 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			}
 		});
 		
+		newRound = Debug.createDebugButton(toolbox, "Give Computer Airs");
+		newRound.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				gamePanel.setTrickHandToAirs(false);
+			}
+		});
+		
+		newRound = Debug.createDebugButton(toolbox, "Give Me Ices");
+		newRound.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				gamePanel.setTrickHandToIces(true);
+			}
+		});
+		
+		newRound = Debug.createDebugButton(toolbox, "Give Computer Ices");
+		newRound.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				gamePanel.setTrickHandToIces(false);
+			}
+		});
+
 		newRound = Debug.createDebugButton(toolbox, "End the Round");
 		newRound.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -270,7 +296,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			}
 		});
 
-		String[] colorOpts = {"Left", "Game", "Status-Back", "Status-Fore"};
+		String[] colorOpts = {"Left", "Game", "Status-Back", "Status-Fore", "Suggestion"};
 		sliderOption = new JComboBox(colorOpts);
 		sliderOption.setVisible(Constants.DEBUG_MODE);
 		toolbox.add(sliderOption);
@@ -378,7 +404,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	}
 	
 	private boolean doAComputerOpponentMove() {
-		if(!gamePanel.computerMove()) {
+		if(!gamePanel.computerMove(false)) {
 			askToFinishRound();
 			return true;
 		}
@@ -410,6 +436,12 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			jc.setEnabled(enabled);
 		}
 	}
+	
+	public void suggestDoneWithTurn() {
+		doneWithTurnButton.setForeground(Constants.LOUD_BUTTON_TEXT_COLOR);
+		doneWithTurnButton.setFont(Constants.FONT_SMALL);
+		repaint();
+	}
 
 	public void updateLabels(Player p) {
 		int playerPts = p.getPoints();
@@ -431,7 +463,9 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			int oppoPoints = gamePanel.getOppositionPoints();
 			int playerPoints = gamePanel.getPlayerPoints();
 			if(oppoPoints < Constants.SCORE_TO_WIN && playerPoints < Constants.SCORE_TO_WIN) {
-				shufflin = new FYIMessage(myFrame, Constants.INFO_SHUFFLING);
+				if(!Constants.DEBUG_MODE) {
+					shufflin = new FYIMessage(myFrame, Constants.INFO_SHUFFLING);
+				}
 				gamePanel.newRound();
 			}else{
 				String message = determineWinMessage(playerPoints, oppoPoints);
@@ -580,7 +614,14 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			return;
 		}
 		String cardIndex = s.substring(0, semiPos);
-		int deckIndex = Integer.parseInt(s.substring(semiPos+1));
+		String deckStr;
+		int spacePos = s.indexOf(" ");
+		if(spacePos == -1) {
+			deckStr = s.substring(semiPos+1);
+		}else{
+			deckStr = s.substring(semiPos+1, spacePos);
+		}
+		int deckIndex = Integer.parseInt(deckStr);
 		gamePanel.handleNetworkMove(cardIndex, deckIndex);
 	}
 
@@ -755,6 +796,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		case 1: return gamePanel.getBackground();
 		case 2: return gamePanel.getStatusArea().getBackground();
 		case 3: return gamePanel.getStatusBox().getForeground();
+		case 4: return gamePanel.getSuggestionOverlay();
 		}
 		return null;
 	}
@@ -766,6 +808,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		case 1: gamePanel.setBackground(c); break;
 		case 2: gamePanel.getStatusArea().setBackground(c); break;
 		case 3: gamePanel.getStatusBox().setForeground(c); break;
+		case 4: gamePanel.setSuggestionOverlay(c); break;
 		}
 	}
 }

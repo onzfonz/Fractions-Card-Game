@@ -14,8 +14,11 @@ public class Constants {
 	public static final String IMG_PATH;
 	public static final String BASE_IMG_PATH;
 	public static final String FNAME_TEAM_DECK;
+	public static final String FNAME_TEAM_DECK_ALT;
 	public static final String FNAME_TRICK_DECK;
+	public static final String FNAME_SEQ_PREFIX;
 	public static final int SCORE_TO_WIN;
+	public static final int NUM_ROUNDS_B4_SHADOW;
 	
 	//IP Addresses
 	public static final String SERVER_IP;
@@ -62,6 +65,8 @@ public class Constants {
 	public static final String DECIDED_MOVE;
 	public static final String THOUGHT_MOVE;
 	public static final String UP_SOON;
+	public static final String ICE_CREAM_ORANGE_DESC;
+	public static final String ICE_CREAM_PURPLE_DESC;
 
 	//Error Messages
 	public static final String ERROR_PLACING_RADIO;
@@ -99,6 +104,7 @@ public class Constants {
 	public static final String INFO_ERR_NAMES_TAKEN;
 	public static final String INFO_NET_ERR_LOST_CONN;
 	public static final String INFO_ASK_B4_CLOSING;
+	public static final String INFO_SHADOW_PLAYER;
 		
 	//Status messages
 	//public static final String STATUS_NEW_ROUND = "A new round has started; choose which tricks you want to play.";
@@ -167,6 +173,8 @@ public class Constants {
 	
 	public static final String YOUR_INIT_SCORE;
 	public static final String THEIR_INIT_SCORE;
+	public static final String YOUR_LABEL;
+	public static final String THEIR_LABEL;
 	
 	//Question prompts
 	public static final String ASK_FOR_RADIOS;
@@ -183,10 +191,15 @@ public class Constants {
 	public static boolean ASK_USERS_FRACTION_QS;
 	public static boolean MANIPS_OVERLAP;
 	public static boolean DEBUG_MODE;
+	public static boolean VERBOSE_MODE;
 	public static boolean SHOW_COLOR_SLIDERS;
 	public static boolean NETWORK_MODE;
 	public static boolean SHOW_ME_HOW_ENABLED;
 	public static boolean SHOW_WORK_ON_COMPUTER;
+	public static boolean USE_RIGGED_DECK;
+	
+	public static int ANIMATION_DELAY;
+	public static final int ANIMATION_MS_PAUSE;
 	
 	static {
 		InputStream input = Constants.class.getResourceAsStream("/game.properties");
@@ -202,8 +215,11 @@ public class Constants {
 		IMG_PATH = propValue("IMG_PATH");
 		BASE_IMG_PATH = propValue("BASE_IMG_PATH");
 		FNAME_TEAM_DECK = propValue("FNAME_TEAM_DECK");
+		FNAME_TEAM_DECK_ALT = propValue("FNAME_TEAM_DECK_ALT");
 		FNAME_TRICK_DECK = propValue("FNAME_TRICK_DECK");
+		FNAME_SEQ_PREFIX = propValue("FNAME_SEQ_PREFIX");
 		SCORE_TO_WIN = propIntValue("SCORE_TO_WIN");
+		NUM_ROUNDS_B4_SHADOW = propIntValue("NUM_ROUNDS_B4_SHADOW");
 		
 		SERVER_IP = propValue("SERVER_IP");
 		SERVER_IP_STANFORD = propValue("SERVER_IP");
@@ -245,6 +261,8 @@ public class Constants {
 		DECIDED_MOVE = propValue("DECIDED_MOVE");
 		THOUGHT_MOVE = propValue("THOUGHT_MOVE");
 		UP_SOON = propValue("UP_SOON");
+		ICE_CREAM_ORANGE_DESC = propValue("ICE_CREAM_ORANGE_DESC");
+		ICE_CREAM_PURPLE_DESC = propValue("ICE_CREAM_PURPLE_DESC");
 		
 		ERROR_PLACING_RADIO = propValue("ERROR_PLACING_RADIO");
 		ERROR_INPUT_NO_INT = propValue("ERROR_INPUT_NO_INT");
@@ -277,6 +295,7 @@ public class Constants {
 		INFO_ERR_NAMES_TAKEN = propValue("INFO_ERR_NAMES_TAKEN");
 		INFO_NET_ERR_LOST_CONN = propValue("INFO_NET_ERR_LOST_CONN"); 
 		INFO_ASK_B4_CLOSING = propValue("INFO_ASK_B4_CLOSING");
+		INFO_SHADOW_PLAYER = propValue("INFO_SHADOW_PLAYER");
 
 		STATUS_OPPO_NO_MOVES = propValue("STATUS_OPPO_NO_MOVES");
 		STATUS_CALC_FRACTION = propValue("STATUS_CALC_FRACTION");
@@ -343,6 +362,8 @@ public class Constants {
 		YOUR_OPPO_HAS = propValue("YOUR_OPPO_HAS"); 
 		YOUR_INIT_SCORE = propValue("YOUR_INIT_SCORE"); 
 		THEIR_INIT_SCORE = propValue("THEIR_INIT_SCORE"); 
+		YOUR_LABEL = propValue("YOUR_LABEL");
+		THEIR_LABEL = propValue("THEIR_LABEL");
 		ASK_FOR_RADIOS = propValue("ASK_FOR_RADIOS");
 		
 		REGULAR_MODE = propTFValue("REGULAR_MODE");
@@ -352,12 +373,17 @@ public class Constants {
 		ASK_USERS_FRACTION_QS = propTFValue("ASK_USERS_FRACTION_QS");
 		MANIPS_OVERLAP = propTFValue("MANIPS_OVERLAP");
 		DEBUG_MODE = propTFValue("DEBUG_MODE");
+		VERBOSE_MODE = propTFValue("VERBOSE_MODE");
 		NETWORK_MODE = propTFValue("NETWORK_MODE");
 		SHOW_ME_HOW_ENABLED = propTFValue("SHOW_ME_HOW_ENABLED");
 		SHOW_WORK_ON_COMPUTER = propTFValue("SHOW_WORK_ON_COMPUTER");
 		SHOW_COLOR_SLIDERS = propTFValue("DEBUG_MODE") && propTFValue("SHOW_COLOR_SLIDERS");
 		SHOW_DECK_LABEL_NUMBER = propTFValue("DEBUG_MODE") && propTFValue("SHOW_DECK_LABEL_NUMBER");
 		SHOW_COMPUTER_CARDS = propTFValue("DEBUG_MODE") && propTFValue("SHOW_COMPUTER_CARDS");
+		USE_RIGGED_DECK = propTFValue("USE_RIGGED_DECK");
+		
+		ANIMATION_DELAY = propIntValue("ANIMATION_DELAY");
+		ANIMATION_MS_PAUSE = propIntValue("ANIMATION_MS_PAUSE");
 	}
 	
 	public static String propValue(String propName) {
@@ -391,10 +417,13 @@ public class Constants {
 	public static final int MAX_SPEED = 5;
 	public static final int JUMP_VELOCITY = 10;
 	public static final int DISPERSER_TIMES = 160;
+	public static final int TRANSFORMER_TIMES = 19;
 	public static final double PROPENSITY_TO_FLIP = .03;
 	public static final int REVOLUTIONS = 5;
 	public static final int PARTS_PER_REVOLUTION = 20;
-
+	public static final int MANIP_STATE_REG = -1;
+	public static final int MANIP_STATE_STINKY = 0;
+	public static final int MANIP_STATE_FRESH = 1;
 	
 	//Card keywords
 	public static final String FNAME_REP = "Representation";
@@ -403,6 +432,7 @@ public class Constants {
 	public static final String FNAME_ICE = "Ice-Cream";
 	public static final String FNAME_TEAM = "Midground---Teammates---";
 	public static final String FNAME_SPACE_SEP = "---";
+	public static final String FILE_CONTENT_SPACING = "---";
 	public static final String FNAME_COMBO_REP = FNAME_REP + FNAME_SPACE_SEP + "Combo" + FNAME_SPACE_SEP;
 	public static final String FNAME_SEP = "-";
 	public static final String IMG_EXT = ".png";
@@ -428,10 +458,17 @@ public class Constants {
 	public static final String TUG_ROPE_FILENAME = "ropethin.png";
 	public static final String TUG_STINK_FILENAME = "stinkbomb.png";
 	public static final String TUG_AIR_FILENAME = "airfreshener.png";
+	public static final String TRASH_CAN_FILENAME = "trashcan.png";
+	public static final String TRASH_CAN_OPEN_FILENAME = "trashcanopen.png";
+	public static final String DISCARD_PILE_FILENAME = "CardBack---Discard.png";
+	public static final String ICE_CREAM_TRUCK_ICON_FILENAME = "icecreamtruck.png";
 	public static final String MAN_IMG_PATH = BASE_IMG_PATH + "man.png";
 	public static final String PEN_ICON_IMG_PATH = IMG_PATH + "lineicon.png";
 	public static final String LINE_ICON_IMG_PATH = IMG_PATH + "pencilicon.png";
 	public static final String PPL_ICON_IMG_PATH = IMG_PATH + "pplicon.png";
+	
+	//Debug Filenames for starting up Files
+	public static final String CHEAT_SHADOW_CARD = "Shadow Players,What Is 1/2 of 6?,Shadow-Players.png,3,1";
 	
 	//Card Filenames
 	public static final String TEAMMATE_BACK = "CardBack---Teammates.png";
@@ -448,6 +485,8 @@ public class Constants {
 
 	//Older Auxiliary Filenames
 	public static final String HALF_STINK_FILENAME = "One-Half.png";
+	public static final String POINT_5_FILENAME = "Point-5.png";
+	public static final String ONE_QTR_AIR_FILENAME = "One-Quarter.png";
 	public static final String THREE_QTRS_AIR_FILENAME = "Three-Quarters.png";
 	public static final String HALF_AIR_FILENAME = "One-Half.png";
 	public static final String RADIO_FILENAME = "Radio---General.png";
@@ -481,8 +520,22 @@ public class Constants {
 	public static final Color TOOLBOX_BACKGROUND = new Color(255, 255, 255);
 	public static final Color COLOR_LIGHT_WOOD = new Color(221, 202, 147);
 	public static final Color MANIP_CENTER_BACKGROUND = new Color(197, 241, 186);
+	public static final Color MANIP_SHADOW_LEFT_BACKGROUND = new Color(140, 152, 163);
+	public static final Color MANIP_SHADOW_CENTER_BACKGROUND = new Color(50, 50, 50);
+	public static final Color MANIP_SHADOW_TEXT_FOREGROUND = new Color(255, 255, 255);
+	public static final Color TINY_SHADOW_COLOR = Color.black;
 	public static final Color COLOR_SKIN_TONE = new Color(244, 213, 183);
+	public static final Color COLOR_ORANGE = new Color(245, 140, 105);
+	public static final Color COLOR_PURPLE = new Color(178, 80, 158);
+	public static final Color BAD_MOVE_COLOR = Color.red;
+	public static final Color POSSIBLE_MOVE_COLOR = Color.blue;
+	public static final Color DEFAULT_BUTTON_TEXT_COLOR = Color.black;
+	public static final Color LOUD_BUTTON_TEXT_COLOR = Color.red;
+	public static final Color GOOD_MOVE_COLOR = Color.green;
+	public static final Color HIGHLIGHTED_MOVE_COLOR = Color.blue;
+	public static final Color SUGGEST_MOVE_COLOR = Color.yellow;
 	public static final int LINE_THICKNESS = 2;
+	public static final int NUM_PLAYERS = 2;
 	public static final int NUM_DASHES = 20;
 	public static final int DRAG_THRESHOLD = 30;
 	public static final int PENCIL_MODE = 1;
@@ -490,6 +543,7 @@ public class Constants {
 	public static final int PPL_MODE = -1;
 	public static final int LEFT_MOUSE_BTN = MouseEvent.BUTTON1;
 	public static final int SOCKET_PORT = 1604;
+	public static final int NUM_MANIPS_PER_ROW = 4;
 	public static final String SENTENCE_SEP = "  ";
 
 	
@@ -538,6 +592,7 @@ public class Constants {
 	public static final String CMD_CARD_DELIMITER = "_";
 	public static final String CMD_LOG = "log";
 	public static final String CMD_LOG_HYPHEN = "-";
+	public static final String CMD_LOG_SPACE = " ";
 	
 	//More network commands
 	public static final String NET_CMD_PRE = ".";
@@ -550,7 +605,7 @@ public class Constants {
 	public static final String NET_CMD_ERR = NET_CMD_PRE + "error";
 	public static final String NET_CMD_READY_TO_START = NET_CMD_PRE + "readytostart";
 	//public static final String NET_CMD_ = NET_CMD_PRE + "";
-	
+		
 	//Ugly constants that shouldn't really be public but are shared by multiple files
 	public static final double REP_WIDTH_MOD = .40;
 	public static final double REP_HEIGHT_MOD = .28;
