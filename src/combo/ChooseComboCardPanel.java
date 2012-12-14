@@ -32,8 +32,8 @@ public class ChooseComboCardPanel extends JPanel {
 	
 		add(pPanel, BorderLayout.WEST);	
         
-		JPanel statusBox = new JPanel();
-		statusBox.setLayout(new FlowLayout());
+//		JPanel statusBox = new JPanel();
+//		statusBox.setLayout(new FlowLayout());
 		
 		JLabel message = new JLabel(Constants.COMBO_MSG_SIDE);
 		message.setFont(Constants.FONT_LARGE);
@@ -80,6 +80,11 @@ public class ChooseComboCardPanel extends JPanel {
 		CardView cView = CardViewFactory.createCard(combo);
 
 		ChooseComboCardPanel pPanel = new ChooseComboCardPanel(cView);
+		JFrame f = new JFrame();
+		f.add(pPanel);
+		f.setVisible(true);
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		f.pack();
 	}
 	
 }

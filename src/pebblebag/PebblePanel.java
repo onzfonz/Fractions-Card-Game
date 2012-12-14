@@ -75,7 +75,6 @@ public class PebblePanel extends JPanel implements PebbleListener {
 	private PebblePanelListener listener;
 	private String participant;
 	private boolean leftButtonDown;
-	private ManDeckViewPanel deckViewShown;
 
 	/* Need to have a good shake pebble method
 	 * that will have the pebbles randomly move in their locations
@@ -110,6 +109,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		frame = f;
 		playerIsShakingBag = playerStarts;
 		setLayout(new BorderLayout());
+		
 		JPanel southBox = new JPanel();
 		southBox.setLayout(new BoxLayout(southBox, BoxLayout.Y_AXIS));
 		add(southBox, BorderLayout.SOUTH);
@@ -129,10 +129,6 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		updateStatusMessage(playerStarts);
 		beginInsertingAnimation();
 		playerShouldStartShaking = playerStarts;
-
-		deckViewShown = new ManDeckViewPanel(dv, null);
-		deckViewShown.setPreferredSize(new Dimension(Constants.ORIG_CARD_WIDTH, getHeight()));
-		add(deckViewShown, BorderLayout.EAST);
 
 		addMouseListener( new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {

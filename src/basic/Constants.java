@@ -493,7 +493,7 @@ public class Constants {
 	public static final String MUSIC_GEEKS_FILENAME = "Music-Geeks.png";
 	public static final String BBALL_TEAM_FILENAME = "Basketball-Team.png";
 	public static final String TWO_TWO_ICE_FILENAME = "One-Half.png";
-	public static final String COMBO1_FILENAME = "Combo-1---Combo---Point-5-Ice.png";
+	public static final String COMBO1_FILENAME = "Combo-1---Point-5-Ice.png";
 	
 	
 	//General Constants

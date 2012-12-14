@@ -569,8 +569,10 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		int ppl = GameUtils.extractPeople(question);
 		boolean isStink = false;
 		if(cardPlayed != null) {
+			Debug.println(cardPlayed.getCard() + " will determine stinkiness");
 			isStink = ((TrickCard) cardPlayed.getCard()).isStink();
 		}else if(deckPresented != null){
+			Debug.println("cardPlayed was null so " + deckPresented.getTrickOnTop().getCard() + " will determine stinkiness");
 			isStink = ((TrickCard) deckPresented.getTrickOnTop().getCard()).isStink();
 		}
 		manPanel.launchResultAnimation(ppl, num, den, solution, isStink);

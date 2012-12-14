@@ -147,7 +147,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		//need to manually reshuffle them save the index to where it should be and then move it to the end.
 		addMouseListener( new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
-				if(e.getButton() == Constants.LEFT_MOUSE_BTN) {
+				if(e.getButton() == Constants.LEFT_MOUSE_BTN && canInteract()) {
 					leftButtonDown = true;
 					CardView cv = findCardView(e.getX(), e.getY());
 					makeSelectedCard(cv);
@@ -171,7 +171,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 
 			public void mouseReleased(MouseEvent e) {
 				//				repaintCard(findCardView(e.getX(), e.getY()));
-				if(e.getButton() == Constants.LEFT_MOUSE_BTN) { 
+				if(e.getButton() == Constants.LEFT_MOUSE_BTN && canInteract()) { 
 					leftButtonDown = false;
 					if(currentCard != null) {
 						//have a function that gives the user a chance to select which side of the card...
@@ -196,7 +196,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 
 		addMouseMotionListener( new MouseMotionAdapter() {
 			public void mouseDragged(MouseEvent e) {
-				if(leftButtonDown) {
+				if(leftButtonDown && canInteract()) {
 					dragging = true;
 					if (currentCard != null && isInTrickHand(currentCard)) {
 						// compute delta from last point
@@ -661,7 +661,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		if(cv != null) {
 			cv.setHighlighted(false);
 			//setComponentZOrder(cv, cv.getZOrder());
-			if(!isTeammateCard(cv)) {
+			if(!isTeammateCard(cv) && isInTrickHand(cv)) {
 				int index = currentTrickCardsLeft.indexOf(cv);
 				Debug.println("index: " + index + ", cv: " + cv + " otherCards: " + currentTrickCardsLeft);
 				if(index != -1) {
@@ -676,7 +676,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 				}
 			}else{
 				playersTrickCards.remove(cv);
-				Debug.println("was teammate so playersTrickCards now looks like " + playersTrickCards);
+				Debug.println("was teammate or opponent trick so playersTrickCards now looks like " + playersTrickCards);
 			}
 			repaintCard(cv);
 			curSelOrigIndex = -1;
@@ -1735,8 +1735,10 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		if(cv == null) {
 			return false;
 		}
-		boolean isInOpponentHand = isInOpponentsTrickHand(cv);
-		return !(isInOpponentHand);
+		boolean notInTrickHand = isInOpponentsTrickHand(cv);
+		return !(notInTrickHand);
+//		boolean inTrickHand = isInTrickHand(cv);
+//		return inTrickHand;
 	}
 
 	private int currentCardHeight(List<DeckView> decks) {

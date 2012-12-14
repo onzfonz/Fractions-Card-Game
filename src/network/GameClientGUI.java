@@ -57,6 +57,7 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 	private String chatSent;
 	private CardGamePanel game;
 	private FYIMessage alertMsg;
+	private GameClientLogger log;
 
 	private static final String LOBBY_PANEL = "Lobby Panel";
 	private static final String GAME_PANEL = "Game Panel";
@@ -72,6 +73,8 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 
 		gamePanel = new JPanel(new BorderLayout());
 		createGamePanel(gamePanel);
+		
+		log = GameClientLogger.getLogger();
 
 		windows.add(lobbyPanel, LOBBY_PANEL);
 		windows.add(gamePanel, GAME_PANEL);
@@ -350,6 +353,8 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 	private void sendToServer(String msg) {
 		if(Constants.NETWORK_MODE) {
 			out.println(msg);
+		}else{
+			log.logMessage(msg);
 		}
 	}
 

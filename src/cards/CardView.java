@@ -56,8 +56,10 @@ public class CardView {
 		faceUp = isShowin;
 		setVisible(true);
 		images = new ArrayList<BufferedImage>();
+		Debug.println("building card filenames from " + card);
 		ArrayList <String> fnames = buildImageFilenames(card);
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		Debug.println("Starting in CardView: " + fnames);
 		for(String name:fnames) {
 			Debug.println(Constants.IMG_PATH+ "," + name);
 			InputStream imageURL = cl.getResourceAsStream(Constants.IMG_PATH+name);

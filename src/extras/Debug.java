@@ -35,7 +35,11 @@ public class Debug {
 	}
 	
 	public static void println(Object o) {
-		println(o.toString());
+		if(o != null) {
+			println(o.toString());
+		}else{
+			println(null);
+		}
 	}
 	
 	public static void printlnVerbose(String s) {

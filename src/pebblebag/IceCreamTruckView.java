@@ -6,6 +6,7 @@ package pebblebag;
  * a pebble panel.
  */
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -15,6 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import manipulatives.ManDeckViewPanel;
 import network.NetDelegate;
 import network.NetHelper;
 import basic.Constants;
@@ -115,6 +117,10 @@ public class IceCreamTruckView extends JPanel implements PebblePanelListener {
 		
 		manBox.add(pPanel, BorderLayout.CENTER);
 		add(manBox, BorderLayout.WEST);
+		
+		ManDeckViewPanel deckViewShown = new ManDeckViewPanel(dv, null);
+		deckViewShown.setPreferredSize(new Dimension(Constants.ORIG_CARD_WIDTH, getHeight()));
+		add(deckViewShown, BorderLayout.EAST);
 		
 		setVisible(true);
 	}

@@ -43,12 +43,6 @@ public class ComboPanel extends JPanel{
 	 */
 	private static final long serialVersionUID = -6965341647940551092L;
 	private int origX, origY;
-	private int chooseX, chooseY;
-	private RandomGenerator rgen;
-	private JLabel statusLine1;
-	private JLabel statusLine2;
-	private boolean playerIsShakingBag;
-	private boolean playerShouldStartShaking;
 	private CardView comboCard;
 	private ArrayList<ComboListener> listeners;
 	private ChooseComboCardPanel combo;
@@ -66,10 +60,7 @@ public class ComboPanel extends JPanel{
 	private void setupPanel(CardView cv, ChooseComboCardPanel cf) {
 		comboCard = cv;
 		combo = cf;
-		rgen = RandomGenerator.getInstance();
 		listeners = new ArrayList<ComboListener>();
-		chooseX = 0;
-		chooseY = 0;
 		leftButtonDown = false;
 		setLayout(new BorderLayout());
 
@@ -88,10 +79,6 @@ public class ComboPanel extends JPanel{
 				if(e.getButton() == Constants.LEFT_MOUSE_BTN) { 
 					leftButtonDown = false;
 					int lastX = e.getX();
-					int lastY = e.getY();
-
-					Point p1 = new Point(origX, origY);
-					Point p2 = new Point(lastX, lastY);
 
 					int comboLineX = (getWidth()-(Constants.HUGE_CARD_WIDTH/2));
 					if(Math.abs(origX - comboLineX) > Constants.DRAG_THRESHOLD/2 && Math.abs(lastX - comboLineX) > Constants.DRAG_THRESHOLD/2) {
@@ -140,6 +127,7 @@ public class ComboPanel extends JPanel{
 
 	public void paintComponent(Graphics g) {
 		//comboCard.drawBigCard(g, getWidth(), getHeight());
+		super.paintComponent(g);
 		comboCard.drawBigCard(g, Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT);
 		if(cpOption >= 0) {
 			ComboCardView.drawACircle(g, getWidth()-Constants.HUGE_CARD_WIDTH, 0, Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT, cpOption);
