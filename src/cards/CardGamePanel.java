@@ -440,6 +440,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	public void suggestDoneWithTurn() {
 		doneWithTurnButton.setForeground(Constants.LOUD_BUTTON_TEXT_COLOR);
 		doneWithTurnButton.setFont(Constants.FONT_SMALL);
+		gamePanel.updateStatus(Constants.STATUS_SUGGEST_DONE_W_TURN);
 		repaint();
 	}
 

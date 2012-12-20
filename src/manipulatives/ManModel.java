@@ -4,7 +4,7 @@ import basic.Constants;
 import extras.RandomGenerator;
 
 
-public class ManModel extends BasicModel{
+public class ManModel extends BasicModel implements ManipInterface {
 	private boolean isStinky;
 	private boolean isFresh;
 	private boolean isShadowCircle;
@@ -15,6 +15,8 @@ public class ManModel extends BasicModel{
 	private RandomGenerator rgen;
 	private boolean hasJumped;
 	private boolean alternatePlace;
+	private boolean isHighlighted;
+	private boolean selected;
 	private int numMoves = 0;
 	private int desiredX;
 	private int desiredY;
@@ -28,7 +30,7 @@ public class ManModel extends BasicModel{
 		alpha = 255;
 	}
 	
-	public ManModel(ManModel m) {
+	public ManModel(ManipInterface m) {
 		this();
 		isStinky = m.isStinky();
 		isFresh = m.isFresh();
@@ -206,5 +208,21 @@ public class ManModel extends BasicModel{
 	public void setDesiredLocation(int desiredX, int desiredY) {
 		setDesiredX(desiredX);
 		setDesiredY(desiredY);
+	}
+	
+	public boolean isHighlighted() {
+		return isHighlighted;
+	}
+	
+	public void setHighlighted(boolean highlight) {
+		isHighlighted = highlight;
+	}
+
+	public boolean isSelected() {
+		return selected;
+	}
+
+	public void setSelected(boolean selected) {
+		this.selected = selected;
 	}
 }

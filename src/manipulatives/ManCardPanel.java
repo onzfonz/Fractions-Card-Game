@@ -608,8 +608,8 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 
 	private void checkUserAnswer() {
 		int num = 0;
+		String s = questionAnswer.getText().trim();
 		try{
-			String s = questionAnswer.getText().trim();
 			num = Integer.parseInt(s);
 		}catch(NumberFormatException ex) {
 			JOptionPane.showMessageDialog(myFrame,
@@ -617,6 +617,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 					Constants.ERROR_NOT_AN_INTEGER,
 					JOptionPane.ERROR_MESSAGE);
 			questionAnswer.setText("");
+			sendLogMessage("Oops tried " + s + "| " + manPanel.generateStatLine());
 			return;
 		}
 		compareToAnswer(num);
@@ -627,6 +628,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 			manPanel.displayMessage(Constants.CORRECT);
 			String c = (clickedShowedMeHow)? "y": "n";
 			sendLogMessage("Done tried " + answersTried + "| " + manPanel.generateStatLine() + "| shownHow? " + c);
+			disableControls();
 			if(solution != -1 && legalMove() && !ManPanelUtils.isShadowOnly(deckPresented, cardPlayed)) {
 				launchResultAnimation();
 			}else if(ManPanelUtils.isShadowOnly(deckPresented, cardPlayed)) {

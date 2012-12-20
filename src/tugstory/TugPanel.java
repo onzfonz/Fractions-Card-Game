@@ -6,19 +6,19 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.text.AttributedCharacterIterator;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import extras.GameImages;
-
+import manipulatives.AssetView;
+import manipulatives.ManipInterface;
 import basic.Constants;
+import deck.DeckView;
+import extras.GameImages;
 
 
 public class TugPanel extends JPanel {
@@ -47,13 +47,43 @@ public class TugPanel extends JPanel {
 	public static final double TUG_PROBABILITY = (TUG_TICK/(TUG_MS_ACTION))/2;
 
 	public TugPanel(int myside, int theirside) {
+		initialSetup(myside, theirside);
+		mypeeps = setupPeople(myside, true);
+		oppopeeps = setupPeople(theirside, false);
+		
+		//		add(new JLabel(""+myside), BorderLayout.WEST);
+		//		add(new JLabel(""+opposide), BorderLayout.EAST);
+	}
+	
+	public TugPanel(List<DeckView> decksInPlay) {
+		ArrayList<AssetView> myAssets = new ArrayList<AssetView>();
+		ArrayList<AssetView> theirAssets = new ArrayList<AssetView>();
+		for(DeckView dv: decksInPlay) {
+			if(dv.getPlayer().isHuman()) {
+				potentiallyAddAssets(dv, myAssets);
+			}else{
+				potentiallyAddAssets(dv, theirAssets);
+			}
+		}
+		initialSetup(myAssets.size(), theirAssets.size());
+		mypeeps = setupPeople(myAssets, true);
+		oppopeeps = setupPeople(theirAssets, false);
+	}
+	
+	private void potentiallyAddAssets(DeckView dv, ArrayList<AssetView> assets) {
+		for(ManipInterface mi: dv.getManipulatives()) {
+			if(!mi.isStinky()) {
+				assets.add((AssetView) mi);
+			}
+		}
+	}
+	
+	private void initialSetup(int myside, int theirside) {
 		setPreferredSize(new Dimension(TUG_WIDTH, TUG_HEIGHT));
 		this.myside = myside;
 		opposide = theirside;
 		canMoveFlag = false;
 		
-		mypeeps = setupPeople(myside, true);
-		oppopeeps = setupPeople(theirside, false);
 		regImage = new TugPersonView(GameImages.getMan(), GameImages.getLostMan(), true);
 		flagI = 0;
 		peopleFallenCounter = 0;
@@ -61,9 +91,12 @@ public class TugPanel extends JPanel {
 		ropeX = TUG_WIDTH/2 - GameImages.getTugRope().getWidth()/2;
 		listeners = new ArrayList<TugListener>();
 		donePulling = false;
-		setLayout(new BorderLayout());
-		//		add(new JLabel(""+myside), BorderLayout.WEST);
-		//		add(new JLabel(""+opposide), BorderLayout.EAST);
+		setLayout(new BorderLayout());		
+	}
+	
+	//This is initialization code for the the Timer
+	public void initializeTug() {
+		
 	}
 
 	public ArrayList<TugPersonView> setupPeople(int num, boolean onMyTeam) {
@@ -74,11 +107,14 @@ public class TugPanel extends JPanel {
 		return peeps;
 	}
 
-	/* Use this method to do any initial work before you start the animation */
-	public void initializeTug() {
-
+	public ArrayList<TugPersonView> setupPeople(ArrayList<AssetView> assets, boolean onMyTeam) {
+		ArrayList<TugPersonView> peeps = new ArrayList<TugPersonView>();
+		for(int i = 0; i < assets.size(); i++) {
+			peeps.add(new TugPersonView(assets.get(i), onMyTeam));
+		}
+		return peeps;
 	}
-
+	
 	public void tugAction() {
 		rotatePeople(oppopeeps, doILose());
 		rotatePeople(mypeeps, doIWin());

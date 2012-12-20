@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import manipulatives.DoublePoint;
-import manipulatives.ManModel;
+import manipulatives.ManipInterface;
 import basic.Constants;
 
 public class GraphicUtils {
@@ -65,7 +65,7 @@ public class GraphicUtils {
 		return Math.round((desired-current)/(stepsLeft));
 	}
 	
-	public static void incrementalMove(ManModel man, int stepsLeft) {
+	public static void incrementalMove(ManipInterface man, int stepsLeft) {
 		int curX = man.getX();
 		int desireX = man.getDesiredX();
 		int curY = man.getY();

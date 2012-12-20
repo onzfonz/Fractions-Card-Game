@@ -9,8 +9,10 @@ import java.util.ArrayList;
 
 import javax.swing.Timer;
 
+import manipulatives.AssetView;
 import manipulatives.DoublePoint;
 import manipulatives.ManModel;
+import manipulatives.ManipInterface;
 import basic.Constants;
 import basic.Player;
 import cards.Card;
@@ -41,9 +43,10 @@ public class DeckView {
 	private int numFrames;
 	private int totalFrames;
 	private FreshPoofer poofer;
-	protected ArrayList<ManModel> manips;
+	protected ArrayList<ManipInterface> manips;
 	protected RandomGenerator rgen;
 	protected boolean manipsDiscarded;
+	protected ArrayList<AssetView> gamePanelManips;
 
 	public boolean isManipsDiscarded() {
 		return manipsDiscarded;
@@ -69,7 +72,7 @@ public class DeckView {
 		labelShown = true;
 		hasLaunchedFreshPoof = false;
 		numFrames = -1;
-		manips = new ArrayList<ManModel>();
+		manips = new ArrayList<ManipInterface>();
 		createManipModels();
 		recalculateManips(false);
 		rgen = RandomGenerator.getInstance();
@@ -89,7 +92,10 @@ public class DeckView {
 		TeammateCard tc = (TeammateCard) (teammateCard.getCard());
 		int numManips = tc.getValue();
 		for(int i = 0; i < numManips; i++) {
-			ManModel man = new ManModel();
+//			ManipInterface man = new AssetView(GameImages.getMan());
+//			if(Constants.USE_CHARACTER_MANIPS_IN_GAME) {
+			ManipInterface man = new AssetView(GameImages.getCharacterImage(i, tc));
+//			}
 			manips.add(man);
 		}
 	}
@@ -234,7 +240,7 @@ public class DeckView {
 		return getX() + (int) (getCardWidth()/2);
 	}
 	
-	public ArrayList<ManModel> getManipulatives() {
+	public ArrayList<ManipInterface> getManipulatives() {
 		return manips;
 	}
 
@@ -282,7 +288,7 @@ public class DeckView {
 		BufferedImage manip = GameImages.getMan();
 		int numOnSide = calculateNumOnSide(manip);
 //		Debug.println("getCardWidth is: " + getCardWidth() + ", while manip width is " + manip.getWidth());
-		for(ManModel man:manips) {
+		for(ManipInterface man:manips) {
 			drawOneMan(g, man);
 		}
 		
@@ -292,14 +298,10 @@ public class DeckView {
 		}
 	}
 
-	private void recalculateManModels(boolean isDesired) {
+	private void recalculateManModels(boolean isDesired, int numOnSide, int x, int y) {
 		//int x = getCardWidth() + getX();
 		//int y = getY();
-		int x = 0;
-		int y = 0;
-		
 		BufferedImage manImg = GameImages.getMan();
-		int numOnSide = calculateNumOnSide(manImg);
 		int numTotal = deck.initialDeckValue();
 		int numSoFar = 0;
 		//This may need to be rewritten so that 
@@ -319,9 +321,34 @@ public class DeckView {
 		}
 	}
 	
+	/* Start with the middle part of the list, then add
+	 * the stinky manipulatives to the end while adding the regular
+	 * ones up front.  Cuts down on writing an extra for loop.
+	 */
+	private void repositionAssetsInManips(boolean isDesired, int numOnSide, int x, int y) {
+		ArrayList<AssetView> reOrdered = new ArrayList<AssetView>();
+		for(AssetView manip: gamePanelManips) {
+			if(manip.isFresh()) {
+				reOrdered.add(manip);
+			}
+		}
+		for(AssetView manip: gamePanelManips) {
+			if(manip.isStinky()) {
+				reOrdered.add(manip);
+			}else if(!manip.isFresh()){
+				reOrdered.add(0, manip);
+			}
+		}
+		for(int i = 0; i < reOrdered.size(); i++) {
+			AssetView manip = reOrdered.get(i);
+			manips.set(i, manip);
+			setDesiredOrCurrentLocation(manips, 0, 0, i, numOnSide, GameImages.getMan(), isDesired);
+		}
+	}
+	
 	public void setManipsDesiredLocation(int x, int y) {
 		Debug.println("setting manips to x:" + x + ", " + y);
-		for(ManModel m:manips) {
+		for(ManipInterface m:manips) {
 			m.setDesiredX(x);
 			m.setDesiredY(y);
 		}
@@ -334,8 +361,8 @@ public class DeckView {
 		return Constants.NUM_MANIPS_PER_ROW;
 	}
 
-	private void setDesiredOrCurrentLocation(ArrayList<ManModel> manModels, int baseX, int baseY, int numSoFar, int numOnSide, BufferedImage manImage, boolean isDesired) {
-		ManModel m = manModels.get(numSoFar);
+	private void setDesiredOrCurrentLocation(ArrayList<ManipInterface> manModels, int baseX, int baseY, int numSoFar, int numOnSide, BufferedImage manImage, boolean isDesired) {
+		ManipInterface m = manModels.get(numSoFar);
 		int newX = calcManipX(baseX, numSoFar, numOnSide, manImage.getWidth());
 		int newY = calcManipY(baseY, numSoFar, numOnSide, manImage.getHeight());
 		Debug.println("setting manipulative to: " + newX + ", " + newY);
@@ -384,8 +411,8 @@ public class DeckView {
 		}
 	}
 	
-	private void unFreshModels(ArrayList<ManModel> models) {
-		for(ManModel m:models) {
+	private void unFreshModels(ArrayList<ManipInterface> models) {
+		for(ManipInterface m:models) {
 			if(m.isFresh()) {
 				m.setRegular();
 			}
@@ -399,28 +426,25 @@ public class DeckView {
 		player.fireDeckRepaint(this);
 		poofer = null;
 	}
-
-	private void drawOneMan(Graphics g, int x, int y, int numSoFar, int numOnSide, BufferedImage manImage) {
-		drawOneMan(g, x, y, numSoFar, numOnSide, manImage.getWidth(), manImage.getHeight(), manImage);
-	}
-
-	private void drawOneMan(Graphics g, int x, int y, int numSoFar, int numOnSide, int width, int height, BufferedImage manImage) {
-		int manX = calcManipX(x, numSoFar, numOnSide, width);
-		int manY = calcManipY(y, numSoFar, numOnSide, height);
-		//Debug.println("Drawing men at " + manX + ", " + manY + "with dimensions: " + manImage.getWidth() + ", " + manImage.getHeight());
-		g.drawImage(manImage, manX, manY, width, height, null);
-	}
 	
-	private void drawOneMan(Graphics g, ManModel man) {
+	private void drawOneMan(Graphics g, ManipInterface man) {
 		int x = getCardWidth() + getX();
 		int y = getY();
 		BufferedImage imgToUse = GameImages.getMan();
-		if(man.isFresh()) {
-			imgToUse = GameImages.getFreshenedMan();
-		}else if(man.isStinky()) {
-			imgToUse = GameImages.getStinkyMan();
+		BufferedImage origImg = imgToUse;
+		if(Constants.USE_CHARACTER_MANIPS_IN_GAME) {
+			imgToUse = ((AssetView) man).getImage();
 		}
-		g.drawImage(imgToUse, x + man.getX(), y + man.getY(), null);
+		BufferedImage addedLayer = null;
+		if(man.isFresh() && justFreshened()) {
+			addedLayer = GameImages.getFreshenedLayer();
+		}else if(man.isStinky()) {
+			addedLayer = GameImages.getStinkyLayer();
+		}
+		g.drawImage(imgToUse, x + man.getX(), y + man.getY(), origImg.getWidth(), origImg.getHeight(), null);
+		if(addedLayer != null) {
+			g.drawImage(addedLayer, x + man.getX(), y + man.getY(), origImg.getWidth(), origImg.getHeight(), null);
+		}
 	}
 
 	private int calcManipX(int baseX, int numSoFar, int numOnSide, int width) {
@@ -527,10 +551,33 @@ public class DeckView {
 	}
 
 	public void recalculateManips(boolean isDesired) {
-		recalculateManModels(isDesired);
+		int numOnSide = calculateNumOnSide(GameImages.getMan());
+		if(gamePanelManips != null) {
+			numOnSide = calculateNumOnSide(gamePanelManips.get(0).getImage());
+			repositionAssetsInManips(isDesired, numOnSide, 0, 0);
+			gamePanelManips = null;
+		}else{
+			recalculateManModels(isDesired, numOnSide, 0, 0);
+		}
 	}
 	
 	public boolean justFreshened() {
 		return justFreshened;
+	}
+	
+	public void setAssetManips(ArrayList<AssetView> assets) {
+		gamePanelManips = assets;
+	}
+	
+	// Deprecated or unsupported methods now
+	private void drawOneMan(Graphics g, int x, int y, int numSoFar, int numOnSide, BufferedImage manImage) {
+		drawOneMan(g, x, y, numSoFar, numOnSide, manImage.getWidth(), manImage.getHeight(), manImage);
+	}
+
+	private void drawOneMan(Graphics g, int x, int y, int numSoFar, int numOnSide, int width, int height, BufferedImage manImage) {
+		int manX = calcManipX(x, numSoFar, numOnSide, width);
+		int manY = calcManipY(y, numSoFar, numOnSide, height);
+		//Debug.println("Drawing men at " + manX + ", " + manY + "with dimensions: " + manImage.getWidth() + ", " + manImage.getHeight());
+		g.drawImage(manImage, manX, manY, width, height, null);
 	}
 }

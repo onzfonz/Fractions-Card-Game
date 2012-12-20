@@ -8,24 +8,35 @@ package basic;
 
 import java.util.ArrayList;
 
-import cards.CardView;
-import cards.TrickCard;
 import extras.CardGameUtils;
 import extras.Debug;
 import extras.GameUtils;
+import extras.RandomGenerator;
 
 
 public class ComputerPlayer extends Player {
+	private RandomGenerator rgen;
+	
 	public ComputerPlayer(Dealer dlr) {
 		super(dlr);
+		computerSetup();
 	}
 	
 	public ComputerPlayer(Dealer dlr, PlayerListener pl) {
 		super(dlr, pl);
+		computerSetup();
 	}
 	
 	public ComputerPlayer(Dealer dlr, PlayerListener pl, boolean startRound) {
 		super(dlr, pl, startRound, false);
+		computerSetup();
+	}
+	
+	private void computerSetup() {
+		rgen = RandomGenerator.getInstance();
+		if(Constants.DEBUG_MODE) {
+			rgen.setSeed(1);
+		}
 	}
 	
 	/*
@@ -57,7 +68,7 @@ public class ComputerPlayer extends Player {
 		if(allMoves == null || allMoves.size() == 0) {
 			return null;
 		}
-		int randIndex = (int) (Math.random()*allMoves.size());
+		int randIndex = rgen.nextInt(0, allMoves.size()-1);
 		return allMoves.get(randIndex);
 	}
 	

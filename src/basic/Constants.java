@@ -116,6 +116,7 @@ public class Constants {
 	public static final String STATUS_NICE_MOVE;
 	public static final String STATUS_NO_SUCH_CMD;
 	public static final String STATUS_DECIDING_WHOS_FIRST;
+	public static final String STATUS_START_GAME_HELP;
 	
 	public static final String STATUS_THEY;
 	public static final String STATUS_FALL;
@@ -127,6 +128,7 @@ public class Constants {
 	public static final String STATUS_FIB_FIGURE_PREFIX;
 	public static final String STATUS_FIB_FIGURE_MID;
 	public static final String STATUS_FIB_FIGURE_SUFFIX;
+	public static final String STATUS_SUGGEST_DONE_W_TURN;
 	
 	public static final String PARTS_PREFIX_YOU;
 	public static final String PARTS_SUFFIX_YOU;
@@ -197,9 +199,14 @@ public class Constants {
 	public static boolean SHOW_ME_HOW_ENABLED;
 	public static boolean SHOW_WORK_ON_COMPUTER;
 	public static boolean USE_RIGGED_DECK;
+	public static boolean USE_CHARACTER_MANIPS_IN_CALC;
+	public static boolean USE_CHARACTER_MANIPS_IN_GAME;
+	public static boolean ASK_USERS_TO_PICK_PPL;
 	
 	public static int ANIMATION_DELAY;
 	public static final int ANIMATION_MS_PAUSE;
+	public static final int BETWEEN_GAME_PAUSE;
+	
 	
 	static {
 		InputStream input = Constants.class.getResourceAsStream("/game.properties");
@@ -316,6 +323,8 @@ public class Constants {
 		STATUS_FIB_FIGURE_MID = propValue("STATUS_FIB_FIGURE_MID"); 
 		STATUS_FIB_FIGURE_SUFFIX = propValue("STATUS_FIB_FIGURE_SUFFIX");
 		STATUS_NEW_ROUND = propValue("STATUS_NEW_ROUND");
+		STATUS_SUGGEST_DONE_W_TURN = propValue("STATUS_SUGGEST_DONE_W_TURN");
+		STATUS_START_GAME_HELP = propValue("STATUS_START_GAME_HELP");
 
 		PARTS_PREFIX_YOU = propValue("PARTS_PREFIX_YOU");
 		PARTS_SUFFIX_YOU = propValue("PARTS_SUFFIX_YOU");
@@ -381,13 +390,20 @@ public class Constants {
 		SHOW_DECK_LABEL_NUMBER = propTFValue("DEBUG_MODE") && propTFValue("SHOW_DECK_LABEL_NUMBER");
 		SHOW_COMPUTER_CARDS = propTFValue("DEBUG_MODE") && propTFValue("SHOW_COMPUTER_CARDS");
 		USE_RIGGED_DECK = propTFValue("USE_RIGGED_DECK");
+		USE_CHARACTER_MANIPS_IN_CALC = propTFValue("USE_CHARACTER_MANIPS_IN_CALC");
+		USE_CHARACTER_MANIPS_IN_GAME = propTFValue("USE_CHARACTER_MANIPS_IN_GAME");
+		ASK_USERS_TO_PICK_PPL = propTFValue("ASK_USERS_TO_PICK_PPL");
 		
 		ANIMATION_DELAY = propIntValue("ANIMATION_DELAY");
-		ANIMATION_MS_PAUSE = propIntValue("ANIMATION_MS_PAUSE");
+		ANIMATION_MS_PAUSE = propIntValue("ANIMATION_MS_PAUSE") / ((DEBUG_MODE)?2:1);
+		BETWEEN_GAME_PAUSE = 2500 / ((DEBUG_MODE)?5:1);
+		
 	}
 	
 	public static String propValue(String propName) {
-		return props.getProperty(propName);
+		String val = props.getProperty(propName);
+		assert(val != null);
+		return val;
 	}
 	
 	public static int propIntValue(String propName) {
@@ -449,6 +465,11 @@ public class Constants {
 	public static final String ORANGE_FILENAME = "chip_ice.png";
 	public static final String HIDDEN_FILENAME = "chip_unknown.png";
 	public static final String PEBBLE_BAG_FILENAME = "pebble_bag.png";
+	public static final String LAYER_STINKY_FILENAME = "stinkymanlayer.png";
+	public static final String LAYER_FRESH_FILENAME = "freshmanlayer.png";
+	public static final String LAYER_STINKY_CHAR_FILENAME = "StinkCover.png";
+	public static final String LAYER_FRESH_CHAR_FILENAME = "FreshCover.png";
+	public static final String LAYER_HIGHLIGHT_FILENAME = "HighlightLayer.png";
 	public static final String MAN_IMG_FILENAME = "man.png";
 	public static final String MAN_STINKY_FILENAME = "stinkyman.png";
 	public static final String MAN_FRESH_FILENAME = "freshman.png";
@@ -466,6 +487,19 @@ public class Constants {
 	public static final String PEN_ICON_IMG_PATH = IMG_PATH + "lineicon.png";
 	public static final String LINE_ICON_IMG_PATH = IMG_PATH + "pencilicon.png";
 	public static final String PPL_ICON_IMG_PATH = IMG_PATH + "pplicon.png";
+	public static final String MOUSE_ICON = "MousePointer.png";
+	public static final String MOUSE_DOWN_ICON = "MousePointerClicked.png";
+	
+	//Character Filenames
+	public static final String CHAR_GEEKS_FILENAME = "MusicGeeks";
+	public static final String CHAR_TWINS_FILENAME = "Twins";
+	public static final String CHAR_PIRATES_FILENAME = "Pirates";
+	public static final String CHAR_1ST_GRADERS_FILENAME = "1stGraders";
+	public static final String CHAR_JOHNSON_FILENAME = "Johnson";
+	public static final String CHAR_BBALL_FILENAME = "Basketball";
+	public static final String CHAR_SHADOW_FILENAME = "Shadow";
+	public static final String FRESH_LAYER_FILENAME = "freshmanlayer.png";
+	public static final String STINK_LAYER_FILENAME = "stinkmanlayer.png";
 	
 	//Debug Filenames for starting up Files
 	public static final String CHEAT_SHADOW_CARD = "Shadow Players,What Is 1/2 of 6?,Shadow-Players.png,3,1";
@@ -505,7 +539,6 @@ public class Constants {
 	public static final int PEBBLE_BAG_MARGIN = 10;
 	public static final int PEBBLE_BAG_THRESHOLD = 60 + PEBBLE_BAG_MARGIN;
 	public static final int MAX_PEBBLES_FOR_RESIZING = 6;
-	public static final int BETWEEN_GAME_PAUSE = 2500;
 	public static final int MINI_GAME_PAUSE = 300;
 	public static final int RESULT_ANIMATION_FIRE_WINDOW_PAUSE = 300;
 	public static final Font FONT_TINY = new Font("sans-serif", Font.BOLD, 16);
@@ -616,6 +649,24 @@ public class Constants {
 	public static final double REP_COMBO_H_MOD = .13;
 	public static final double REP_COMBO_X_MOD = .02;
 	public static final double REP_COMBO_Y_MOD = .57;	
+	
+	//Constants for the number of people in each character card, using this for the characters part
+	public static final int NUM_PIRATES = 2;
+	public static final int NUM_TWINS = 2;
+	public static final int NUM_1ST_GRADERS = 4;
+	public static final int NUM_GEEKS = 6;
+	public static final int NUM_JOHNSON = 8;
+	public static final int NUM_BBALL_TEAM = 12;
+	public static final int NUM_SHADOW_PLAYERS = 1;
+	
+	//Constants for Character Card Names to Determine the right images to get.
+	public static final String NAME_MUSIC_GEEKS = "The Music Geeks";
+	public static final String NAME_1ST_GRADERS = "The 1st Graders";
+	public static final String NAME_PIRATES = "The Pirates";
+	public static final String NAME_JOHNSON = "The Johnson Family";
+	public static final String NAME_BBALL_TEAM = "The Basketball Team";
+	public static final String NAME_SHADOW_PLAYERS = "The Shadow Players";
+	public static final String NAME_TWINS = "The Twins";
 
 	public static boolean TEXT_AS_IMAGES = true;  //Need to change ComboCardView superclass if you change this
 }

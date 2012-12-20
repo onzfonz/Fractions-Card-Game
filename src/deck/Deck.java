@@ -39,18 +39,7 @@ public abstract class Deck {
 	}
 	
 	public void shuffle() {
-		for(int i = 0; i < cards.size(); i++) {
-			swapCards(i, rgen.nextInt(0, cards.size()-1));
-		}
-	}
-	
-	private void swapCards(int pos1, int randPos) {
-		Object c1 = cards.get(pos1);
-		Object c2 = cards.get(randPos);
-		cards.add(randPos+1, c1);
-		cards.remove(randPos);
-		cards.add(pos1+1, c2);
-		cards.remove(pos1);		
+		Utils.shuffle(cards);
 	}
 	
 	protected void addCard(Card c) {

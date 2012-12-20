@@ -32,12 +32,14 @@ import javax.swing.Timer;
 
 import basic.Constants;
 import cards.CardView;
+import cards.TeammateCard;
 import deck.DeckView;
 import extras.CardGameUtils;
 import extras.Debug;
 import extras.GameImages;
 import extras.GraphicUtils;
 import extras.RandomGenerator;
+import extras.Utils;
 
 public class ManPanel extends JPanel implements ManipPanelListener {
 	/**
@@ -47,7 +49,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	// our data model is a list of DotModel objects
 	// (java.util is specified here to distinguish vs.
 	//  the GUI java.awt.List)
-	private java.util.List<ManModel> manips;
+	private ArrayList<ManipInterface> manips;
 	private ArrayList<Line> lines;
 	private ArrayList<Line> circles;
 	private ArrayList<Arc> arcs;
@@ -58,8 +60,8 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 
 	// remember the last dot for mouse tracking
 	private int lastX, lastY;
-	private ManModel lastManip;
-	private ManModel stinkAirObj;
+	private ManipInterface lastManip;
+	private ManipInterface stinkAirObj;
 	private BufferedImage stinkAirImg;
 	private BufferedImage trashCanImg;
 	private DoublePoint origPoint;
@@ -71,13 +73,16 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	private boolean oldRepaint;
 	private boolean redPaint;
 	private boolean draggingManip, onTrashCan, canClickPanel;
+	private int leftToChoose;
 	private int pencilMode;
 	private int buttonPressed;
 	private BufferedImage img;
-	private BufferedImage alternateImg, alternateImg2;
+	private BufferedImage alternateImg, alternateImg2, alternateBaseImg, alternateBaseImg2;
 	private JLabel numberMen;
 	private JLabel message;
 	private ManPanelListener frame;
+	private Timer pTimer;
+	private String laterMessage;
 	
 	// dirty bit = changed from disk version
 	private boolean dirty;
@@ -96,7 +101,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		setBackground(Color.gray);
 
 		frame = f;
-		manips = new ArrayList<ManModel>();
+		manips = new ArrayList<ManipInterface>();
 		lines = new ArrayList<Line>();
 		circles = new ArrayList<Line>();
 		arcs = new ArrayList<Arc>();
@@ -117,11 +122,13 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		oldRepaint = true;
 		redPaint = false;
 		draggingManip = false;
+		leftToChoose = -1;
 		canClickPanel = true;
 		trashCanImg = GameImages.getTrashCan();
 		pencilMode = Constants.LINE_MODE;
 		origPoint = null;
 		newLine = null;
+		pTimer = null;
 		numberMen = new JLabel("0");
 		message = new JLabel("");
 		numberMen.setFont(Constants.FONT_LARGE);
@@ -159,6 +166,17 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 			public void mouseDragged(MouseEvent e) {
 				manPanelMouseDragged(e);
 			}
+			
+			public void mouseMoved(MouseEvent e) {
+				if(leftToChoose > 0) {
+					ManipInterface manip = findManip(e.getX(), e.getY());
+					if(manip != null) {
+						clearHighlights();
+						manip.setHighlighted(true);
+						repaint();
+					}
+				}
+			}
 		});
 
 	}
@@ -172,11 +190,15 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	public void manPanelMousePressed(int x, int y, int bPress) {
 		Debug.println("press:" + x + " " + y + ", " + bPress);
 		
+		if(leftToChoose > 0) {
+			setHighlightedManipAsChosen();
+			return;
+		}
 		if(buttonPressed != 0 || !canClickPanel) {
 			return;
 		}
 		origPoint = new DoublePoint(x, y);
-		lastManip = findDot(x, y);
+		lastManip = findManip(x, y);
 		buttonPressed = bPress;
 		if (buttonPressed == MouseEvent.BUTTON1) {
 			leftPress(x, y);
@@ -184,7 +206,19 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 			rightPress(lastManip);
 		}
 	}
-	
+
+	private void setHighlightedManipAsChosen() {
+		ManipInterface manip = findHighlightedManip();
+		if(manip == null)  return;
+		manip.setHighlighted(false);
+		manip.setSelected(true);
+		leftToChoose--;
+		displayMessage(leftToChoose + "left to choose");
+		if(leftToChoose == 0) {
+			startSwirlAnimation();
+		}
+	}
+
 	public void manPanelMouseDragged(MouseEvent e) {
 		manPanelMouseDragged(e.getX(), e.getY(), e.getButton());
 	}
@@ -223,7 +257,13 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		repaint();
 	}
 	
-	private void rightPress(ManModel dotModel) {
+	public void clearHighlights() {
+		for(ManipInterface manip:manips) {
+			manip.setHighlighted(false);
+		}
+	}
+	
+	private void rightPress(ManipInterface dotModel) {
 		if(dotModel == null) {
 			newLine = findClosestLine(origPoint);
 		}
@@ -330,7 +370,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		repaintLine(newLine);
 	}
 	
-	private void removeManip(ManModel manip) {
+	private void removeManip(ManipInterface manip) {
 		manips.remove(manip);
 		repaintManip(manip);
 	}
@@ -370,7 +410,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	 Plain repaint: repaint the whole panel
 	 Smart repaint: repaint just the old+new bounds of the dot
 	 */
-	public void doMove(ManModel dotModel, int dx, int dy) {
+	public void doMove(ManipInterface dotModel, int dx, int dy) {
 		if (!smartRepaint) {
 			// Change the data model, then repaint the whole panel
 			dotModel.moveBy(dx, dy);
@@ -430,7 +470,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	 Utility -- does a repaint rect just around one dot. Used
 	 by smart repaint when dragging a dot.
 	 */
-	private void repaintManip(ManModel dot) {
+	private void repaintManip(ManipInterface dot) {
 		repaint(dot.getX()-Constants.MAN_WIDTH/2, dot.getY()-Constants.MAN_HEIGHT/2, Constants.MAN_WIDTH+1, Constants.MAN_HEIGHT+1);
 	}
 
@@ -454,7 +494,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	 Utility -- given a completed dot model, adds it and sets things up.
 	 This is the bottleneck for adding a dot.
 	 */
-	public void doAdd(ManModel dotModel) {
+	public void doAdd(ManipInterface dotModel) {
 		manips.add(dotModel);
 		repaint();
 		setDirty(true);
@@ -465,12 +505,23 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	  Convenience doAdd() that takes an int x,y, adds and returns
 	  a dot model for it.
 	 */
-	public ManModel doAdd(int x, int y, boolean isStinky) {
+	public ManipInterface doAdd(int x, int y, boolean isStinky) {
 		return doAdd(x, y, isStinky, false);
 	}
 	
-	public ManModel doAdd(int x, int y, boolean isStinky, boolean isShadow) {
-		ManModel dotModel = new ManModel();
+	public ManipInterface doAdd(int x, int y, boolean isStinky, boolean isShadow) {
+		ManipInterface dotModel;
+//		if(Constants.USE_CHARACTER_MANIPS_IN_CALC) {
+			BufferedImage correctImage;
+//			if(Constants.USE_CHARACTER_MANIPS_IN_GAME) {
+				correctImage = retrieveCorrectImageFromGame(isStinky);
+//			}else{
+//				correctImage = retrieveCorrectImage();				
+//			}
+			dotModel = new AssetView(correctImage);
+//		}else{
+//			dotModel = new ManModel();
+//		}
 		dotModel.setXY(x, y);
 		if(isStinky) {
 			dotModel.setStinked();
@@ -482,8 +533,43 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		return dotModel;
 	}
 	
-	public ManModel doAdd(int x, int y) {
+	public ManipInterface doAdd(int x, int y) {
 		return doAdd(x, y, false);
+	}
+	
+	private BufferedImage retrieveCorrectImage() {
+		if(currentDeckGiven == null) {
+			return GameImages.getRandomCharacter();
+		}
+		int num = manips.size();
+		TeammateCard tc = (TeammateCard) currentDeckGiven.getTeammateCard().getCard();
+		return GameImages.getCharacterImage(num, tc);
+	}
+	
+	/* What we are doing here is making sure we get the stinky images first
+	 * Because in the deck they are placed at the end of the array, we are getting
+	 * the last elements first when we place them or when we add them to the screen.
+	 * otherwise if it isn't stinky, then we just grab the image from the front
+	 */
+	private BufferedImage retrieveCorrectImageFromGame(boolean isStinky) {
+		int num = getCorrectIndex(isStinky);
+		ArrayList<ManipInterface> deckManips = currentDeckGiven.getManipulatives();
+		num = num % deckManips.size();
+		if(isStinky) {
+			num = (deckManips.size()-1)-num;
+		}
+		return ((AssetView) deckManips.get(num)).getImage();
+	}
+	
+	private int getCorrectIndex(boolean isStinky) {
+		int num = 0;
+		for(int i = 0; i < manips.size(); i++) {
+			ManipInterface manip = manips.get(i);
+			if(manip.isStinky() == isStinky) {
+				num++;
+			}
+		}
+		return num;
 	}
 
 	private Line findClosestLine(DoublePoint p) {
@@ -520,22 +606,30 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	}
 
 	/**
-	 Finds a dot in the data model that contains
-	 the given x,y or returns null.
+	 Finds a manip that is on top of the xy and y or returns null.
 	 */
-	public ManModel findDot(int x, int y) {
+	public ManipInterface findManip(int x, int y) {
 		// Search through the manips in reverse order, so
 		// hit topmost ones first.
 		for (int i=manips.size()-1; i>=0; i--) {
-			ManModel dotModel = manips.get(i);
-			int centerX = dotModel.getX();
-			int centerY = dotModel.getY();
+			ManipInterface manipModel = manips.get(i);
+			int centerX = manipModel.getX();
+			int centerY = manipModel.getY();
 
 			// figure x-squared + y-squared, see if it's
 			// less than radius squared.
 			// trick: don't need to take square root this way
 			if(x > (centerX - Constants.MAN_WIDTH/2) && x < (centerX + Constants.MAN_WIDTH/2) && y > (centerY - Constants.MAN_HEIGHT/2) && y < (centerY + Constants.MAN_HEIGHT/2)){
-				return dotModel;
+				return manipModel;
+			}
+		}
+		return null;
+	}
+	
+	public ManipInterface findHighlightedManip() {
+		for(ManipInterface manip:manips) {
+			if(manip.isHighlighted()) {
+				return manip;
 			}
 		}
 		return null;
@@ -575,29 +669,15 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		numberMen.setText(""+manips.size());
 
 		// Go through all the manips, drawing a circle for each
-		for (ManModel dotModel : manips) {
+		for (ManipInterface dotModel : manips) {
 			//g.drawImage(img, dotModel.getX() - MAN_WIDTH/2, dotModel.getY() - MAN_HEIGHT/2, MAN_WIDTH, MAN_HEIGHT, null);
 			BufferedImage imgToDraw = img;
-			BufferedImage stinkyImg = GameImages.getStinkyMan();
-			BufferedImage freshImg = GameImages.getFreshenedMan();
 			if(dotModel.isShadow()) {
+				if(Constants.USE_CHARACTER_MANIPS_IN_CALC) {
+					imgToDraw = ((AssetView) dotModel).getImage();
+				}
 				drawShadows(g, dotModel, imgToDraw);
 			}else{
-				if(dotModel.isStinky()) {
-					double radians = Math.PI/16;
-					if(alternateImg == null) {
-						alternateImg = GameImages.rotatePerson(stinkyImg, radians, true);
-					}
-					if(alternateImg2 == null) {
-						alternateImg2 = GameImages.rotatePerson(stinkyImg, radians, false);
-					}
-					imgToDraw = alternateImg2;
-					if(dotModel.inAlternatePlace()) {
-						imgToDraw = alternateImg;
-					}
-				}else if(dotModel.isFresh()) {
-					imgToDraw = freshImg;
-				}
 //				g.drawImage(imgToDraw, dotModel.getX()-Constants.MAN_WIDTH/2, dotModel.getY()-Constants.MAN_HEIGHT/2, null);
 				drawSinglePerson(g, imgToDraw, dotModel);
 			}
@@ -632,16 +712,66 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		g.setColor(Color.BLACK);
 	}
 	
-	private void drawSinglePerson(Graphics g, BufferedImage imgToDraw, ManModel man) {
-		g.drawImage(imgToDraw, man.getX()-img.getWidth()/2, man.getY()-img.getHeight()/2, null);
+	private void drawSinglePerson(Graphics g, BufferedImage imgToDraw, ManipInterface man) {
+		ArrayList<BufferedImage> layers = getImgsToDraw(imgToDraw, man);
+		drawSinglePersonLayers(g, layers, man);
 	}
 	
-	private void drawShadows(Graphics g, ManModel dotModel, BufferedImage img) {
+	private void drawSinglePersonLayers(Graphics g, ArrayList<BufferedImage> layers, ManipInterface man) {
+		for(BufferedImage layer: layers) {
+			g.drawImage(layer, man.getX()-layer.getWidth()/2, man.getY()-layer.getHeight()/2, null);
+		}
+	}
+	
+	private ArrayList<BufferedImage> getImgsToDraw(BufferedImage imgToDraw, ManipInterface man) {
+		ArrayList<BufferedImage> imgsToDraw = new ArrayList<BufferedImage>();
+		BufferedImage stinkyImg = GameImages.getStinkyLayer();
+		BufferedImage freshImg = GameImages.getFreshenedLayer();
+		BufferedImage addedLayer = null;
+		if(Constants.USE_CHARACTER_MANIPS_IN_CALC) {
+			AssetView sv = (AssetView) man;
+			imgToDraw = sv.getImage();
+		}
+		if(man.isHighlighted()) {
+			imgsToDraw.add(GameImages.getHighlightLayer());
+		}
+		if(man.isStinky()) {
+			double radians = Math.PI/16;
+			if(alternateImg == null) {
+				alternateImg = GameImages.rotatePerson(stinkyImg, radians, true);
+				alternateBaseImg = GameImages.rotatePerson(imgToDraw, radians, true);
+			}
+			if(alternateImg2 == null) {
+				alternateImg2 = GameImages.rotatePerson(stinkyImg, radians, false);
+				alternateBaseImg2 = GameImages.rotatePerson(imgToDraw, radians, false);
+			}
+			if(Constants.USE_CHARACTER_MANIPS_IN_CALC) {
+				AssetView sv = (AssetView) man;
+				alternateBaseImg = sv.getTransformedImage(radians, true);
+				alternateBaseImg2 = sv.getTransformedImage(radians, false);
+			}
+			addedLayer = alternateImg2;
+			imgToDraw = alternateBaseImg2;
+			if(man.inAlternatePlace()) {
+				addedLayer = alternateImg;
+				imgToDraw = alternateBaseImg;
+			}
+		}else if(man.isFresh()) {
+			addedLayer = freshImg;
+		}
+		imgsToDraw.add(imgToDraw);
+		if(addedLayer != null) {
+			imgsToDraw.add(addedLayer);
+		}
+		return imgsToDraw;
+	}
+	
+	private void drawShadows(Graphics g, ManipInterface dotModel, BufferedImage img) {
 		Color orig = g.getColor();
 		g.setColor(Constants.TINY_SHADOW_COLOR);
 		int circleD = img.getHeight()+getShadowOffset();
-		g.fillOval(dotModel.getX()-circleD/2, dotModel.getY()-circleD/2, circleD, circleD);
 		if(dotModel.isShadowPlayer()) {
+//			g.fillOval(dotModel.getX()-circleD/2, dotModel.getY()-circleD/2, circleD, circleD);
 			drawSinglePerson(g, img, dotModel);
 		}
 		int alpha = dotModel.getAlpha();
@@ -683,7 +813,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	}
 
 	public void shuffle() {
-		for(ManModel man:manips) {
+		for(ManipInterface man:manips) {
 			int randX = rgen.nextInt(Constants.MAN_WIDTH/2, getWidth() - Constants.MAN_WIDTH/2);
 			int randY = rgen.nextInt(Constants.MAN_HEIGHT/2, getHeight() - Constants.MAN_HEIGHT/2);
 			man.setXY(randX, randY);
@@ -723,21 +853,33 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	
 	public void launchResultAnimation(int total, int num, int den, int numAffected, boolean isStinky) {
 		clearAll();
-		drawPeople(total, den, num, numAffected);
-		PeopleSprayer pSpray = new PeopleSprayer(this, total, num, den, numAffected, isStinky);
-		Timer pTimer = new Timer(Constants.ANIMATION_MS_PAUSE, pSpray);
-		displayMessage(num + "/" + den + " are now " + ((isStinky)?"stinky":"fresh"));
-		pTimer.setInitialDelay(Constants.ANIMATION_DELAY);
-		pSpray.setTimer(pTimer);
+		drawPeople(total, den, num, numAffected, isStinky);
+		if(isStinky && Constants.ASK_USERS_TO_PICK_PPL) {
+			enterUserPickMode(numAffected);
+			PeopleSprayer pSpray = new PeopleSprayer(this, total, num, den, numAffected, isStinky);
+			pTimer = new Timer(Constants.ANIMATION_MS_PAUSE, pSpray);
+			laterMessage = num + "/" + den + " are now " + ((isStinky)?"stinky":"fresh");
+			pTimer.setInitialDelay(Constants.ANIMATION_DELAY);
+			pSpray.setTimer(pTimer);
+		}
+	}
+	
+	public void enterUserPickMode(int numAffected) {
+		leftToChoose = numAffected;
+		displayMessage("Who gets it?");
+	}
+	
+	public void startSwirlAnimation() {
+		displayMessage(laterMessage);
 		pTimer.start();
 	}
 	
 	public void launchShadowResultAnimation(int total, int num, int den, int numAffected) {
 		clearAll();
-		drawPeople(total, den, num, numAffected, true);
+		drawPeople(total, den, num, numAffected, true, false);
 		for(int i = 0; i < manips.size(); i++) {
 			if(i%den < num) {
-				ManModel man = manips.get(i);
+				ManipInterface man = manips.get(i);
 				man.setShadowPlayer(true);
 			}
 		}
@@ -754,6 +896,14 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	
 	public void fireAnimationDone() {
 		CardGameUtils.pause(Constants.RESULT_ANIMATION_FIRE_WINDOW_PAUSE);
+		//set the assets in the currentDeck
+		//if(Constants.USE_CHARACTER_MANIPS_IN_GAME) {
+		ArrayList<AssetView> assets = new ArrayList<AssetView>();
+		for(ManipInterface manip:manips) {
+			assets.add((AssetView)manip);
+		}
+		currentDeckGiven.setAssetManips(assets);
+		//}
 		frame.windowFinished();
 	}
 	
@@ -786,10 +936,10 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		mTimer.start();
 	}
 	
-	private void setAffectedManipulatives(List<ManModel> manModels, int regions, int numerator, boolean isStinky) {
+	private void setAffectedManipulatives(List<ManipInterface> manModels, int regions, int numerator, boolean isStinky) {
 		for(int i = 0; i < manModels.size(); i++) {
 			if(i%regions < numerator) {
-				ManModel man = manModels.get(i);
+				ManipInterface man = manModels.get(i);
 				if(isStinky) {
 					man.setStinked();
 				}else{
@@ -799,40 +949,42 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		}
 	}
 	
-	private void setTransformedManipulatives(List<ManModel> manModels, int regions, int numerator, boolean isStinky) {
+	private void setTransformedManipulatives(List<ManipInterface> manModels, int regions, int numerator, boolean isStinky) {
 		for(int i = 0; i < manModels.size(); i++) {
 			if(i%regions < numerator) {
-				ManModel man = manModels.get(i);
+				ManipInterface man = manModels.get(i);
 				man.setToTransform(isStinky);
 			}
 		}
 	}
 	
-	private void cloneShadowPlayersWithoutShadow(List<ManModel> manModels) {
-		ArrayList<ManModel> duplicates = new ArrayList<ManModel>();
-		ArrayList<ManModel> toRemove = new ArrayList<ManModel>();
+	private void cloneShadowPlayersWithoutShadow(List<ManipInterface> manModels) {
+		ArrayList<ManipInterface> duplicates = new ArrayList<ManipInterface>();
+		ArrayList<ManipInterface> toRemove = new ArrayList<ManipInterface>();
 		for(int i = 0; i < manModels.size(); i++) {
-			ManModel manip = manModels.get(i);
+			ManipInterface manip = manModels.get(i);
 			if(manip.isShadowPlayer()) {
 				manip.setShadowPlayer(false);
-				ManModel newManip = new ManModel(manip);
+				ManipInterface newManip = new AssetView(manip, GameImages.getCharacterImage(0, (TeammateCard) currentDeckGiven.getTeammateCard().getCard()));
 				newManip.setShadow(false);
 //				newManip.moveBy(getShadowOffset()/2, getShadowOffset()/2);
 				duplicates.add(newManip);
 				toRemove.add(manip);
 			}
 		}
-		for(ManModel m:duplicates) {
+		//get rid of bad shadow thing?
+		manModels.clear();
+		for(ManipInterface m:duplicates) {
 			manModels.add(m);
 		}
-		for(ManModel m:toRemove) {
+		for(ManipInterface m:toRemove) {
 			manModels.remove(m);
 		}
 	}
 	
-	private void setRandomlyDesiredLocations(List<ManModel> manips, int baseX, int baseY) {
+	private void setRandomlyDesiredLocations(List<ManipInterface> manips, int baseX, int baseY) {
 		for(int i = 0; i < manips.size(); i++) {
-			ManModel man = manips.get(i);
+			ManipInterface man = manips.get(i);
 			man.setDesiredX(baseX + man.getX()/rgen.nextInt(1, 4));
 			man.setDesiredY((baseY + man.getY())/2);
 		}
@@ -915,7 +1067,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	}
 	
 	public void moveAffectedPeople(boolean isStinky) {
-		for(ManModel m:manips) {
+		for(ManipInterface m:manips) {
 			if(isStinky && m.isStinky()) {
 				m.franticMove();
 			}else if(!isStinky && m.isFresh()) {
@@ -925,7 +1077,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	}
 	
 	public void transformAffectedPeople(boolean isStinky) {
-		for(ManModel m:manips) {
+		for(ManipInterface m:manips) {
 			if(m.shouldTransform()) {
 				m.toggleTransform(isStinky);
 			}
@@ -985,11 +1137,11 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		repaint();
 	}
 	
-	public void drawPeople(int totalPeople, int divs, int sectionsAffected, int answer) {
-		drawPeople(totalPeople, divs, sectionsAffected, answer, false);
+	public void drawPeople(int totalPeople, int divs, int sectionsAffected, int answer, boolean isStinky) {
+		drawPeople(totalPeople, divs, sectionsAffected, answer, false, isStinky);
 	}
 	
-	public void drawPeople(int totalPeople, int divs, int sectionsAffected, int answer, boolean isShadow) {
+	public void drawPeople(int totalPeople, int divs, int sectionsAffected, int answer, boolean isShadow, boolean isStinky) {
 		int stinky = numToDrawStinky();
 		double theta = calculateTheta(divs);
 		DoublePoint center = getCenter();
@@ -1011,6 +1163,9 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 				}
 			}
 		}
+		if(/*Constants.USE_CHARACTER_MANIPS_IN_CALC && */!isShadow && isStinky) {
+			AssetView.shuffleImages(manips);
+		}
 		repaint();
 	}
 	
@@ -1031,7 +1186,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	}
 	
 	public void setManipsAlpha(int alpha) {
-		for(ManModel man:manips) {
+		for(ManipInterface man:manips) {
 			man.setAlpha(alpha);
 		}
 	}
@@ -1078,7 +1233,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		}
 	}
 	
-	private ManModel findDotArea(int x, int y) {
+	private ManipInterface findDotArea(int x, int y) {
 		return findOverlap(x, y);
 //		if(Constants.MANIPS_OVERLAP) {
 //			return null;
@@ -1100,12 +1255,12 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	}
 	
 	//new model based on web search for rectangle overlap.
-	private ManModel findOverlap(int x, int y) {
+	private ManipInterface findOverlap(int x, int y) {
 		if(Constants.MANIPS_OVERLAP) {
 			return null;
 		}
-		if(findDot(x, y) != null) {
-			return findDot(x, y);
+		if(findManip(x, y) != null) {
+			return findManip(x, y);
 		}
 		double manW = Constants.MAN_WIDTH/2;
 		double manH = Constants.MAN_HEIGHT/2;
@@ -1116,10 +1271,10 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		return findOverlap(pLeftX, pTopY, pRightX, pBotY);
 	}
 	
-	private ManModel findOverlap(double x1, double y1, double x2, double y2) {
+	private ManipInterface findOverlap(double x1, double y1, double x2, double y2) {
 		double manW = Constants.MAN_WIDTH/2;
 		double manH = Constants.MAN_HEIGHT/2;
-		for(ManModel dot:manips) {
+		for(ManipInterface dot:manips) {
 			double leftX = dot.getX()-manW;
 			double topY = dot.getY()-manH;
 			double rightX = dot.getX()+manW;

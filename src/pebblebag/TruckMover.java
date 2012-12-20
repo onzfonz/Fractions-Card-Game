@@ -6,7 +6,9 @@ import java.util.List;
 
 import javax.swing.Timer;
 
+import manipulatives.AssetView;
 import manipulatives.ManModel;
+import manipulatives.ManipInterface;
 import manipulatives.ManipPanelListener;
 import basic.Constants;
 import cards.CardView;
@@ -18,15 +20,15 @@ public class TruckMover implements ActionListener {
 	private ManipPanelListener manPanel;
 	private int numTimesMoved;
 	private Timer timer;
-	private List<ManModel> manipulatives;
+	private List<ManipInterface> manipulatives;
 	private DeckView manipsDeck;
-	private ManModel iceCreamTruck;
+	private AssetView iceCreamTruck;
 	private int xStart;
 
 	public static final int VELOCITY = 0;
 	public static final int MAX_MOVES = 120;
 
-	public TruckMover(ManipPanelListener p, List<ManModel> manips, DeckView deck, ManModel truck) {
+	public TruckMover(ManipPanelListener p, List<ManipInterface> manips, DeckView deck, AssetView truck) {
 		manPanel = p;
 		numTimesMoved = 0;
 		manipulatives = manips;
@@ -48,7 +50,7 @@ public class TruckMover implements ActionListener {
 		}
 		if(iceCreamTruck.getX() > xStart) {
 			for(int i = 0; i < manipulatives.size(); i++) {
-				ManModel chosenManip = manipulatives.get(i);
+				ManipInterface chosenManip = manipulatives.get(i);
 				if(!chosenManip.isShadow()) {
 					curManX = chosenManip.getX();
 					curManY = chosenManip.getY();

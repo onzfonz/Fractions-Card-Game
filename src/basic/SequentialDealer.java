@@ -23,12 +23,12 @@ public class SequentialDealer implements Dealer{
 	private Deck teammates;
 	
 	public SequentialDealer() {
-		this(Constants.FNAME_SEQ_PREFIX + Constants.FNAME_TRICK_DECK, Constants.FNAME_SEQ_PREFIX + Constants.FNAME_TEAM_DECK, Constants.FNAME_SEQ_PREFIX + Constants.FNAME_TEAM_DECK);
+		this(Constants.FNAME_SEQ_PREFIX + Constants.FNAME_TRICK_DECK, Constants.FNAME_SEQ_PREFIX + Constants.FNAME_TEAM_DECK);
 	}
 	
-	public SequentialDealer(String tricksName, String teamsName, String teamsNameAlt) {
+	public SequentialDealer(String tricksName, String teamsName) {
 		tricks = new TricksDeck(tricksName);
-		teammates = new TeammatesDeck(teamsName, teamsNameAlt);
+		teammates = new TeammatesDeck(teamsName);
 	}
 	
 	public TeammateCard dealTeammateCard() {

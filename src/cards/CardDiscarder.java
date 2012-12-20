@@ -1,33 +1,34 @@
-package manipulatives;
+package cards;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
+import java.util.ArrayList;
 
 import javax.swing.Timer;
 
-import basic.Constants;
+import basic.GamePanel;
 import deck.DeckView;
 import extras.Debug;
-import extras.GameImages;
 import extras.GraphicUtils;
-import extras.RandomGenerator;
 
-public class ManipMover implements ActionListener {
-	private ManipPanelListener manPanel;
+public class CardDiscarder implements ActionListener {
+	private GamePanel gamePanel;
 	private int numTimesMoved;
 	private Timer timer;
-	private List<ManipInterface> manipulatives;
+	private ArrayList<CardView> cardsTossed;
 	private DeckView manipsDeck;
 	
 	public static final int VELOCITY = 0;
 	public static final int MAX_MOVES = 50;
 	
-	public ManipMover(ManipPanelListener p, List<ManipInterface> manips, DeckView deck) {
-		manPanel = p;
+	public CardDiscarder(GamePanel p, ArrayList<CardView> cards, DeckView deck) {
+		gamePanel = p;
 		numTimesMoved = 0;
-		manipulatives = manips;
+		cardsTossed = cards;
 		manipsDeck = deck;
+		if(cardsTossed == null) {
+			cardsTossed = deck.getAllCards();
+		}
 	}
 	
 	public void setTimer(Timer t) {
@@ -38,17 +39,15 @@ public class ManipMover implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		double curManX = 0, curManY = 0;
 		if(numTimesMoved == 0) {
-			//gPanel.disableUser();
+
 		}
-		for(int i = 0; i < manipulatives.size(); i++) {
-			ManipInterface chosenManip = manipulatives.get(i);
-			if(!chosenManip.isShadow()) {
-				curManX = chosenManip.getX();
-				curManY = chosenManip.getY();
-				chosenManip.moveBy((int) increment(curManX, chosenManip.getDesiredX()), (int) increment(curManY, chosenManip.getDesiredY()));
-			}
+		for(int i = 0; i < cardsTossed.size(); i++) {
+			CardView card = cardsTossed.get(i);
+			curManX = card.getX();
+			curManY = card.getY();
+			card.moveBy((int) increment(curManX, gamePanel.calcDiscardPileX(card.getWidth())), (int) increment(curManY, gamePanel.calcDiscardPileY(card.getHeight())));
 		}
-		manPanel.repaint();
+		gamePanel.repaint();
 		numTimesMoved++;
 		if(numTimesMoved >= MAX_MOVES) {
 			Debug.println("pebble ended at " + curManX + ", " + curManY);
@@ -57,16 +56,11 @@ public class ManipMover implements ActionListener {
 	}
 	
 	private void completelyFinishTimer() {
-		manPanel.repaint();
+		gamePanel.repaint();
 		numTimesMoved = 0;
 		//stuff to have it finish completely
 		timer.stop();
-		manPanel.fireAnimationDone(manipsDeck);
-	}
-	
-	private void restartTimer() {
-		timer.setInitialDelay(Constants.BETWEEN_GAME_PAUSE/2);
-		timer.start();
+		gamePanel.fireCardDiscardAnimationDone(cardsTossed, manipsDeck, cardsTossed.size() == manipsDeck.getAllCards().size());
 	}
 	
 	public double increment(double cur, int desired) {

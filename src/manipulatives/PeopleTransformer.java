@@ -14,13 +14,13 @@ public class PeopleTransformer implements ActionListener {
 	private int ticks;
 	private Timer timer;
 	private boolean stink;
-	private List<ManModel> people;
+	private List<ManipInterface> people;
 	private int regions;
 	private int numerator;
 	private int answer;
 	private int numTotal;
 	
-	public PeopleTransformer(ManPanel p, List<ManModel> ppl, int totalPeeps, int regions, int numerator, int answer, boolean isStinky) {
+	public PeopleTransformer(ManPanel p, List<ManipInterface> ppl, int totalPeeps, int regions, int numerator, int answer, boolean isStinky) {
 		mPanel = p;
 		ticks = 0;
 		stink = isStinky;

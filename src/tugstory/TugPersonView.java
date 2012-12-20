@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 
 import extras.GameImages;
 
+import manipulatives.AssetView;
 import manipulatives.ManModel;
 
 public class TugPersonView {
@@ -25,6 +26,10 @@ public class TugPersonView {
 		this.lost = GameImages.rotatePerson(lost, Math.PI/2, !side);
 		showLost = false;
 		model = new ManModel();
+	}
+	
+	public TugPersonView(AssetView asset, boolean side) {
+		this(asset.getImage(), asset.getImage(), side);
 	}
 	
 	public BufferedImage getImage() {

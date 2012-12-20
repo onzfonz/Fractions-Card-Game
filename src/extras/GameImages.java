@@ -1,17 +1,17 @@
 package extras;
 
-import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 
 import basic.Constants;
+import cards.TeammateCard;
 
 
 
@@ -33,6 +33,19 @@ public final class GameImages {
 	private static BufferedImage trashCanOpen;
 	private static BufferedImage discardPile;
 	private static BufferedImage iceCreamTruck;
+	private static BufferedImage stinkyLayer;
+	private static BufferedImage freshenedLayer;
+	private static BufferedImage mouseButton;
+	private static BufferedImage mouseButtonDown;
+	private static BufferedImage highlightLayer;
+	
+	private static BufferedImage[] musicGeeks;
+	private static BufferedImage[] pirates;
+	private static BufferedImage[] twins;
+	private static BufferedImage[] firstGraders;
+	private static BufferedImage[] johnsonFamily;
+	private static BufferedImage[] basketballTeam;
+	private static BufferedImage[] shadowPlayers;
 	
 	public GameImages() {
 		orangePebble = getOrangePebble();
@@ -41,7 +54,9 @@ public final class GameImages {
 		pebbleBag = getPebbleBag();
 		man = getMan();
 		stinkyMan = getStinkyMan();
+		stinkyLayer = getStinkyLayer();
 		freshenedMan = getFreshenedMan();
+		freshenedLayer = getFreshenedLayer();
 		tugBackground = getTugBackground();
 		redFlag = getRedFlag();
 		tugRope = getTugRope();
@@ -52,6 +67,10 @@ public final class GameImages {
 		trashCanOpen = getTrashCanOpen();
 		discardPile = getDiscardPile();
 		iceCreamTruck = getIceCreamTruck();
+		musicGeeks = getMusicGeeks();
+		mouseButton = getMouseCursor();
+		mouseButtonDown = getMouseButtonDown();
+		highlightLayer = getHighlightLayer();
 	}
 	
 	public static BufferedImage rotatePerson(BufferedImage man, double radians, boolean myside) {
@@ -95,9 +114,27 @@ public final class GameImages {
 		return stinkyMan;
 	}
 	
+	public static BufferedImage getStinkyLayer() {
+		String layerName = Constants.LAYER_STINKY_FILENAME;
+		if(Constants.USE_CHARACTER_MANIPS_IN_CALC) {
+			layerName = Constants.LAYER_STINKY_CHAR_FILENAME;
+		}
+		stinkyLayer = retrieveImage(stinkyLayer, layerName);
+		return stinkyLayer;
+	}
+	
 	public static BufferedImage getFreshenedMan() {
 		freshenedMan = retrieveImage(freshenedMan, Constants.MAN_FRESH_FILENAME);
 		return freshenedMan;
+	}
+	
+	public static BufferedImage getFreshenedLayer() {
+		String layerName = Constants.LAYER_FRESH_FILENAME;
+		if(Constants.USE_CHARACTER_MANIPS_IN_CALC) {
+			layerName = Constants.LAYER_FRESH_CHAR_FILENAME;
+		}
+		freshenedLayer = retrieveImage(freshenedLayer, layerName);
+		return freshenedLayer;
 	}
 	
 	public static BufferedImage getLostMan() {
@@ -148,6 +185,106 @@ public final class GameImages {
 	public static BufferedImage getIceCreamTruck() {
 		iceCreamTruck = retrieveImage(iceCreamTruck, Constants.ICE_CREAM_TRUCK_ICON_FILENAME);
 		return iceCreamTruck;
+	}
+	
+	public static BufferedImage getMouseCursor() {
+		mouseButton = retrieveImage(mouseButton, Constants.MOUSE_ICON);
+		return mouseButton;
+	}
+	
+	public static BufferedImage getMouseButtonDown() {
+		mouseButtonDown = retrieveImage(mouseButtonDown, Constants.MOUSE_DOWN_ICON);
+		return mouseButtonDown;
+	}
+	
+	public static BufferedImage getHighlightLayer() {
+		highlightLayer = retrieveImage(highlightLayer, Constants.LAYER_HIGHLIGHT_FILENAME);
+		return highlightLayer;
+	}
+	
+	public static BufferedImage getCharacterImage(int index, TeammateCard tc) {
+		BufferedImage[] charSet = getCorrectCharacterSet(tc);
+		return getSingleCharacterImage(index, charSet);
+	}
+	
+	public static BufferedImage getRandomCharacter() {
+		RandomGenerator rgen = RandomGenerator.getInstance();
+		ArrayList<BufferedImage> chars = new ArrayList<BufferedImage>();
+		chars.addAll(Arrays.asList(get1stGraders()));
+		chars.addAll(Arrays.asList(getBasketballTeam()));
+		chars.addAll(Arrays.asList(getJohnsonFamily()));
+		chars.addAll(Arrays.asList(getMusicGeeks()));
+		chars.addAll(Arrays.asList(getPirates()));
+		chars.addAll(Arrays.asList(getTwins()));
+		return chars.get(rgen.nextInt(0, chars.size()-1));
+	}
+	
+	private static BufferedImage[] getCorrectCharacterSet(TeammateCard tc) {
+		String name = tc.getName();
+		if(name.equals(Constants.NAME_1ST_GRADERS)) {
+			return get1stGraders();
+		}else if(name.equals(Constants.NAME_BBALL_TEAM)) {
+			return getBasketballTeam();
+		}else if(name.equals(Constants.NAME_JOHNSON)) {
+			return getJohnsonFamily();
+		}else if(name.equals(Constants.NAME_MUSIC_GEEKS)) {
+			return getMusicGeeks();
+		}else if(name.equals(Constants.NAME_PIRATES)) {
+			return getPirates();
+		}else if(name.equals(Constants.NAME_TWINS)) {
+			return getTwins();
+		}
+		return getShadowPlayers();
+	}
+	
+	private static BufferedImage getSingleCharacterImage(int index, BufferedImage[] arr) {
+		return arr[index%arr.length];
+	}
+	
+	private static BufferedImage[] getMusicGeeks() {
+		musicGeeks = fillAllCharacters(musicGeeks, Constants.CHAR_GEEKS_FILENAME, Constants.IMG_EXT, Constants.NUM_GEEKS);
+		return musicGeeks;
+	}
+	
+	private static BufferedImage[] get1stGraders() {
+		firstGraders = fillAllCharacters(firstGraders, Constants.CHAR_1ST_GRADERS_FILENAME, Constants.IMG_EXT, Constants.NUM_1ST_GRADERS);
+		return firstGraders;
+	}
+	
+	private static BufferedImage[] getJohnsonFamily() {
+		johnsonFamily = fillAllCharacters(johnsonFamily, Constants.CHAR_JOHNSON_FILENAME, Constants.IMG_EXT, Constants.NUM_JOHNSON);
+		return johnsonFamily;
+	}
+	
+	private static BufferedImage[] getBasketballTeam() {
+		basketballTeam = fillAllCharacters(basketballTeam, Constants.CHAR_BBALL_FILENAME, Constants.IMG_EXT, Constants.NUM_BBALL_TEAM);
+		return basketballTeam;
+	}
+	
+	private static BufferedImage[] getPirates() {
+		pirates = fillAllCharacters(pirates, Constants.CHAR_PIRATES_FILENAME, Constants.IMG_EXT, Constants.NUM_PIRATES);
+		return pirates;
+	}
+	
+	private static BufferedImage[] getTwins() {
+		twins = fillAllCharacters(twins, Constants.CHAR_TWINS_FILENAME, Constants.IMG_EXT, Constants.NUM_TWINS);
+		return twins;
+	}
+	
+	private static BufferedImage[] getShadowPlayers() {
+		shadowPlayers = fillAllCharacters(shadowPlayers, Constants.CHAR_SHADOW_FILENAME, Constants.IMG_EXT, Constants.NUM_SHADOW_PLAYERS);
+		return shadowPlayers;
+	}
+	
+	private static BufferedImage[] fillAllCharacters(BufferedImage[] arr, String prefix, String suffix, int size) {
+		if(arr != null) {
+			return arr;
+		}
+		BufferedImage[] characters = new BufferedImage[size];
+		for(int i = 0; i < characters.length; i++) {
+			characters[i] = retrieveImage(characters[i], prefix+(i+1)+suffix);
+		}
+		return characters;
 	}
 	
 	public static BufferedImage getStinkOrAir(boolean isStinky) {
