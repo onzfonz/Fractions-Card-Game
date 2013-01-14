@@ -51,7 +51,8 @@ public class ManipMover implements ActionListener {
 		manPanel.repaint();
 		numTimesMoved++;
 		if(numTimesMoved >= MAX_MOVES) {
-			Debug.println("pebble ended at " + curManX + ", " + curManY);
+			Debug.println("manipmover ended at " + curManX + ", " + curManY);
+			Debug.println("manipmoverdone with num stinky as: " + numStinky());
 			completelyFinishTimer();
 		}
 	}
@@ -71,5 +72,15 @@ public class ManipMover implements ActionListener {
 	
 	public double increment(double cur, int desired) {
 		return GraphicUtils.incrementalMove(cur, desired, MAX_MOVES-numTimesMoved);
+	}
+	
+	private int numStinky() {
+		int num = 0;
+		for(ManipInterface man:manipulatives) {
+			if(man.isStinky()) {
+				num++;
+			}
+		}
+		return num;
 	}
 }

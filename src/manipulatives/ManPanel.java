@@ -170,7 +170,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 			public void mouseMoved(MouseEvent e) {
 				if(leftToChoose > 0) {
 					ManipInterface manip = findManip(e.getX(), e.getY());
-					if(manip != null) {
+					if(manip != null && !manip.isSelected()) {
 						clearHighlights();
 						manip.setHighlighted(true);
 						repaint();
@@ -213,7 +213,8 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		manip.setHighlighted(false);
 		manip.setSelected(true);
 		leftToChoose--;
-		displayMessage(leftToChoose + "left to choose");
+		displayMessage(leftToChoose + " left to choose");
+		repaint();
 		if(leftToChoose == 0) {
 			startSwirlAnimation();
 		}
@@ -292,10 +293,10 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	}
 	
 	private void leftRelease(int x, int y) {
-		if (lastManip == null && newLine == null) {	// make a dot if nothing there
+		if (lastManip == null && newLine == null && (frame == null || frame.canAddManips(manips.size(), currentDeckGiven, currentCardPlayed))) {	// make a dot if nothing there
 			int curX = CardGameUtils.keepInBoundary(x, Constants.MAN_WIDTH, 0, getWidth());
 			int curY = CardGameUtils.keepInBoundary(y, Constants.MAN_HEIGHT, 0, getHeight());
-			doAdd(curX, curY);
+			doAdd(curX, curY, false, ManPanelUtils.isShadowOnly(currentDeckGiven, currentCardPlayed));
 		}else if(lastManip != null) {
 			if(insideTrashCanArea(x, y)) {
 				removeManip(lastManip);
@@ -315,22 +316,11 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	private void leftDrag(int x, int y, DoublePoint latestPoint) {
 		if(lastManip == null) {
 			if(pencilMode == Constants.PENCIL_MODE) {
-				if(newLine == null) {
-					createLine(origPoint, latestPoint);
+				if(changeActivePencil(latestPoint)) {
 					return;
 				}
-				DoublePoint start = newLine.getEnd();
-				if(start.distance(latestPoint) > (DRAG_VS_CLICK*2)) {
-					createLine(start, latestPoint);
-				}else{
-					//changeLine(newLine, latestPoint);
-				}
 			}else if(pencilMode == Constants.LINE_MODE){
-				if(newLine != null) {
-					changeLine(newLine, latestPoint);
-				}else if(origPoint.distance(latestPoint) > DRAG_VS_CLICK && newLine == null) {
-					newLine = addLine(origPoint, latestPoint, lines);
-				}
+				possiblyCreateLine(latestPoint);
 			}
 		}
 
@@ -363,10 +353,41 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		lastManip = new ManModel();
 	}
 	
-	private void createLine(DoublePoint start, DoublePoint end) {
+	public void createActivePencil(DoublePoint start, DoublePoint end) {
+		createActiveLine(start, end);
+	}
+	
+	public boolean changeActivePencil(DoublePoint latestPoint) {
+		if(newLine == null) {
+			createActiveLine(origPoint, latestPoint);
+			return true;
+		}
+		DoublePoint start = newLine.getEnd();
+		if(start.distance(latestPoint) > (DRAG_VS_CLICK*2)) {
+			createActiveLine(start, latestPoint);
+		}else{
+			//changeLine(newLine, latestPoint);
+		}
+		return false;
+	}
+	
+	public void createActiveLine(DoublePoint start, DoublePoint end) {
 		newLine = new Line(start, end);
 		newLine.setPencil(pencilMode);
 		lines.add(newLine);
+		repaintLine(newLine);
+	}
+	
+	public void possiblyCreateLine(DoublePoint latestPoint) {
+		if(newLine != null) {
+			changeLine(newLine, latestPoint);
+		}else if(origPoint.distance(latestPoint) > DRAG_VS_CLICK && newLine == null) {
+			newLine = addLine(origPoint, latestPoint, lines);
+		}
+	}
+	
+	public void changeActiveLine(DoublePoint end) {
+		newLine.setEndPoint(end);
 		repaintLine(newLine);
 	}
 	
@@ -382,6 +403,8 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		lines.clear();
 		circles.clear();
 		arcs.clear();
+		origPoint = null;
+		newLine = null;
 		dirty = false;
 		repaint();
 	}
@@ -510,11 +533,23 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	}
 	
 	public ManipInterface doAdd(int x, int y, boolean isStinky, boolean isShadow) {
+		ManipInterface dotModel = retrieveNewCorrectAssetFromGame(isStinky, isShadow);
+		dotModel.setXY(x, y);
+		if(isStinky && !dotModel.isStinky()) {
+			dotModel.setStinked();
+		}else if(isShadow) {
+			dotModel.setShadow(true);
+		}
+		doAdd(dotModel);
+		return dotModel;
+	}
+	
+	public ManipInterface doAddOld(int x, int y, boolean isStinky, boolean isShadow) {
 		ManipInterface dotModel;
 //		if(Constants.USE_CHARACTER_MANIPS_IN_CALC) {
 			BufferedImage correctImage;
 //			if(Constants.USE_CHARACTER_MANIPS_IN_GAME) {
-				correctImage = retrieveCorrectImageFromGame(isStinky);
+				correctImage = retrieveCorrectImageFromGame(isStinky, isShadow);
 //			}else{
 //				correctImage = retrieveCorrectImage();				
 //			}
@@ -551,21 +586,48 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	 * the last elements first when we place them or when we add them to the screen.
 	 * otherwise if it isn't stinky, then we just grab the image from the front
 	 */
-	private BufferedImage retrieveCorrectImageFromGame(boolean isStinky) {
-		int num = getCorrectIndex(isStinky);
-		ArrayList<ManipInterface> deckManips = currentDeckGiven.getManipulatives();
-		num = num % deckManips.size();
-		if(isStinky) {
-			num = (deckManips.size()-1)-num;
+	private BufferedImage retrieveCorrectImageFromGame(boolean isStinky, boolean isShadow) {
+		return retrieveCorrectAssetFromGame(isStinky, isShadow).getImage();
+	}
+	
+	private AssetView retrieveNewCorrectAssetFromGame() {
+		return retrieveNewCorrectAssetFromGame(false, false);
+	}
+	
+	private AssetView retrieveNewCorrectAssetFromGame(boolean isStinky, boolean isShadow) {
+		return new AssetView(retrieveCorrectAssetFromGame(isStinky, isShadow));
+	}
+	
+	private AssetView retrieveCorrectAssetFromGame(boolean isStinky, boolean isShadow) {
+		if(currentDeckGiven == null || isShadow) {
+			if(isShadow) {
+				return new AssetView(retrieveCorrectImageFromGame(isStinky, false));
+			}
+			return new AssetView(GameImages.getRandomCharacter());
 		}
-		return ((AssetView) deckManips.get(num)).getImage();
+		ArrayList<ManipInterface> deckManips = currentDeckGiven.getManipulatives();
+		int num = retrieveCorrectIndex(isStinky, isShadow, deckManips);
+		return (AssetView) deckManips.get(num);
+	}
+	
+	private int retrieveCorrectIndex(boolean isStinky, boolean isShadow, ArrayList<ManipInterface> deckManips) {
+		int num = getCorrectIndex(isStinky);
+		if(!isShadow) {
+			num = num % deckManips.size();
+			if(airFreshenerPlayed()) {
+				num = (deckManips.size()-1)-num;
+			}
+		}
+		Debug.println("final number retrieved is " + num + ", isStinky? " + isStinky + ", isShadow? " + isShadow);
+		return num;
 	}
 	
 	private int getCorrectIndex(boolean isStinky) {
 		int num = 0;
 		for(int i = 0; i < manips.size(); i++) {
 			ManipInterface manip = manips.get(i);
-			if(manip.isStinky() == isStinky) {
+//			if(manip.isStinky() == isStinky) {
+			if(isStinky && manip.isStinky() || !isStinky) { //TODO: make sure this doesn't give us problems
 				num++;
 			}
 		}
@@ -728,11 +790,13 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		BufferedImage stinkyImg = GameImages.getStinkyLayer();
 		BufferedImage freshImg = GameImages.getFreshenedLayer();
 		BufferedImage addedLayer = null;
-		if(Constants.USE_CHARACTER_MANIPS_IN_CALC) {
+		if(Constants.USE_CHARACTER_MANIPS_IN_CALC || man.shouldUseImage()) {
 			AssetView sv = (AssetView) man;
 			imgToDraw = sv.getImage();
 		}
-		if(man.isHighlighted()) {
+		if(man.isSelected()) {
+			imgsToDraw.add(GameImages.getSelectedLayer());
+		}else if(man.isHighlighted()) {
 			imgsToDraw.add(GameImages.getHighlightLayer());
 		}
 		if(man.isStinky()) {
@@ -852,16 +916,26 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	}
 	
 	public void launchResultAnimation(int total, int num, int den, int numAffected, boolean isStinky) {
-		clearAll();
-		drawPeople(total, den, num, numAffected, isStinky);
-		if(isStinky && Constants.ASK_USERS_TO_PICK_PPL) {
-			enterUserPickMode(numAffected);
-			PeopleSprayer pSpray = new PeopleSprayer(this, total, num, den, numAffected, isStinky);
-			pTimer = new Timer(Constants.ANIMATION_MS_PAUSE, pSpray);
-			laterMessage = num + "/" + den + " are now " + ((isStinky)?"stinky":"fresh");
-			pTimer.setInitialDelay(Constants.ANIMATION_DELAY);
-			pSpray.setTimer(pTimer);
+		if(manips.size() > total) {
+			clearAll();
 		}
+		drawPeople(total-manips.size(), total-manips.size(), num, numAffected, isStinky); //changed 2nd arg to total from den so that it is more circular
+		PeopleSprayer pSpray = new PeopleSprayer(this, total, num, den, numAffected, isStinky);
+		pTimer = new Timer(Constants.ANIMATION_MS_PAUSE, pSpray);
+		laterMessage = num + "/" + den + ((isStinky)?Constants.MAN_MSG_NOW_STINKY:Constants.MAN_MSG_NOW_FRESH);
+		pTimer.setInitialDelay(Constants.ANIMATION_DELAY);
+		pSpray.setTimer(pTimer);
+		if(userShouldSelectChars(isStinky)) {
+			enterUserPickMode(numAffected);
+		}else{
+			//this will get fixed by figuring out how to pick the items in the start swirl animation
+			selectDefaultChars(manips, numAffected);
+			startSwirlAnimation();
+		}
+	}
+	
+	private boolean userShouldSelectChars(boolean isStinky) {
+		return isStinky && Constants.ASK_USERS_TO_PICK_PPL;
 	}
 	
 	public void enterUserPickMode(int numAffected) {
@@ -902,6 +976,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		for(ManipInterface manip:manips) {
 			assets.add((AssetView)manip);
 		}
+		clearAllTransformedManipulatives(assets);   //TODO: Change this back to uncomment this
 		currentDeckGiven.setAssetManips(assets);
 		//}
 		frame.windowFinished();
@@ -920,7 +995,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	public void launchPeopleTransformAnimation(int ppl, int regions, int numerator, int answer, boolean isStinky) {
 		assert(manips.size() == ppl);
 		setTransformedManipulatives(manips, regions, numerator, isStinky);
-		PeopleTransformer pTrans = new PeopleTransformer(this, manips, ppl, regions, numerator, answer, isStinky);
+		PeopleTransformer pTrans = new PeopleTransformer(this, ppl, regions, numerator, answer, isStinky);
 		Timer tTimer = new Timer(75, pTrans);
 		pTrans.setTimer(tTimer);
 		tTimer.start();
@@ -938,8 +1013,10 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	
 	private void setAffectedManipulatives(List<ManipInterface> manModels, int regions, int numerator, boolean isStinky) {
 		for(int i = 0; i < manModels.size(); i++) {
-			if(i%regions < numerator) {
-				ManipInterface man = manModels.get(i);
+			ManipInterface man = manModels.get(i);
+//			if(i%regions < numerator) {
+			if(man.isSelected()) {
+				man.setSelected(false);
 				if(isStinky) {
 					man.setStinked();
 				}else{
@@ -951,9 +1028,39 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	
 	private void setTransformedManipulatives(List<ManipInterface> manModels, int regions, int numerator, boolean isStinky) {
 		for(int i = 0; i < manModels.size(); i++) {
-			if(i%regions < numerator) {
-				ManipInterface man = manModels.get(i);
-				man.setToTransform(isStinky);
+			ManipInterface man = manModels.get(i);
+//			if(i%regions < numerator) {  this is the old way of getting it
+			if(man.isSelected()) {
+				man.setToTransform(isStinky);	
+			}
+		}
+	}
+	
+	private void clearAllTransformedManipulatives(List<AssetView> manModels) {
+		for(ManipInterface manip: manModels) {
+			manip.clearTransform();
+		}
+	}
+	
+	private void selectDefaultChars(List<ManipInterface> manModels, int numAffected) {
+		//change this to get the stinky ones.
+		int numSoFar = 0;
+		for(int i = 0; i < manModels.size(); i++) {
+//			if(i%regions < numerator) {
+			ManipInterface man = manModels.get(i);
+			if(man.isStinky()) {
+				man.setSelected(true);
+				numSoFar++;
+				if(numSoFar == numAffected) return;
+			}
+		}
+		if(numSoFar == numAffected) return;
+		for(int i = 0; i < manModels.size(); i++) {
+			ManipInterface man = manModels.get(i);
+			if(!man.isStinky()) {
+				man.setSelected(true);
+				numSoFar++;
+				if(numSoFar == numAffected) return;
 			}
 		}
 	}
@@ -1012,7 +1119,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	}
 	
 	public void launchCirclerAnimation(int ppl, int den, int numer, int ans) {
-		GroupCircler gCir = new GroupCircler(this, ppl, den, numer, ans);
+		GroupCircler gCir = new GroupCircler(this, den, numer, ans);
 		Timer manipTimer = new Timer(1000, gCir);
 		if(ans == -1) {
 			displayMessage(Constants.MAN_MSG_GROUPS_NOT_EQUAL);
@@ -1109,7 +1216,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		boolean quarter = true;
 		DoublePoint center = getCenter();
 		for(int i = 0; i < num; i++) {
-			double r = calculatePersonDistance(i/divs);
+			double r = calculatePersonDistance(((double)i)/divs);
 			if(divs <= 3 && i % divs == 0) {
 				if(quarter) {
 					offset = theta / 4;
@@ -1119,7 +1226,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 				quarter = !quarter;
 			}
 			if(divs <= 3) {
-				r = calculatePersonDistance(i/(divs*2));
+				r = calculatePersonDistance(((double)i)/(divs*2));
 			}
 			double angle = theta*i+offset;
 			DoublePoint pos = GraphicUtils.getPolarProjectedPoint(center, r, angle);
@@ -1132,7 +1239,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		double theta = calculateTheta(divs);
 		DoublePoint center = getCenter();
 		for(int i = 0; i < totalPeople; i++) {
-			addAManip(i, theta, center, divs, false);
+			addAManip(i, theta, calculatePersonDistanceAlt(i, divs, totalPeople), center, divs, false, false);
 		}
 		repaint();
 	}
@@ -1143,6 +1250,15 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	
 	public void drawPeople(int totalPeople, int divs, int sectionsAffected, int answer, boolean isShadow, boolean isStinky) {
 		int stinky = numToDrawStinky();
+		if(totalPeople == 0 || divs == 0) {
+//			if(!isShadow && !isStinky) {
+//				for(int i = 0; i < stinky; i++) {
+//					ManipInterface
+//				}
+//			}
+			return;
+		}
+		
 		double theta = calculateTheta(divs);
 		DoublePoint center = getCenter();
 		int numStinkyDrawn = 0;
@@ -1172,11 +1288,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	/* should be initial value - stinky right? */
 	private int numToDrawStinky() {
 		int stinky = 0;
-		CardView trick = null;
-		if(currentDeckGiven != null && currentDeckGiven.getAllCards().size() > 1) {
-			trick = currentDeckGiven.getTrickOnTop();
-		}
-		if(currentDeckGiven != null && ((currentCardPlayed == null && trick != null && trick.isAir()) || (currentCardPlayed != null && currentCardPlayed.isAir()))) {
+		if(airFreshenerPlayed()) {
 			stinky = currentDeckGiven.initialDeckValue() - currentDeckGiven.calculateDeck();
 			if(currentCardPlayed == null) {
 				stinky = currentDeckGiven.initialDeckValue() - currentDeckGiven.calculateDeckMinusTop();
@@ -1191,7 +1303,11 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		}
 	}
 	
-	private boolean airFreshenerPlayed(CardView trick) {
+	private boolean airFreshenerPlayed() {
+		CardView trick = null;
+		if(currentDeckGiven != null && currentDeckGiven.getAllCards().size() > 1) {
+			trick = currentDeckGiven.getTrickOnTop();
+		}
 		return (currentDeckGiven != null && (currentCardPlayed == null && trick != null && trick.isAir())) || (currentCardPlayed != null && currentCardPlayed.isAir());
 	}
 	
@@ -1203,18 +1319,45 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		addAManip(ithPerson, theta, center, divs, isStinky, false);
 	}
 	
+	//The commented line was for testing out different scenarios to make sure that things could be drawn
 	public void addAManip(int ithPerson, double theta, DoublePoint center, int divs, boolean isStinky, boolean isShadow) {
+//		addAManip(ithPerson, theta, calculatePersonDistance2(ithPerson/divs), center, divs, isStinky, isShadow);
+		addAManip(ithPerson, theta, calculatePersonDistanceAlt(ithPerson, divs, 12), center, divs, isStinky, isShadow);
+	}
+	
+	public void addAManip(int ithPerson, double theta, double r, DoublePoint center, int divs, boolean isStinky, boolean isShadow) {
 		DoublePoint pos = null;
 		while(true) {
 			double offset = calculateOffsetAngle(theta);
-			double r = calculatePersonDistance2(ithPerson/divs);
 			double angle = theta*ithPerson+offset;
 			pos = GraphicUtils.getPolarProjectedPoint(center, r, angle);
+			movePointInBounds(pos);
 			if(findDotArea((int) pos.getX(), (int) pos.getY()) == null) {
 				break;
 			}
 		}
 		doAdd((int) pos.getX(), (int) pos.getY(), isStinky, isShadow);
+	}
+	
+	private void movePointInBounds(DoublePoint e) {
+		Debug.println("moving point in bounds: " + e.getX() + ", " + e.getY());
+		BufferedImage img = GameImages.getRandomCharacter();
+		int xLimit = getWidth() - img.getWidth()/2;
+		int yLimit = getHeight() - img.getHeight()/2;
+		int xLower = 0 + img.getWidth()/2;
+		int yLower = 0 + img.getHeight()/2;
+		if(e.getX() < xLower) {
+			e.setLocation(xLower, e.getY());
+		}
+		if(e.getY() < yLower) {
+			e.setLocation(e.getX(), yLower);
+		}
+		if(e.getY() > yLimit) {
+			e.setLocation(e.getX(), yLimit-1);
+		}
+		if(e.getX() > xLimit){
+			e.setLocation(xLimit-1, e.getY());
+		}
 	}
 	
 	public void drawOvals(int num, int divs) {
@@ -1312,8 +1455,16 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		return Constants.MAN_HEIGHT + rgen.nextDouble(0, Math.min(getHeight()/2-Constants.MAN_HEIGHT, sep * Constants.MAN_HEIGHT));
 	}
 	
+	//And then figure out how to add this to just this part where they have to select the characters
+	private double calculatePersonDistanceAlt(int ith, int divs, int totalPeople) {
+		int pplPerDiv = totalPeople / divs;
+		int ithToDiv = ith / divs;
+		double r = calculatePersonDistance2((int) (10 * ((double)pplPerDiv-ithToDiv)));
+		return r;
+	}
+	
 	public DoublePoint getCenter() {
-		return new DoublePoint(getWidth()/2, getHeight()/2);
+		return new DoublePoint(getWidth()/2.0, getHeight()/2.0);
 	}
 	
 	public Line addLine(DoublePoint p1, DoublePoint p2, ArrayList<Line> list) {

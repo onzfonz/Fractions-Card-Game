@@ -315,7 +315,7 @@ public class DeckViewPanel extends JPanel {
 
 		TeammateCard tm0 = new TeammateCard(Constants.MUSIC_GEEKS_FILENAME, "Music Geeks", "joined team", 6);
 		TeammateCard tm1 = new TeammateCard(Constants.BBALL_TEAM_FILENAME, "Basketball Team", "joined team", 12);
-		TrickCard t3 = new TrickCard(Constants.HALF_STINK_FILENAME, 1, 2, "stink");
+		TrickCard t3 = new TrickCard(Constants.HALF_FILENAME, 1, 2, "stink");
 		TrickCard t1 = new TrickCard(Constants.HALF_AIR_FILENAME, 1, 2, "air");	
 
 		CardViewPanel pdm0 = CardViewPanelFactory.createCard(tm0, 100, 400);

@@ -135,7 +135,7 @@ public class ComboPanel extends JPanel{
 	}
 
 	public void fireComboDone(int option) {
-		Debug.println(option);
+		Debug.println("combo done and they picked: " + option);
 		for(ComboListener l:listeners) {
 			l.comboCardDone(combo, comboCard, option);
 		}

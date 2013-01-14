@@ -18,6 +18,10 @@ public class AssetView implements ManipInterface {
 		setup(m, img);
 	}
 	
+	public AssetView(AssetView m) {
+		setup(m.getModel(), m.getImage());
+	}
+	
 	public AssetView(ManipInterface m, BufferedImage img) {
 		if(m instanceof AssetView) {
 			setup(((AssetView)m).getModel(), img);
@@ -216,5 +220,13 @@ public class AssetView implements ManipInterface {
 			AssetView asset = (AssetView) assets.get(i);
 			asset.setImage(imgList.get(i));
 		}
+	}
+	
+	public void setShouldUseImage(boolean use) {
+		model.setShouldUseImage(use);
+	}
+	
+	public boolean shouldUseImage() {
+		return model.shouldUseImage();
 	}
 }

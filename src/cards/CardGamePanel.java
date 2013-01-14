@@ -11,6 +11,7 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.concurrent.Semaphore;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -28,7 +29,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import manipulatives.ManCardPanel;
-import manipulatives.ManFrame;
 import network.NetDelegate;
 import network.NetHelper;
 import pebblebag.IceCreamTruckView;
@@ -50,7 +50,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 
 	private static final long serialVersionUID = -2520131149153594608L;
 	private GamePanel gamePanel;
-	private ManFrame manipWindow;
+//	private ManFrame manipWindow;
 	private CardGamePanel myFrame;
 	private JButton newGame;
 	private JLabel playerScore;
@@ -72,14 +72,13 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 
 	private static final String GAME_PANEL = "Game Panel";
 	private static final String MANIP_PANEL = "Manip Panel";
-	private static final String MANIP_CALC_PANEL = "Manip Calc";
 	private static final String COMBO_NAME = "Combo View";
 	private static final String ICE_NAME = "Chance View";
 	private static final String TUG_VIEW = "End-Of-Round View";
 
 	public CardGamePanel(NetDelegate nRep) {
 		//setTitle(Constants.WINDOW_TITLE);
-		manipWindow = null;
+//		manipWindow = null;
 		myFrame = this;
 		netRep = nRep;
 		//if (file != null) boardPanel.open(file);
@@ -93,7 +92,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		controls = new ArrayList<JComponent>();
 		gameArea = new JPanel(new CardLayout());
 		resetPanel(false);
-
+			
 		/*
 		 Create the checkboxes and wire them to setters
 		 on the ManPanel for each boolean feature.
@@ -137,7 +136,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		manipButton.setToolTipText(Constants.TIP_MANIP);
 		manipButton.setFont(Constants.FONT_TINY);
 		manipButton.setVisible(Constants.HAVE_MANIP_BUTTON);
-		final JButton manipBtn = manipButton;
+//		final JButton manipBtn = manipButton;
 		//controls.add(newRound);
 		toolbox.add(manipButton);
 		manipButton.addActionListener( new ActionListener() {
@@ -250,7 +249,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		newRound = Debug.createDebugButton(toolbox, "End the Round");
 		newRound.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				gamePanel.endOfRoundAnimation();
+				gamePanel.endOfRoundAnimation(false);
 			}
 		});
 
@@ -397,10 +396,14 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	}
 	
 	public boolean possibleComputerTurn() {
-		if(!Constants.NETWORK_MODE) {
+		if(!Constants.NETWORK_MODE && !gamePanel.isMyTurn()) {
 			return doAComputerOpponentMove();
 		}
 		return false;
+	}
+	
+	public void doComputerTurn() {
+		doAComputerOpponentMove();
 	}
 	
 	private boolean doAComputerOpponentMove() {
@@ -424,6 +427,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 
 	public void disableControls() {
 		setAllControls(false);
+		Debug.println("disabling controls");
 	}
 
 	public void enableControls() {
@@ -458,9 +462,9 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		}
 	}
 
-	private void calculateScore() {  //This is the part that I want to look into for calculating the score, which we'll swap out
+	private void calculateScore(boolean wasTold) {  //This is the part that I want to look into for calculating the score, which we'll swap out
 		if(gamePanel.gameStarted()) {
-			JOptionPane.showMessageDialog(myFrame, gamePanel.calculateScoreForRound());
+			String score = gamePanel.calculateScoreForRound();
 			int oppoPoints = gamePanel.getOppositionPoints();
 			int playerPoints = gamePanel.getPlayerPoints();
 			if(oppoPoints < Constants.SCORE_TO_WIN && playerPoints < Constants.SCORE_TO_WIN) {
@@ -473,6 +477,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 				int option = JOptionPane.showOptionDialog(myFrame, message, "", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, Constants.YES_NO, 0);
 				handleWinScenario(option);
 			}
+			JOptionPane.showMessageDialog(myFrame, score);
 		}else{
 			JOptionPane.showMessageDialog(gamePanel, Constants.ERROR_NO_GAME_YET, "", JOptionPane.ERROR_MESSAGE);
 		}
@@ -509,16 +514,20 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	private void askToFinishRound() {
 		String[] optsArray = {"No", "Yes"};
 		int option = JOptionPane.showOptionDialog(myFrame, Constants.INFO_NO_MOVES, "", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, optsArray, 0);
+		gamePanel.systemNotify("askToFinishRound");
 		if(option == 1) {
 			NetHelper.sendNetCalc(netRep); //send this out first so that the animation doesn't take over...
 			//calculateScore();
-			gamePanel.endOfRoundAnimation();
+			gamePanel.endOfRoundAnimation(false);
 		}else if(option == 0 || option == JOptionPane.CLOSED_OPTION) {
 			forceUserTurn(true);
 		}
 	}
 
 	private void forceUserTurn(boolean isForSelf) {
+		if(gamePanel.shouldLaunchHelp(isForSelf)) {
+			return;
+		}
 		gamePanel.setTurn(isForSelf);
 	}
 
@@ -567,14 +576,18 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			showGameLayout();
 		}
 		if(command.equals(Constants.CMD_MOVE)) {
+			Debug.println("received the move command");
+			gamePanel.systemWait("received move cmd");
+			Debug.println("passed the wait part");
 			parseMove(rest);
+			Debug.println("finished parsing move cmd");
 		}else if(command.equals(Constants.CMD_CALC)) {
-			gamePanel.endOfRoundAnimation();
+			gamePanel.endOfRoundAnimation(true);
 			//calculateScore();
-			NetHelper.sendNetNewRound(netRep);
 		}else if(command.equals(Constants.CMD_START)) {
 			beginGame();
 		}else if(command.equals(Constants.CMD_NO_MOVES)) {
+			gamePanel.systemWait("received nomoves cmd");
 			askToFinishRound();
 		}else if(command.contains(Constants.CMD_TURN)) {
 			forceUserTurn(isForSelf);
@@ -587,21 +600,21 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		} else if(command.contains(Constants.CMD_SHAKING)) {
 			gamePanel.timeToMoveBagAround(rest);
 		} else if(command.contains(Constants.CMD_ADD_TRICK)) {
-			Helpers.acquireSem(Helpers.cardDist);
+			Helpers.acquireCardDist();
 			if(shouldClear){
 				clearHand(rest, isForSelf);
 			}else{
 				parseHand(rest, isForSelf);
 			}
-			Helpers.releaseSem(Helpers.cardDist);
+			Helpers.releaseCardDist();
 		}else if(command.contains(Constants.CMD_ADD_TEAM)) {
-			Helpers.acquireSem(Helpers.cardDist);
+			Helpers.acquireCardDist();
 			if(shouldClear) {
 				clearTeam(rest, isForSelf);
 			}else{
 				parseTeam(rest, isForSelf);
 			}
-			Helpers.releaseSem(Helpers.cardDist);
+			Helpers.releaseCardDist();
 		}else{
 			gamePanel.updateStatus(Constants.STATUS_NO_SUCH_CMD);
 		}
@@ -623,6 +636,7 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 			deckStr = s.substring(semiPos+1, spacePos);
 		}
 		int deckIndex = Integer.parseInt(deckStr);
+		gamePanel.systemNotify(" parsed moved");
 		gamePanel.handleNetworkMove(cardIndex, deckIndex);
 	}
 
@@ -697,8 +711,10 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 
 	private void toggleManipLayout() {
 		if(!currentLayout.equals(GAME_PANEL)) {
+			NetHelper.logMessage(netRep, gamePanel.parsePlayerTurnName(), "Closed the scratch paper");
 			switchToLayout(GAME_PANEL);
 		}else{
+			NetHelper.logMessage(netRep, gamePanel.parsePlayerTurnName(), "Opened the scratch paper");
 			switchToLayout(MANIP_PANEL);
 		}
 	}
@@ -769,7 +785,11 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	
 	public boolean tugViewDone(TugPanel tPanel) {
 		boolean b = panelViewDone(tPanel, TUG_VIEW);
-		calculateScore();
+		Debug.println("told? " + tPanel.wasTold());
+		calculateScore(tPanel.wasTold());
+		if(Constants.NETWORK_MODE && tPanel.wasTold()) {
+			NetHelper.sendNetNewRound(netRep);
+		}
 		return b;
 	}
 

@@ -155,6 +155,9 @@ public class Player {
 	}
 	
 	public boolean couldAddToPlayDeck(DeckView dv, TrickCard tc, Player cvOwner) {
+		if(tc.isCombo()) {
+			return couldAddToPlayDeck(dv, tc.getFirstCard(), cvOwner) || couldAddToPlayDeck(dv, tc.getSecondCard(), cvOwner);
+		}
 		Player p = dv.getPlayer();
 		if(cvOwner == this) {
 			if(tc.isDefense()) {

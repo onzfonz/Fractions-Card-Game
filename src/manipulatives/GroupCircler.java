@@ -16,16 +16,14 @@ public class GroupCircler implements ActionListener {
 	private DoublePoint center;
 	private double theta;
 	private int answer;
-	private int people;
 	private double r;
 	
-	public GroupCircler(ManPanel p, int ppl, int den, int numer, int ans) {
+	public GroupCircler(ManPanel p, int den, int numer, int ans) {
 		mPanel = p;
 		numShapesAdded = 0;
 		numShapesNeeded = numer;
 		sections = den;
 		answer = ans;
-		people = ppl;
 	}
 	
 	public void setTimer(Timer t) {

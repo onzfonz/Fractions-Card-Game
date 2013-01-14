@@ -22,11 +22,12 @@ public class ManFrameLauncher implements ActionListener {
 	private DeckView view;
 	private CardView card;
 	private NetDelegate netRep;
+	private boolean firstTime;
 	
 	public static final int VELOCITY = 0;
 	public static final int MAX_MOVES = 0;
 	
-	public ManFrameLauncher(GamePanel gP, String q, ArrayList<ManCardPanel> manWindows, DeckView dv, CardView cv, NetDelegate nr) {
+	public ManFrameLauncher(GamePanel gP, String q, ArrayList<ManCardPanel> manWindows, DeckView dv, CardView cv, NetDelegate nr, boolean firstTimeLaunched) {
 		question = q;
 		frameList = manWindows;
 		frameList.add(null);
@@ -35,6 +36,7 @@ public class ManFrameLauncher implements ActionListener {
 		view = dv;
 		card = cv;
 		netRep = nr;
+		firstTime = firstTimeLaunched;
 	}
 	
 	public void setTimer(Timer t) {
@@ -59,7 +61,7 @@ public class ManFrameLauncher implements ActionListener {
 	}
 	
 	private void completelyFinishTimer() {
-		ManCardPanel manWindow = new ManCardPanel(question, view, card, netRep, gPanel);
+		ManCardPanel manWindow = new ManCardPanel(question, view, card, netRep, gPanel, firstTime);
 		PanelListener pl = gPanel.getPanelListener();
 		pl.manViewCreated(manWindow);
 		frameList.remove(null);

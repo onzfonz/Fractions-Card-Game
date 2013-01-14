@@ -57,7 +57,7 @@ public class PossibleMove {
 	
 	public static PossibleMove getSpecifiedMove(ArrayList<PossibleMove> moves, TrickCard tc, DeckView dv) {
 		PossibleMove myPm = null;
-		assert(moves != null & moves.size() > 0);
+		assert(moves != null && moves.size() > 0);
 		for(PossibleMove pm: moves) {
 			if(isMyMove(pm, tc, dv)) {
 				return pm;

@@ -62,11 +62,11 @@ public class CardViewPanel extends JPanel{
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		setLayout(null);
 		for(String name:fnames) {
-			Debug.println(Constants.IMG_PATH+name);
+			Debug.println("CardViewPanel constructor " + Constants.IMG_PATH+name);
 			InputStream imageURL = cl.getResourceAsStream(Constants.IMG_PATH+name);
 			BufferedImage imgComp = null;
 			try{
-				Debug.println(imageURL);
+				Debug.println("CardViewPanel constructor try: " + imageURL);
 				imgComp = ImageIO.read(imageURL);
 			}catch(IOException e) {
 				e.printStackTrace();
@@ -428,7 +428,7 @@ public class CardViewPanel extends JPanel{
 		TrickCard t0 = new TrickCard(Constants.RADIO_FILENAME, 1, 1, "radio");
 		TrickCard t1 = new TrickCard(Constants.HALF_AIR_FILENAME, 1, 2, "air");
 		TrickCard t2 = new TrickCard(Constants.TWO_TWO_ICE_FILENAME, 2, 2, "ice");
-		TrickCard t3 = new TrickCard(Constants.HALF_STINK_FILENAME, 1, 2, "stink");
+		TrickCard t3 = new TrickCard(Constants.HALF_FILENAME, 1, 2, "stink");
 
 		CardViewPanel pdm0 = CardViewPanelFactory.createCard(tm0, 100, 400);
 		CardViewPanel pd0 = CardViewPanelFactory.createCard(t0, 180, 180);

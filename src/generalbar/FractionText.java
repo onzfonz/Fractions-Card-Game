@@ -35,7 +35,7 @@ public class FractionText extends RepPanel {
 		double w = fm.stringWidth(text);
 		double h = fm.getAscent()-(fm.getLeading()+fm.getDescent());
 		//Debug.println(getHeight() + "," + h);
-		g.drawString(text, (int) (getWidth()/2 - w/2), (int) (getHeight()-(getHeight()/2 - h/2)));
+		g.drawString(text, (int) (getWidth()/2.0 - w/2.0), (int) (getHeight()-(getHeight()/2.0 - h/2.0)));
 		g.setFont(origFont);
 	}
 	

@@ -30,7 +30,7 @@ public class BarPanel extends RepPanel {
 	
 	public void paintComponent(Graphics g) {
 		//super.paintComponent(g);
-		drawBar(g, 0, getHeight()/8, getWidth(), getHeight());
+		drawBar(g, 0, getHeight()/8.0, getWidth(), getHeight());
 	}
 	
 	public void drawBar(Graphics g, double x, double y, double width, double height) {

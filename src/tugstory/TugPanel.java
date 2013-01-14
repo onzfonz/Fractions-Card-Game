@@ -18,6 +18,7 @@ import manipulatives.AssetView;
 import manipulatives.ManipInterface;
 import basic.Constants;
 import deck.DeckView;
+import extras.Debug;
 import extras.GameImages;
 
 
@@ -32,9 +33,9 @@ public class TugPanel extends JPanel {
 	private int ropeX;
 	private boolean canMoveFlag;
 	private TugPersonView regImage;
-	private int peopleFallenCounter;
 	private int ticksPassedTugging;
 	private boolean donePulling;
+	private boolean wasTold;
 	
 	public static final int TUG_WIDTH = 900;
 	public static final int TUG_HEIGHT = 640;
@@ -55,7 +56,7 @@ public class TugPanel extends JPanel {
 		//		add(new JLabel(""+opposide), BorderLayout.EAST);
 	}
 	
-	public TugPanel(List<DeckView> decksInPlay) {
+	public TugPanel(List<DeckView> decksInPlay, boolean told) {
 		ArrayList<AssetView> myAssets = new ArrayList<AssetView>();
 		ArrayList<AssetView> theirAssets = new ArrayList<AssetView>();
 		for(DeckView dv: decksInPlay) {
@@ -66,8 +67,14 @@ public class TugPanel extends JPanel {
 			}
 		}
 		initialSetup(myAssets.size(), theirAssets.size());
-		mypeeps = setupPeople(myAssets, true);
-		oppopeeps = setupPeople(theirAssets, false);
+		if(Constants.USE_CHARACTER_MANIPS_IN_CALC || Constants.USE_CHARACTER_MANIPS_IN_GAME) {
+			mypeeps = setupPeople(myAssets, true);
+			oppopeeps = setupPeople(theirAssets, false);
+		}else{
+			mypeeps = setupPeople(myAssets.size(), true);
+			oppopeeps = setupPeople(theirAssets.size(), false);
+		}
+		wasTold = told;
 	}
 	
 	private void potentiallyAddAssets(DeckView dv, ArrayList<AssetView> assets) {
@@ -86,7 +93,6 @@ public class TugPanel extends JPanel {
 		
 		regImage = new TugPersonView(GameImages.getMan(), GameImages.getLostMan(), true);
 		flagI = 0;
-		peopleFallenCounter = 0;
 		flagX = TUG_WIDTH/2 - regImage.getNormalImage().getWidth()/8;
 		ropeX = TUG_WIDTH/2 - GameImages.getTugRope().getWidth()/2;
 		listeners = new ArrayList<TugListener>();
@@ -146,32 +152,71 @@ public class TugPanel extends JPanel {
 		makePeopleFall(men, 0, amount, didTheyLose);
 	}
 	
+	/*also deprecated and transformed so watch out */
 	private void makePeopleFall(ArrayList<TugPersonView> men, int start, int amount, boolean didTheyLose) {
-		amount = Math.min(men.size(), start+amount);
-		for(int i = start; i < amount; i++) {
+//		amount = Math.min(men.size(), start+amount);
+		Debug.println("start: "+start+" amount: "+amount);
+		start = Math.min(men.size()-1, start);
+		amount = Math.max(0, men.size()-(start-amount));
+		for(int i = start; i > start - amount; i--) {
 			TugPersonView tpv = men.get(i);
 			tpv.personFalls(didTheyLose);
 		}
+	}
+	
+	private void makePersonFall(ArrayList<TugPersonView> men, int start, boolean didTheyLose) {
+//		amount = Math.min(men.size(), start+amount);
+		start--;
+		int oldStart = start;
+		start = Math.max(0, Math.min(men.size()-1, start));
+		Debug.println("oldStart:" + oldStart + ", start: " + start);
+		TugPersonView tpv = men.get(start);
+		tpv.personFalls(didTheyLose);
 	}
 	
 	private void getPeopleUpright(ArrayList<TugPersonView> men, int amountFallen) {
 		getPeopleUpright(men, amountFallen, true);
 	}
 	
+	//deprecated no longer using
 	private void getPeopleUpright(ArrayList<TugPersonView> men, int amountFallen, boolean didIWin) {
-		makePeopleFall(men, men.size()-(amountFallen), men.size(), !didIWin);
+//		makePeopleFall(men, men.size()-(amountFallen), men.size(), !didIWin);
 		for(int i = 0; i < men.size()-amountFallen; i++) {
 			TugPersonView tpv = men.get(i);
 			tpv.personWon();
 		}
 	}
 	
+	private void getPeopleUpright(ArrayList<TugPersonView> men) {
+		for(TugPersonView tpv:men) {
+			if(!tpv.fallen()) {
+				tpv.personWon();
+			}
+		}
+	}
+	
 	public boolean contestOver() {
-		return flagX > (getWidth()/2 + centerToWinDistance()) || flagX < (getWidth()/2 - centerToWinDistance()); 
+		return (flagX > (getWidth()/2.0 + centerToWinDistance())) || (flagX < (getWidth()/2.0 - centerToWinDistance())) || (oneSideDown()); 
+	}
+	
+	public boolean oneSideDown() {
+		boolean isDown = numDown(mypeeps) == mypeeps.size() || numDown(oppopeeps) == oppopeeps.size();
+		Debug.printlnVerbose("numDown: " + numDown(mypeeps) + "/" + mypeeps.size() + " ------------- " + numDown(oppopeeps) + "/" + oppopeeps.size() + " | " + isDown);
+		return isDown;
+	}
+	
+	private int numDown(ArrayList<TugPersonView> peeps) {
+		int down = 0;
+		for(TugPersonView tpv:peeps) {
+			if(tpv.fallen()) {
+				down++;
+			}
+		}
+		return down;
 	}
 	
 	public double centerToWinDistance() {
-		return getWidth()/TUG_LINE_DIVISOR;
+		return ((double)getWidth())/TUG_LINE_DIVISOR;
 	}
 	
 	public void repositionRope() {
@@ -209,38 +254,46 @@ public class TugPanel extends JPanel {
 	}
 
 	public void endTugOfWar(boolean takeOut) {
+		while(!oneSideDown()) {
+			makeOneSetFall();
+		}
+		repaint();
 		if(isItATie()) {
-			makeOneSetFall();
-			getPeopleUpright(mypeeps, 0);
-			getPeopleUpright(oppopeeps, 0);
+			getPeopleUpright(mypeeps);
+			getPeopleUpright(oppopeeps);
 		} else if(doIWin()) {
-			makeOneSetFall();
 //			makePeopleFall(oppopeeps);
-			getPeopleUpright(mypeeps, oppopeeps.size());
+			getPeopleUpright(mypeeps);
+			repaint();
 			makePeopleJump(mypeeps);
 		}else{
-			makeOneSetFall();
 //			makePeopleFall(mypeeps);
-			getPeopleUpright(oppopeeps, mypeeps.size());
+			getPeopleUpright(oppopeeps);
+			repaint();
 			makePeopleJump(oppopeeps);
 		}
 		donePulling = true;
+		repaint();
 	}
 	
 	public void makeOneSetFall() {
-		if(peopleFallenCounter < calcNumFall()) {
-			peopleFallenCounter++;
-			if(doIWin()) {
-				getPeopleUpright(mypeeps, peopleFallenCounter, true);
-				getPeopleUpright(oppopeeps, peopleFallenCounter, false);
-			}else if(doILose()) {
-				getPeopleUpright(oppopeeps, peopleFallenCounter, true);
-				getPeopleUpright(mypeeps, peopleFallenCounter, false);
-			}else{
-				getPeopleUpright(mypeeps, peopleFallenCounter, true);
-				getPeopleUpright(oppopeeps, peopleFallenCounter, true);
-			}
+		Debug.println("making one set fall win? " + doIWin() + " lose? " + doILose());
+		if(oneSideDown()) return;
+		if(doIWin()) {
+			makeOneFall(mypeeps, true);
+			makeOneFall(oppopeeps, false);
+		}else if(doILose()) {
+			makeOneFall(oppopeeps, true);
+			makeOneFall(mypeeps, false);
+		}else{
+			makeOneFall(mypeeps, true);
+			makeOneFall(oppopeeps, true);
 		}
+		repaint();
+	}
+	
+	private void makeOneFall(ArrayList<TugPersonView> men, boolean didIWin) {
+		makePersonFall(men, men.size()-numDown(men), !didIWin);
 	}
 	
 	private void makePeopleJump(ArrayList<TugPersonView> men) {
@@ -279,12 +332,30 @@ public class TugPanel extends JPanel {
 		super.paintComponent(g);
 		g.drawImage(GameImages.getTugBackground(), 0, 0, getWidth(), getHeight(), null);
 		int theY = getHeight()/2;
-		BufferedImage buf = regImage.getNormalImage();
+//		BufferedImage buf = regImage.getNormalImage();
+		BufferedImage buf = getAnchorImage();
 		drawRope(g, getWidth(), theY, buf);
 		drawSides(g, theY, buf);
 		if(donePulling) {
 			drawText(g);
 		}
+	}
+	
+	private BufferedImage getAnchorImage() {
+		return getAnchorTPV().getNormalImage();
+	}
+	
+	private TugPersonView getAnchorTPV() {
+		if(!(Constants.USE_CHARACTER_MANIPS_IN_CALC || Constants.USE_CHARACTER_MANIPS_IN_GAME)) {
+			return regImage;
+		}
+		if(mypeeps == null || mypeeps.size() <= 0) {
+			if(oppopeeps == null || oppopeeps.size() <= 0) {
+				return regImage;
+			}
+			return oppopeeps.get(0);
+		}
+		return mypeeps.get(0);
 	}
 	
 	private int calcManY(TugPersonView tpv, int y) {
@@ -350,7 +421,7 @@ public class TugPanel extends JPanel {
 		if(isItATie()) {
 			return "It's a tie";
 		}
-		return calcDifference() + " point" + ((calcDifference()==1)? "":"s") + "!";
+		return calcDifference() + ((calcDifference()==1)? Constants.TUG_MSG_POINT:Constants.TUG_MSG_POINTS) + "!";
 	}
 	
 	private void drawLabelMessage(Graphics g, String message, boolean ourSide) {
@@ -375,6 +446,10 @@ public class TugPanel extends JPanel {
 		g.drawImage(rope, ropeX, y+man.getHeight()/2, null);
 		g.drawImage(GameImages.getRedFlag(), length/2+(flagI), y+man.getHeight()/2, null);
 	}
+	
+	public boolean wasTold() {
+		return wasTold;
+	}
 
 	/* Need to have a good shake pebble method
 	 * that will have the pebbles randomly move in their locations
@@ -385,7 +460,7 @@ public class TugPanel extends JPanel {
 		JFrame frame = new JFrame("Tug Panel");
 
 		//TODO: Modify the images so that the lines are better marked on the floor.
-		TugPanel pPanel = new TugPanel(14, 11);
+		TugPanel pPanel = new TugPanel(18, 2);
 		frame.add(pPanel);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();

@@ -35,7 +35,7 @@ public class CardViewFactory {
 			}
 		}else if(c instanceof TeammateCard) {
 			TeammateCard tc = (TeammateCard) c;
-			Debug.println(tc.isShadowPlayer());
+			Debug.println("card view factory-createCard:" + tc.isShadowPlayer());
 			if(tc.isShadowPlayer()) {
 				return new ShadowCardView(c, width, height, visible);
 			}

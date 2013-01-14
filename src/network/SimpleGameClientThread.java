@@ -6,7 +6,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-public class GameClientThread extends Thread {
+
+public class SimpleGameClientThread extends Thread {
 	private Socket socket = null;
 	private GClientInterface client = null;
 	private BufferedReader streamIn = null;
@@ -14,7 +15,7 @@ public class GameClientThread extends Thread {
 	
 	// in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 	 
-	public GameClientThread(GClientInterface sgc, Socket sock) {  
+	public SimpleGameClientThread(GClientInterface sgc, Socket sock) {  
 		client = sgc;
 		socket = sock;
 		open();  

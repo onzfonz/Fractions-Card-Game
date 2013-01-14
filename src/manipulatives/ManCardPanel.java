@@ -8,6 +8,7 @@ package manipulatives;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -30,7 +31,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
@@ -42,14 +42,13 @@ import network.NetHelper;
 import basic.Constants;
 import basic.GamePanel;
 import cards.CardView;
-import cards.TeammateCard;
-import cards.TeammateCardFactory;
 import cards.TrickCard;
 import deck.DeckView;
-import deck.PlayDeck;
 import extras.CardGameUtils;
 import extras.Debug;
+import extras.GameImages;
 import extras.GameUtils;
+import extras.ManPanelHelp;
 import extras.RandomGenerator;
 
 public class ManCardPanel extends JPanel implements KeyListener, ManPanelListener{
@@ -68,9 +67,9 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 	private boolean isMessingAround;
 	
 	private JPanel box;
-	private JRadioButton makePpl;
-	private JRadioButton drawFreely;
-	private JRadioButton drawLines;
+	private JButton makePpl;
+	private JButton drawFreely;
+	private JButton drawLines;
 
 	private ManPanel manPanel;
 	private ManDeckViewPanel deckViewShown;
@@ -93,6 +92,10 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 	private DeckView deckPresented;
 	private CardView cardPlayed;
 	private GamePanel gPanel;
+	private ManPanelHelp helpDemo;
+	private AssetView cursor;
+	private int numTimesWrong;
+	private int maxPpl;
 	
 	private static final int GLUE_NUMS = 10;
 	
@@ -122,24 +125,24 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 	}
 	
 	public ManCardPanel() {
-		this(Constants.MAN_FRAME_DEFAULT_PLAY, null, null, null, null);
+		this(Constants.MAN_FRAME_DEFAULT_PLAY, null, null, null, null, false);
 	}
 
-	public ManCardPanel(String q, int answer, DeckView dv, CardView cv, NetDelegate nr, GamePanel gp) {
-		this(q, answer, null, dv, cv, nr, gp);
+	public ManCardPanel(String q, int answer, DeckView dv, CardView cv, NetDelegate nr, GamePanel gp, boolean firstTime) {
+		this(q, answer, null, dv, cv, nr, gp, firstTime);
 	}
 
-	public ManCardPanel(String q, DeckView dv, CardView cv, NetDelegate nr, GamePanel gp) {
-		this(q, 0, dv, cv, nr, gp);
+	public ManCardPanel(String q, DeckView dv, CardView cv, NetDelegate nr, GamePanel gp, boolean firstTime) {
+		this(q, 0, dv, cv, nr, gp, firstTime);
 	}
 
 	public ManCardPanel(File file) {
-		this("Osvaldo, What is 1/2 (.5) of 10?", null, null, null, null);
+		this("Osvaldo, What is 1/2 (.5) of 10?", null, null, null, null, true);
 	}
 
 	// Creates a new ManFrame
 	// If passed a non-null file, opens that file
-	public ManCardPanel(String q, int answer, File file, DeckView dv, CardView cv, NetDelegate nr, GamePanel gp) {
+	public ManCardPanel(String q, int answer, File file, DeckView dv, CardView cv, NetDelegate nr, GamePanel gp, boolean isFirstTime) {
 		setLayout(new BorderLayout());
 		myFrame = this;
 		//solution = answer;
@@ -154,12 +157,12 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		sendStartLogMessage();
 		answersTried = "";
 		manPanel = new ManPanel(800, 550, dv, cv, this);
-		manPanel.setToolTipText(Constants.TIP_MANIP_AREA);
 		controls.add(manPanel);
 
 		deckPresented = dv;
 		cardPlayed = cv;
 		gPanel = gp;
+		numTimesWrong = 0;
 		
 		if (file != null) manPanel.open(file);
 
@@ -183,13 +186,13 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		String qtext = stripQuestion(question);
 		int numer = GameUtils.extractNumerator(qtext);
 		int denom = GameUtils.extractDenominator(qtext);
-		int ppl = GameUtils.extractPeople(qtext);
+		maxPpl = GameUtils.extractPeople(qtext);
 		int prefixEndPos = GameUtils.extractNumeratorPos(qtext);
 		int suffixStartPos = GameUtils.extractPplEndPos(qtext);
 		String qprefix = qtext.substring(0, prefixEndPos);
 		String endfix = qtext.substring(suffixStartPos);
 		
-		if(qtext.indexOf(".") == -1) {
+		if(qtext.indexOf(".") == -1 && !isScratchPaper()) {
 			questionLabel = new JLabel(qprefix, JLabel.CENTER);
 			addLabelToMainQuestion(questionLabel, questionBox);
 		
@@ -205,21 +208,24 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 			JLabel ofLbl = new JLabel(" of ", JLabel.CENTER);
 			addLabelToMainQuestion(ofLbl, questionBox);
 		
-			peopleLabel = new JLabel(""+ppl, JLabel.CENTER);
+			peopleLabel = new JLabel(""+maxPpl, JLabel.CENTER);
 			addLabelToMainQuestion(peopleLabel, questionBox);
 		
 			JLabel suffixLbl = new JLabel(endfix, JLabel.CENTER);
 			addLabelToMainQuestion(suffixLbl, questionBox);
-		}else{
+		}else if(!isScratchPaper()){
 			String qtextprefix = qtext.substring(0, GameUtils.extractPplStartPos(qtext));
 			questionLabel = new JLabel(qtextprefix, JLabel.CENTER);
 			addLabelToMainQuestion(questionLabel, questionBox);
 			numeratorLabel = new JLabel("", JLabel.CENTER);
 			denominatorLabel = numeratorLabel;
-			peopleLabel = new JLabel(""+ppl, JLabel.CENTER);
+			peopleLabel = new JLabel(""+maxPpl, JLabel.CENTER);
 			addLabelToMainQuestion(peopleLabel, questionBox);
 			JLabel suffixLbl = new JLabel(endfix, JLabel.CENTER);
 			addLabelToMainQuestion(suffixLbl, questionBox);
+		}else{
+			questionLabel = numeratorLabel = denominatorLabel = peopleLabel = new JLabel("", JLabel.CENTER);
+			maxPpl = 200;
 		}
 		createHorizontalGlue(questionBox, GLUE_NUMS/3);
 		
@@ -228,6 +234,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		questionAnswer.setToolTipText(Constants.TIP_USER_ANSWER);
 		questionAnswer.setHorizontalAlignment(JTextField.CENTER);
 		questionAnswer.setMaximumSize(questionAnswer.getPreferredSize());
+		questionAnswer.setVisible(!isScratchPaper());
 		questionAnswer.addKeyListener(this);
 		askForFocus();
 		questionBox.add(questionAnswer);
@@ -326,7 +333,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		drawLines.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isMessingAround);
 		drawLines.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				manPanel.setPencilMode(false);
+				setLineDrawMode();
 			}
 		});
 		
@@ -336,7 +343,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		makePpl.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isMessingAround);
 		makePpl.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				manPanel.setPplMode(true);
+				setPplMode();
 			}
 		});
 		
@@ -346,7 +353,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		drawFreely.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isMessingAround);
 		drawFreely.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				manPanel.setPencilMode(true);
+				setFreeDrawMode();
 			}
 		});
 		
@@ -389,6 +396,22 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 				//gamePanel.setBackground(tempColor);
 				changeElemsToColor(tempColor, currentArea);
 				blueLabel.setText("" + blueSlider.getValue());
+			}
+		});
+		
+		final JButton drawButton = createDebugButton(box, "draw people");
+		drawButton.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				int num = Integer.parseInt(questionAnswer.getText());
+				manPanel.clearAll();
+				manPanel.drawPeople(num, num);
+			}
+		});
+		
+		final JButton showHelp = createDebugButton(box, "help animation");
+		showHelp.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				launch1stTimeAnimation();
 			}
 		});
 		
@@ -444,6 +467,58 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 			changeElemsToColor(Constants.MANIP_SHADOW_CENTER_BACKGROUND, Constants.OPTION_CENTER);
 		}
 		setVisible(true);
+		if(isFirstTime && Constants.GIVE_USERS_INSTRUCTIONS) {
+			launch1stTimeAnimation();
+		}
+	}
+	
+	public void launch1stTimeAnimation() {
+		manPanel.clearAll();
+		cursor = new AssetView(GameImages.getMouseCursor());
+		cursor.setShouldUseImage(true);
+		helpDemo = new ManPanelHelp(myFrame, cursor);
+		manPanel.doAdd(cursor);
+	}
+	
+	public void setInitialHelp() {
+		manPanel.displayMessage(Constants.MAN_FRAME_HELP_INIT);
+	}
+	
+	public void showAnswerSection() {
+		manPanel.displayMessage(Constants.MAN_FRAME_HELP_ANSWER);
+	}
+	
+	public void showNotAWholeNumberSection() {
+		manPanel.displayMessage(Constants.MAN_FRAME_HELP_NOT_WHOLE);
+	}
+	
+	public void showPencilHelp() {
+		manPanel.displayMessage(Constants.MAN_FRAME_HELP_PENCIL);
+	}
+	
+	public void setPplMode() {
+		manPanel.setPplMode(true);
+		drawLines.setSelected(false);
+		makePpl.setSelected(true);
+		drawFreely.setSelected(false);
+	}
+	
+	public void setFreeDrawMode() {
+		manPanel.setPencilMode(true);
+		drawLines.setSelected(false);
+		makePpl.setSelected(false);
+		drawFreely.setSelected(true);
+	}
+	
+	public void setLineDrawMode() {
+		manPanel.setPencilMode(false);
+		drawLines.setSelected(true);
+		makePpl.setSelected(false);
+		drawFreely.setSelected(false);
+	}
+	
+	private boolean isScratchPaper() {
+		return question.equals(Constants.MAN_FRAME_DEFAULT_PLAY);
 	}
 	
 	private void addLabelToMainQuestion(JLabel label, JPanel p) {
@@ -474,11 +549,23 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		setControls(userCanEdit);
 	}
 	
+	public void reset() {
+		setLineDrawMode();
+		manPanel.clearAll();
+	}
+	
 	public JLabel createDebugLabel(JPanel b, String label) {
 		JLabel l = new JLabel(label);
 		l.setVisible(Constants.DEBUG_MODE);
 		b.add(l);
 		return l;
+	}
+	
+	public JButton createDebugButton(JPanel p, String label) {
+		JButton b = new JButton(label);
+		b.setVisible(Constants.DEBUG_MODE);
+		p.add(b);
+		return b;
 	}
 	
 	public DeckView getDeckAffected() {
@@ -523,6 +610,34 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		if(dir.equals(Constants.OPTION_EAST)||dir.equals(Constants.OPTION_OUTER)) {
 			deckViewShown.setBackground(tempColor);
 		}
+	}
+	
+	public void startLine(int x, int y) {
+		manPanel.createActiveLine(new DoublePoint(x, y), new DoublePoint(x, y));
+	}
+	
+	public void modifyLine(int x, int y) {
+		manPanel.changeActiveLine(new DoublePoint(x, y));
+	}
+	
+	public void addAManip(int x, int y) {
+		manPanel.doAdd(x, y);
+	}
+	
+	public void endLine(int x, int y) {
+		manPanel.displayMessage(Constants.MAN_FRAME_HELP_PUT_PPL);
+	}
+	
+	public void startFreeDraw(int x, int y) {
+		manPanel.createActivePencil(new DoublePoint(x, y), new DoublePoint(x, y));
+	}
+	
+	public void modifyFreeDraw(int x, int y) {
+		manPanel.changeActivePencil(new DoublePoint(x, y));
+	}
+	
+	public void endFreeDraw(int x, int y) {
+		manPanel.displayMessage("");
 	}
 	
 	public JSlider createDebugSlider(JPanel b, String title, int low, int high, int reg) {
@@ -585,27 +700,6 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		manPanel.launchShadowResultAnimation(ppl, num, den, solution);
 	}
 
-	private void populateWithNPeople(int ppl, int den) {
-		String s = Constants.MAN_HELP_PLACE_PREFIX + ppl + Constants.MAN_HELP_PLACE_SUFFIX;
-		manPanel.drawPeople(ppl, den);
-		drawMessage(s);
-	}
-
-	private void circleNGroups(int num, int den, int answer) {
-		if(answer == -1) {
-			String s = Constants.MAN_MSG_NOT_COOL_MAN;
-			drawMessage(s);
-			return;
-		}
-		String s = Constants.MAN_HELP_CIRCLE_PREFIX + num + Constants.MAN_HELP_CIRCLE_SUFFIX;
-		drawMessage(s);
-		manPanel.drawOvals(num, den);
-	}
-
-	private void drawMessage(String s) {
-		manPanel.displayMessage(s);
-	}
-
 	private void checkUserAnswer() {
 		int num = 0;
 		String s = questionAnswer.getText().trim();
@@ -644,6 +738,10 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 				prefix = "";
 			}
 			answersTried += prefix + num;
+			numTimesWrong++;
+			if(numTimesWrong >= Constants.NUM_WRONG_B4_SHOW_ME) {
+				manPanel.displayMessage(Constants.MAN_MSG_SHOW_ME_HELP);
+			}
 			//Want to here fire off a message that you tried and got the wrong answer.
 			sendLogMessage("Oops tried " + num + "| " + manPanel.generateStatLine());
 			JOptionPane.showMessageDialog(myFrame,
@@ -664,13 +762,20 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		if(!cardPlayedByHuman) return true;  //computer always makes a legal move
 		return GameUtils.legalHumanCardMove(deckPresented, cardPlayed);
 	}
+	
+//	public void paintComponent(Graphics g) {
+//		super.paintComponent(g);
+//		if(cursor != null) {
+//			cursor.drawObject(g);
+//		}
+//	}
 
 	public void windowFinished() {
 		fireWindowDone();
 	}
 	
-	private JRadioButton createRadioButton(ImageIcon selected, ImageIcon unselected, JPanel box, ButtonGroup tools, String tipText) {
-		JRadioButton temp = new JRadioButton(unselected);
+	private JButton createRadioButton(ImageIcon selected, ImageIcon unselected, JPanel box, ButtonGroup tools, String tipText) {
+		JButton temp = new JButton(unselected);
 		temp.setToolTipText(tipText);
 		tools.add(temp);
 		temp.setSelectedIcon(selected);
@@ -702,6 +807,13 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 	
 	public void askForFocus() {
 		questionAnswer.requestFocusInWindow();
+	}
+	
+	public boolean canAddManips(int numManips, DeckView deck, CardView card) {
+		if(ManPanelUtils.isShadowOnly(deck, card)) {
+			return true;
+		}
+		return numManips < maxPpl;
 	}
 	
 	private String addUnselectedPath(String s) {
@@ -766,5 +878,27 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		numeratorLabel.setForeground(Constants.DEFAULT_BUTTON_TEXT_COLOR);
 		peopleLabel.setForeground(Constants.DEFAULT_BUTTON_TEXT_COLOR);
 	}
+	
+//  These are older versions of methods that are no longer used
+//	private void populateWithNPeople(int ppl, int den) {
+//		String s = Constants.MAN_HELP_PLACE_PREFIX + ppl + Constants.MAN_HELP_PLACE_SUFFIX;
+//		manPanel.drawPeople(ppl, den);
+//		drawMessage(s);
+//	}
+//
+//	private void circleNGroups(int num, int den, int answer) {
+//		if(answer == -1) {
+//			String s = Constants.MAN_MSG_NOT_COOL_MAN;
+//			drawMessage(s);
+//			return;
+//		}
+//		String s = Constants.MAN_HELP_CIRCLE_PREFIX + num + Constants.MAN_HELP_CIRCLE_SUFFIX;
+//		drawMessage(s);
+//		manPanel.drawOvals(num, den);
+//	}
+//
+//	private void drawMessage(String s) {
+//		manPanel.displayMessage(s);
+//	}
 }
 

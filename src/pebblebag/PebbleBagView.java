@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import basic.Constants;
 import basic.PebbleBag;
 import cards.TrickCard;
+import extras.Debug;
 import extras.GameImages;
 import extras.RandomGenerator;
 
@@ -180,7 +181,7 @@ public class PebbleBagView {
 				hidPebs.add(pv);
 			}
 		}
-		System.out.println(hidPebs);
+		Debug.println("pebbles still hidden" + hidPebs);
 		return hidPebs;
 	}
 	

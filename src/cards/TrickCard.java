@@ -265,7 +265,7 @@ public class TrickCard extends Card {
 	 * @param args
 	 */
 	public static void main(String args[]) {
-		TrickCard t1 = new TrickCard(Constants.HALF_STINK_FILENAME, 3, 5, "stink");
+		TrickCard t1 = new TrickCard(Constants.HALF_FILENAME, 3, 5, "stink");
 		System.out.println(t1.getValue());
 		TrickCard t2 = new TrickCard("cards_Point.jpg", 1, 2, "air");
 		System.out.println(t1.toFraction());

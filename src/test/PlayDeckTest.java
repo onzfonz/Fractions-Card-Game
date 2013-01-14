@@ -55,11 +55,11 @@ public class PlayDeckTest extends TestCase {
 		p6 = new PlayDeck(new TeammateCard("", "1st Graders", "", 4));
 		p7 = new PlayDeck(new TeammateCard("", "Johnson Family", "", 8));
 		
-		halfStink = new TrickCard(Constants.HALF_STINK_FILENAME, 1, 2, "Stink");
-		qtrStink = new TrickCard(Constants.HALF_STINK_FILENAME, 1, 4, "Stink");
-		threeQtrStink = new TrickCard(Constants.HALF_STINK_FILENAME, 3, 4, "Stink");
-		twoThirdStink = new TrickCard(Constants.HALF_STINK_FILENAME, 2, 3, "Stink");
-		thirdStink = new TrickCard(Constants.HALF_STINK_FILENAME, 1, 3, "Stink");
+		halfStink = new TrickCard(Constants.HALF_FILENAME, 1, 2, "Stink");
+		qtrStink = new TrickCard(Constants.HALF_FILENAME, 1, 4, "Stink");
+		threeQtrStink = new TrickCard(Constants.HALF_FILENAME, 3, 4, "Stink");
+		twoThirdStink = new TrickCard(Constants.HALF_FILENAME, 2, 3, "Stink");
+		thirdStink = new TrickCard(Constants.HALF_FILENAME, 1, 3, "Stink");
 		
 		halfAir = new TrickCard(Constants.HALF_AIR_FILENAME, 1, 2, "Air");
 		qtrAir = new TrickCard(Constants.HALF_AIR_FILENAME, 1, 4, "Air");

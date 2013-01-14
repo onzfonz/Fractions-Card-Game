@@ -1,5 +1,6 @@
 package manipulatives;
 
+import cards.CardView;
 import deck.DeckView;
 
 public interface ManPanelListener {
@@ -9,4 +10,5 @@ public interface ManPanelListener {
 	public void fireNumerExplained();
 	public void firePplExplained();
 	public void fireExplainDone();
+	public boolean canAddManips(int numManips, DeckView deck, CardView card);
 }

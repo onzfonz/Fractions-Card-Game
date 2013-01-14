@@ -2,6 +2,9 @@ package extras;
 
 import java.util.ArrayList;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MoveAction;
+
+import basic.Constants;
 import basic.Player;
 import basic.PossibleMove;
 import cards.CardView;
@@ -97,37 +100,59 @@ public class GameUtils {
 	}
 	
 	public static int extractPplStartPos(String question) {
-		return question.indexOf(" of ") + 4;
+		return question.indexOf(Constants.MAN_MSG_OF) + 4;
 	}
 	
 	public static boolean legalHumanCardMove(DeckView deck, CardView card) {
+		return legalHumanCardMoveExplained(deck, card) == Constants.MOVE_OK;
+	}
+	
+	//this is pretty much legalHumanCardMove but with 3 different results
+	//returning -1 means it's not being legal at all (tried to place a stink on yourself
+	//0 means it's legal game wise, but illegal via the fraction
+	//1 means it's both legal game wise and legal via the fraction
+	public static int legalHumanCardMoveExplained(DeckView deck, CardView card) {
 		Player deckPlayer = deck.getPlayer();
 		boolean humansDeck = deckPlayer.isHuman();
 		if(card.isCombo()) {
-			return legalHumanComboCardMove(deck, card, humansDeck);
+			return legalHumanComboCardMoveExplained(deck, card, humansDeck);
 		}
-		if(!legalPlacementOnDeck(card, humansDeck)) return false;
-		return deck.couldAddTrickCard(card);
+		if(!legalPlacementOnDeck(card, deck, humansDeck)) return Constants.MOVE_ILLEGAL;
+		if(!deck.couldAddTrickCard(card)) {
+			return Constants.MOVE_BAD_FRACTION;
+		}
+		return Constants.MOVE_OK;
 	}
 	
-	public static boolean legalPlacementOnDeck(CardView cv, boolean humansDeck) {
-		return legalPlacementOnDeck((TrickCard) cv.getCard(), humansDeck);
+	public static boolean legalPlacementOnDeck(CardView cv, DeckView dv, boolean humansDeck) {
+		return legalPlacementOnDeck((TrickCard) cv.getCard(), dv, humansDeck);
 	}
 	
-	public static boolean legalPlacementOnDeck(TrickCard card, boolean humansDeck) {
-		return (card.isAttack() && !humansDeck || card.isDefense() && humansDeck);
+	public static boolean legalPlacementOnDeck(TrickCard card, DeckView dv, boolean humansDeck) {
+		if(card.isCombo()) return ((legalPlacementOnDeck(card.getFirstCard(), dv, humansDeck) || (legalPlacementOnDeck(card.getSecondCard(), dv, humansDeck))));
+		if (!(card.isAttack() && !humansDeck || card.isDefense() && humansDeck)) return false;
+		if(card.isRadio() || card.isAir() && !dv.hasStinkyPpl()) return false; 
+		return true;
 	}
 	
 	public static boolean legalHumanComboCardMove(DeckView deck, CardView card, boolean humansDeck) {
+		return legalHumanComboCardMoveExplained(deck, card, humansDeck) == Constants.MOVE_OK;
+	}
+	
+	public static int legalHumanComboCardMoveExplained(DeckView deck, CardView card, boolean humansDeck) {
 		assert(card.isComboCard());
 		ArrayList<TrickCard> tcs = card.getCards();
+		int bestMoveSoFar = Constants.MOVE_ILLEGAL;
 		for(TrickCard tc:tcs) {
 			Debug.println("playing: " + tc + " on " + deck.getPlayDeck());
-			if(legalPlacementOnDeck(tc, humansDeck) && deck.couldAddTrickCard(tc)) {
-				return true;
+			if(legalPlacementOnDeck(tc, deck, humansDeck)) {
+				bestMoveSoFar = Constants.MOVE_BAD_FRACTION;
+				if(deck.couldAddTrickCard(tc)) {
+					return Constants.MOVE_OK;
+				}
 			}
 		}
-		return false;
+		return bestMoveSoFar;
 	}
 	
 	public static ArrayList<PossibleMove> getAllPossibleMoves(Player p, Player opponent) {

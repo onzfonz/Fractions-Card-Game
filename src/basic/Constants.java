@@ -19,6 +19,7 @@ public class Constants {
 	public static final String FNAME_SEQ_PREFIX;
 	public static final int SCORE_TO_WIN;
 	public static final int NUM_ROUNDS_B4_SHADOW;
+	public static final int NUM_WRONG_B4_SHOW_ME;
 	
 	//IP Addresses
 	public static final String SERVER_IP;
@@ -46,7 +47,6 @@ public class Constants {
 	public static final String TIP_PENCIL;
 	public static final String TIP_PPL;
 	public static final String TIP_DONE_SHAKING;
-	public static final String TIP_MANIP_AREA;
 	
 	//String messages
 	public static final String ICE_CREAM_NAME;
@@ -60,6 +60,11 @@ public class Constants {
 	public static final String MAN_FRAME_YOUR_DECK_TEXT;
 	public static final String MAN_FRAME_THEIR_DECK_TEXT;
 	public static final String MAN_FRAME_DEFAULT_PLAY;
+	public static final String MAN_FRAME_HELP_INIT;
+	public static final String MAN_FRAME_HELP_PUT_PPL;
+	public static final String MAN_FRAME_HELP_PENCIL;
+	public static final String MAN_FRAME_HELP_ANSWER;
+	public static final String MAN_FRAME_HELP_NOT_WHOLE;
 	public static final String CORRECT;
 	public static final String CONNECT_SERVER;
 	public static final String DECIDED_MOVE;
@@ -83,6 +88,7 @@ public class Constants {
 	public static final String ERROR_CANT_PLACE_PREFIX;
 	public static final String ERROR_CANT_PLACE_ON;
 	public static final String ERROR_NOT_WHOLE_NUM;
+	public static final String ERROR_NOT_WHOLE_NUM_DIV;
 	public static final String ERROR_NO_STINKERS_LEFT;
 	public static final String ERROR_NO_STINK_CARDS;
 	public static final String ERROR_STINKS_LEFT_DIV;
@@ -105,6 +111,7 @@ public class Constants {
 	public static final String INFO_NET_ERR_LOST_CONN;
 	public static final String INFO_ASK_B4_CLOSING;
 	public static final String INFO_SHADOW_PLAYER;
+	public static final String INFO_NEXT_ROUND;
 		
 	//Status messages
 	//public static final String STATUS_NEW_ROUND = "A new round has started; choose which tricks you want to play.";
@@ -145,10 +152,27 @@ public class Constants {
 	public static final String MAN_MSG_HOW_MANY;
 	public static final String MAN_MSG_GROUPS_NOT_EQUAL;
 	public static final String MAN_MSG_NOT_COOL_MAN;
+	public static final String MAN_MSG_SHOW_ME_HELP;
+	public static final String MAN_MSG_NOW_STINKY;
+	public static final String MAN_MSG_NOW_FRESH;
+	public static final String MAN_MSG_PREFIX;
+	public static final String MAN_MSG_OF;
 	public static final String MAN_HELP_PLACE_PREFIX;
 	public static final String MAN_HELP_PLACE_SUFFIX;
 	public static final String MAN_HELP_CIRCLE_PREFIX;
 	public static final String MAN_HELP_CIRCLE_SUFFIX;
+	
+	//Pebble bag messages
+	public static final String ICE_MSG_RAN;
+	public static final String ICE_MSG_SAFE;
+	public static final String ICE_MSG_SHAKE;
+	public static final String ICE_MSG_OPPO_SHAKES;
+	public static final String ICE_MSG_CHIP;
+	public static final String ICE_MSG_OPPO_CHIP;
+	public static final String ICE_MSG_NO_TRUCKS;
+	
+	public static final String TUG_MSG_POINT;
+	public static final String TUG_MSG_POINTS;
 	
 	public static final String COMBO_MSG_SIDE;
 	
@@ -184,6 +208,7 @@ public class Constants {
 	//User Preferences
 	public static boolean SHOW_COMPUTER_CARDS;
 	public static boolean REGULAR_MODE;  //false gives green rectangle, doesn't have them calculate their mistakes, can be used for easy level
+	public static boolean ALLOW_ILLEGAL_MOVES; //false provides some guidance to them for the game's rules.
 	public static boolean SHOW_DECK_LABEL_NUMBER;
 	public static boolean SHOW_DECK_MANIPS;
 	public static boolean HAVE_MANIP_BUTTON;
@@ -192,16 +217,17 @@ public class Constants {
 	public static boolean GIVE_QUESTION_TO_USER;
 	public static boolean ASK_USERS_FRACTION_QS;
 	public static boolean MANIPS_OVERLAP;
-	public static boolean DEBUG_MODE;
-	public static boolean VERBOSE_MODE;
-	public static boolean SHOW_COLOR_SLIDERS;
+	public static final boolean DEBUG_MODE;
+	public static final boolean VERBOSE_MODE;
+	public static final boolean SHOW_COLOR_SLIDERS;
 	public static boolean NETWORK_MODE;
 	public static boolean SHOW_ME_HOW_ENABLED;
 	public static boolean SHOW_WORK_ON_COMPUTER;
-	public static boolean USE_RIGGED_DECK;
-	public static boolean USE_CHARACTER_MANIPS_IN_CALC;
-	public static boolean USE_CHARACTER_MANIPS_IN_GAME;
-	public static boolean ASK_USERS_TO_PICK_PPL;
+	public static final boolean USE_RIGGED_DECK;
+	public static final boolean USE_CHARACTER_MANIPS_IN_CALC;
+	public static final boolean USE_CHARACTER_MANIPS_IN_GAME;
+	public static final boolean ASK_USERS_TO_PICK_PPL;
+	public static final boolean GIVE_USERS_INSTRUCTIONS;
 	
 	public static int ANIMATION_DELAY;
 	public static final int ANIMATION_MS_PAUSE;
@@ -227,6 +253,7 @@ public class Constants {
 		FNAME_SEQ_PREFIX = propValue("FNAME_SEQ_PREFIX");
 		SCORE_TO_WIN = propIntValue("SCORE_TO_WIN");
 		NUM_ROUNDS_B4_SHADOW = propIntValue("NUM_ROUNDS_B4_SHADOW");
+		NUM_WRONG_B4_SHOW_ME = propIntValue("NUM_WRONG_B4_SHOW_ME");
 		
 		SERVER_IP = propValue("SERVER_IP");
 		SERVER_IP_STANFORD = propValue("SERVER_IP");
@@ -250,7 +277,6 @@ public class Constants {
 		TIP_PENCIL = propValue("TIP_PENCIL");
 		TIP_PPL = propValue("TIP_PPL");
 		TIP_DONE_SHAKING = propValue("TIP_DONE_SHAKING");
-		TIP_MANIP_AREA = propValue("TIP_MANIP_AREA");
 		
 		ICE_CREAM_NAME = propValue("ICE_CREAM_NAME");
 		ICE_DESC = propValue("ICE_DESC");
@@ -263,6 +289,11 @@ public class Constants {
 		MAN_FRAME_YOUR_DECK_TEXT = propValue("MAN_FRAME_YOUR_DECK_TEXT");
 		MAN_FRAME_THEIR_DECK_TEXT = propValue("MAN_FRAME_THEIR_DECK_TEXT");
 		MAN_FRAME_DEFAULT_PLAY = propValue("MAN_FRAME_DEFAULT_PLAY");
+		MAN_FRAME_HELP_INIT = propValue("MAN_FRAME_HELP_INIT");
+		MAN_FRAME_HELP_PUT_PPL = propValue("MAN_FRAME_HELP_PUT_PPL");
+		MAN_FRAME_HELP_PENCIL = propValue("MAN_FRAME_HELP_PENCIL");
+		MAN_FRAME_HELP_ANSWER = propValue("MAN_FRAME_HELP_ANSWER");
+		MAN_FRAME_HELP_NOT_WHOLE = propValue("MAN_FRAME_HELP_NOT_WHOLE");
 		CORRECT = propValue("CORRECT");
 		CONNECT_SERVER = propValue("CONNECT_SERVER");
 		DECIDED_MOVE = propValue("DECIDED_MOVE");
@@ -285,6 +316,7 @@ public class Constants {
 		ERROR_CANT_PLACE_PREFIX = propValue("ERROR_CANT_PLACE_PREFIX"); 
 		ERROR_CANT_PLACE_ON = propValue("ERROR_CANT_PLACE_ON"); 
 		ERROR_NOT_WHOLE_NUM = propValue("ERROR_NOT_WHOLE_NUM");
+		ERROR_NOT_WHOLE_NUM_DIV = propValue("ERROR_NOT_WHOLE_NUM_DIV");
 		ERROR_NO_STINKERS_LEFT = propValue("ERROR_NO_STINKERS_LEFT");
 		ERROR_NO_STINK_CARDS = propValue("ERROR_NO_STINK_CARDS");
 		ERROR_STINKS_LEFT_DIV = propValue("ERROR_STINKS_LEFT_DIV");
@@ -303,6 +335,7 @@ public class Constants {
 		INFO_NET_ERR_LOST_CONN = propValue("INFO_NET_ERR_LOST_CONN"); 
 		INFO_ASK_B4_CLOSING = propValue("INFO_ASK_B4_CLOSING");
 		INFO_SHADOW_PLAYER = propValue("INFO_SHADOW_PLAYER");
+		INFO_NEXT_ROUND = propValue("INFO_NEXT_ROUND");
 
 		STATUS_OPPO_NO_MOVES = propValue("STATUS_OPPO_NO_MOVES");
 		STATUS_CALC_FRACTION = propValue("STATUS_CALC_FRACTION");
@@ -340,11 +373,27 @@ public class Constants {
 		MAN_MSG_HOW_MANY = propValue("MAN_MSG_HOW_MANY");
 		MAN_MSG_GROUPS_NOT_EQUAL = propValue("MAN_MSG_GROUPS_NOT_EQUAL");
 		MAN_MSG_NOT_COOL_MAN = propValue("MAN_MSG_NOT_COOL_MAN");
+		MAN_MSG_SHOW_ME_HELP = propValue("MAN_MSG_SHOW_ME_HELP");
+		MAN_MSG_NOW_STINKY = propValue("MAN_MSG_NOW_STINKY");
+		MAN_MSG_NOW_FRESH = propValue("MAN_MSG_NOW_FRESH");
+		MAN_MSG_PREFIX = propValue("MAN_MSG_PREFIX");
+		MAN_MSG_OF = propValue("MAN_MSG_OF");
 		MAN_HELP_PLACE_PREFIX = propValue("MAN_HELP_PLACE_PREFIX"); 
 		MAN_HELP_PLACE_SUFFIX = propValue("MAN_HELP_PLACE_SUFFIX");
 		MAN_HELP_CIRCLE_PREFIX = propValue("MAN_HELP_CIRCLE_PREFIX"); 
 		MAN_HELP_CIRCLE_SUFFIX = propValue("MAN_HELP_CIRCLE_SUFFIX");
 		COMBO_MSG_SIDE = propValue("COMBO_MSG_SIDE");
+		
+		ICE_MSG_RAN = propValue("ICE_MSG_RAN");
+		ICE_MSG_SAFE = propValue("ICE_MSG_SAFE");
+		ICE_MSG_SHAKE = propValue("ICE_MSG_SHAKE");
+		ICE_MSG_OPPO_SHAKES = propValue("ICE_MSG_OPPO_SHAKES");
+		ICE_MSG_CHIP = propValue("ICE_MSG_CHIP");
+		ICE_MSG_OPPO_CHIP = propValue("ICE_MSG_OPPO_CHIP");
+		ICE_MSG_NO_TRUCKS = propValue("ICE_MSG_NO_TRUCKS");
+		
+		TUG_MSG_POINT = propValue("TUG_MSG_POINT");
+		TUG_MSG_POINTS = propValue("TUG_MSG_POINTS");
 
 		BTN_NEW_GAME = propValue("BTN_NEW_GAME");
 		BTN_DONE_TURN = propValue("BTN_DONE_TURN");
@@ -376,6 +425,7 @@ public class Constants {
 		ASK_FOR_RADIOS = propValue("ASK_FOR_RADIOS");
 		
 		REGULAR_MODE = propTFValue("REGULAR_MODE");
+		ALLOW_ILLEGAL_MOVES = propTFValue("ALLOW_ILLEGAL_MOVES");
 		SHOW_DECK_MANIPS = propTFValue("SHOW_DECK_MANIPS");
 		HAVE_MANIP_BUTTON = propTFValue("HAVE_MANIP_BUTTON");
 		GIVE_QUESTION_TO_USER = propTFValue("GIVE_QUESTION_TO_USER");
@@ -393,6 +443,7 @@ public class Constants {
 		USE_CHARACTER_MANIPS_IN_CALC = propTFValue("USE_CHARACTER_MANIPS_IN_CALC");
 		USE_CHARACTER_MANIPS_IN_GAME = propTFValue("USE_CHARACTER_MANIPS_IN_GAME");
 		ASK_USERS_TO_PICK_PPL = propTFValue("ASK_USERS_TO_PICK_PPL");
+		GIVE_USERS_INSTRUCTIONS = propTFValue("GIVE_USERS_INSTRUCTIONS") && !DEBUG_MODE;
 		
 		ANIMATION_DELAY = propIntValue("ANIMATION_DELAY");
 		ANIMATION_MS_PAUSE = propIntValue("ANIMATION_MS_PAUSE") / ((DEBUG_MODE)?2:1);
@@ -470,6 +521,7 @@ public class Constants {
 	public static final String LAYER_STINKY_CHAR_FILENAME = "StinkCover.png";
 	public static final String LAYER_FRESH_CHAR_FILENAME = "FreshCover.png";
 	public static final String LAYER_HIGHLIGHT_FILENAME = "HighlightLayer.png";
+	public static final String LAYER_SELECT_FILENAME = "SelectLayer.png";
 	public static final String MAN_IMG_FILENAME = "man.png";
 	public static final String MAN_STINKY_FILENAME = "stinkyman.png";
 	public static final String MAN_FRESH_FILENAME = "freshman.png";
@@ -518,10 +570,12 @@ public class Constants {
 	public static final String COMBO_FILE_DELIMITER = ";";
 
 	//Older Auxiliary Filenames
-	public static final String HALF_STINK_FILENAME = "One-Half.png";
+	public static final String HALF_FILENAME = "One-Half.png";
 	public static final String POINT_5_FILENAME = "Point-5.png";
-	public static final String ONE_QTR_AIR_FILENAME = "One-Quarter.png";
+	public static final String ONE_QTR_FILENAME = "One-Quarter.png";
 	public static final String THREE_QTRS_AIR_FILENAME = "Three-Quarters.png";
+	public static final String TWO_THIRDS_FILENAME = "Two-Thirds.png";
+	public static final String ONE_THIRD_FILENAME = "One-Third.png";
 	public static final String HALF_AIR_FILENAME = "One-Half.png";
 	public static final String RADIO_FILENAME = "Radio---General.png";
 	public static final String MUSIC_GEEKS_FILENAME = "Music-Geeks.png";
@@ -578,7 +632,11 @@ public class Constants {
 	public static final int SOCKET_PORT = 1604;
 	public static final int NUM_MANIPS_PER_ROW = 4;
 	public static final String SENTENCE_SEP = "  ";
-
+	
+	//Constants for legal moves
+	public static final int MOVE_OK = 1;
+	public static final int MOVE_BAD_FRACTION = 0;
+	public static final int MOVE_ILLEGAL = -1;
 	
 	public static final String OPTION_WEST = "West";
 	public static final String OPTION_EAST = "East";

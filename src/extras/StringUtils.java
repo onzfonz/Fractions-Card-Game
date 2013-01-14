@@ -14,7 +14,7 @@ public class StringUtils {
 	}
 	
 	public static String within(String s, String leftChar, String rightChar) {
-		if((leftChar == null || rightChar == null || s == null) && ((!s.contains(leftChar) || !s.contains(rightChar)))) {
+		if((leftChar == null || rightChar == null || s == null) || ((!s.contains(leftChar) || !s.contains(rightChar)))) {
 			return null;
 		}
 		return s.substring(s.indexOf(leftChar)+leftChar.length(), s.indexOf(rightChar));

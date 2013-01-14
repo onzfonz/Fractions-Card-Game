@@ -524,32 +524,35 @@ public class PebblePanel extends JPanel implements PebbleListener {
 
 	public void updateStatusMessage(boolean isPlayersTurn) {
 		PebbleBagView pbv = getCurrentPebbleBag();
-		String s1 = pbv.numTurnsLeft() + " draw" + ((pbv.numTurnsLeft()!=1)? "s":"") + " left.";
+		String s1 = "";
+		if(pbv != null) {
+			s1 = pbv.numTurnsLeft() + " draw" + ((pbv.numTurnsLeft()!=1)? "s":"") + " left.";
+		}
 		String s2 = "";
 		if(noMorePlays()){
 			boolean kidsRan = kidsRanToATruck();
 			if(kidsRan) {
-				s1 = "The kids ran to the ice cream!";
+				s1 = Constants.ICE_MSG_RAN;
 			}else{
-				s1 = "The kids are safe!";
+				s1 = Constants.ICE_MSG_SAFE;
 			}
 			pebbleBagWindowDone(kidsRan);
 		}else if(pbv != null && pbv.bagNeedsShaking()) {
 			if(isPlayersTurn) {
-				s2 += participant + ", please shake the bag.";
+				s2 += participant + Constants.ICE_MSG_SHAKE;
 				notifyBagShakingStarted();
 			}else{
-				s2 += "Opponent shakes the bag.";
+				s2 += Constants.ICE_MSG_OPPO_SHAKES;
 			}
 		}else if(pbv != null) {
 			if(isPlayersTurn) {
-				s2 += participant + ", please take a chip out.";
+				s2 += participant + Constants.ICE_MSG_CHIP;
 			}else{
-				s2 += "Opponent takes a chip.";
+				s2 += Constants.ICE_MSG_OPPO_CHIP;
 			}
 		}
 		if(plays.size() == 0) {
-			s1 = "No Ice Cream Trucks.";
+			s1 = Constants.ICE_MSG_NO_TRUCKS;
 		}
 		statusLineDrawsLeft.setText(s1);
 		statusLineDirections.setText(s2);
@@ -634,11 +637,11 @@ public class PebblePanel extends JPanel implements PebbleListener {
 
 		PlayDeck p1 = new PlayDeck(new TeammateCard("", "Johnson Family", "", 8));
 
-		TrickCard halfStink = new TrickCard(Constants.HALF_STINK_FILENAME, 1, 2, "Stink");
-		TrickCard qtrStink = new TrickCard(Constants.HALF_STINK_FILENAME, 1, 4, "Stink");
-		TrickCard threeQtrStink = new TrickCard(Constants.HALF_STINK_FILENAME, 3, 4, "Stink");
-		TrickCard twoThirdStink = new TrickCard(Constants.HALF_STINK_FILENAME, 2, 3, "Stink");
-		TrickCard thirdStink = new TrickCard(Constants.HALF_STINK_FILENAME, 1, 3, "Stink");
+		TrickCard halfStink = new TrickCard(Constants.HALF_FILENAME, 1, 2, "Stink");
+		TrickCard qtrStink = new TrickCard(Constants.HALF_FILENAME, 1, 4, "Stink");
+		TrickCard threeQtrStink = new TrickCard(Constants.HALF_FILENAME, 3, 4, "Stink");
+		TrickCard twoThirdStink = new TrickCard(Constants.HALF_FILENAME, 2, 3, "Stink");
+		TrickCard thirdStink = new TrickCard(Constants.HALF_FILENAME, 1, 3, "Stink");
 
 		TrickCard halfAir = new TrickCard(Constants.HALF_AIR_FILENAME, 1, 2, "Air");
 		TrickCard qtrAir = new TrickCard(Constants.HALF_AIR_FILENAME, 1, 4, "Air");

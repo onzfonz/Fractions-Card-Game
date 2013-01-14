@@ -56,16 +56,16 @@ public class CardView {
 		faceUp = isShowin;
 		setVisible(true);
 		images = new ArrayList<BufferedImage>();
-		Debug.println("building card filenames from " + card);
+		Debug.printlnVerbose("building card filenames from " + card);
 		ArrayList <String> fnames = buildImageFilenames(card);
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		Debug.println("Starting in CardView: " + fnames);
+		Debug.printlnVerbose("Starting in CardView: " + fnames);
 		for(String name:fnames) {
-			Debug.println(Constants.IMG_PATH+ "," + name);
+			Debug.printlnVerbose(Constants.IMG_PATH+ "," + name);
 			InputStream imageURL = cl.getResourceAsStream(Constants.IMG_PATH+name);
 			BufferedImage imgComp = null;
 			try{
-				Debug.println(imageURL);
+				Debug.printlnVerbose("new card view" + imageURL);
 				imgComp = ImageIO.read(imageURL);
 			}catch(IOException e) {
 				e.printStackTrace();
@@ -214,6 +214,10 @@ public class CardView {
 			}
 		}
 		return false;
+	}
+	
+	public boolean generatesManipWindow() {
+		return isAir() || isStink();
 	}
 
 	public Card getCard() {
@@ -541,7 +545,7 @@ public class CardView {
 		TrickCard t0 = new TrickCard(Constants.RADIO_FILENAME, 1, 1, "radio");
 		TrickCard t1 = new TrickCard(Constants.HALF_AIR_FILENAME, 1, 2, "air");
 		TrickCard t2 = new TrickCard(Constants.BBALL_TEAM_FILENAME, 2, 2, "ice");
-		TrickCard t3 = new TrickCard(Constants.HALF_STINK_FILENAME, 1, 2, "stink");
+		TrickCard t3 = new TrickCard(Constants.HALF_FILENAME, 1, 2, "stink");
 
 		CardView pdm0 = CardViewFactory.createCard(tm0, 100, 400);
 		CardView pd0 = CardViewFactory.createCard(t0, 180, 180);

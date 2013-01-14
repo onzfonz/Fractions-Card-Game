@@ -8,30 +8,27 @@ package basic;
  */
 
 
-import cards.TrickCard;
 
 public class Game {
 	
 	private Dealer d;
 	private Player p1;
 	private Player opponent;
-	private GamePanel board;
 	
-	public Game(GamePanel p) {
+	public Game() {
 		d = DealerFactory.getNewDealer();
 		p1 = new Player(d);
 		opponent = new Player(d);
-		board = p;
 		playOneRound();
 	}
 	
-	public Game(GamePanel p, PlayerListener pl) {
+	public Game(PlayerListener pl) {
 		d = DealerFactory.getNewDealer();
 		opponent = new ComputerPlayer(d, pl, true);
 		p1 = new Player(d, pl, true, true);
 	}
 	
-	public Game(GamePanel p, PlayerListener pl, boolean againstComputer) {
+	public Game(PlayerListener pl, boolean againstComputer) {
 		d = DealerFactory.getNewDealer();
 		if(againstComputer) {
 			opponent = new ComputerPlayer(d, pl, againstComputer);
@@ -58,18 +55,6 @@ public class Game {
 		opponent.newCardRound();
 	}
 	
-	private void selectCardsToPlay() {
-		while(true) {
-			System.out.println("Player 1's turn");
-			TrickCard tP1 = playTrickCard(p1, opponent);
-			System.out.println("Player 2's turn");
-			TrickCard tP2 = playTrickCard(opponent, p1);
-			if(tP1 == null && tP2 == null) {
-				break;
-			}
-		}
-	}
-	
 	public String calculateScore() {
 		int p1Score = getMyRound();
 		int p2Score = getOppoRound();
@@ -91,7 +76,7 @@ public class Game {
 		}else{
 			return Constants.PARTS_TIE;
 		}
-		return prefix + message + suffix + "  " + postsuffix + " scored " + difference + " point" + ((difference == 1)?"":"s") + "!  Let's start the next round!";
+		return prefix + message + suffix + "  " + postsuffix + " scored " + difference + " point" + ((difference == 1)?"":"s") + "!  " + Constants.INFO_NEXT_ROUND;
 	}
 	
 	public int getMyRound() {
@@ -100,14 +85,6 @@ public class Game {
 	
 	public int getOppoRound() {
 		return opponent.totalTeammates();
-	}
-	
-	private TrickCard playTrickCard(Player p, Player otherP) {
-		TrickCard tP = p.chooseTrickToPlay();
-		if(tP != null) {
-			otherP.addToPlayDeck(tP);
-		}
-		return tP;
 	}
 	
 	public Player getPlayer(int i) {
@@ -135,5 +112,25 @@ public class Game {
 	
 //	public static void main(String[] args) {
 //		new Game();
+//	}
+	
+//	private void selectCardsToPlay() {
+//		while(true) {
+//			System.out.println("Player 1's turn");
+//			TrickCard tP1 = playTrickCard(p1, opponent);
+//			System.out.println("Player 2's turn");
+//			TrickCard tP2 = playTrickCard(opponent, p1);
+//			if(tP1 == null && tP2 == null) {
+//				break;
+//			}
+//		}
+//	}
+		
+//	private TrickCard playTrickCard(Player p, Player otherP) {
+//		TrickCard tP = p.chooseTrickToPlay();
+//		if(tP != null) {
+//			otherP.addToPlayDeck(tP);
+//		}
+//		return tP;
 //	}
 }

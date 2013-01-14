@@ -39,4 +39,6 @@ public interface ManipInterface {
 	public void setHighlighted(boolean highlight);
 	public boolean isSelected();
 	public void setSelected(boolean selected);
+	public void setShouldUseImage(boolean use);
+	public boolean shouldUseImage();
 }

@@ -38,6 +38,7 @@ public final class GameImages {
 	private static BufferedImage mouseButton;
 	private static BufferedImage mouseButtonDown;
 	private static BufferedImage highlightLayer;
+	private static BufferedImage selectLayer;
 	
 	private static BufferedImage[] musicGeeks;
 	private static BufferedImage[] pirates;
@@ -71,15 +72,22 @@ public final class GameImages {
 		mouseButton = getMouseCursor();
 		mouseButtonDown = getMouseButtonDown();
 		highlightLayer = getHighlightLayer();
+		selectLayer = getSelectedLayer();
 	}
 	
 	public static BufferedImage rotatePerson(BufferedImage man, double radians, boolean myside) {
 		AffineTransform tx = new AffineTransform();
+		int w = man.getWidth();
+		int h = man.getHeight();
+		tx.translate(w/2.0, h/2.0);
 		if(myside) {
-			tx.rotate(-radians, man.getWidth()/2, man.getHeight()/2);
+//			tx.rotate(-radians, w/2.0, h/2.0);
+			tx.rotate(-radians);
 		}else{
-			tx.rotate(radians, man.getWidth()/2, man.getHeight()/2);
+//			tx.rotate(radians, w/2.0, h/2.0);
+			tx.rotate(radians);
 		}
+		tx.translate(w/-2.0, h/-2.0);
 		AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 		return (op.filter(man, null));
 	}
@@ -200,6 +208,11 @@ public final class GameImages {
 	public static BufferedImage getHighlightLayer() {
 		highlightLayer = retrieveImage(highlightLayer, Constants.LAYER_HIGHLIGHT_FILENAME);
 		return highlightLayer;
+	}
+	
+	public static BufferedImage getSelectedLayer() {
+		selectLayer = retrieveImage(selectLayer, Constants.LAYER_SELECT_FILENAME);
+		return selectLayer;
 	}
 	
 	public static BufferedImage getCharacterImage(int index, TeammateCard tc) {

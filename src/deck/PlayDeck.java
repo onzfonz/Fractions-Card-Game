@@ -101,10 +101,10 @@ public class PlayDeck extends Deck {
 	}
 
 	public String generateQuestion(TrickCard tc, boolean useAllCards) {
-		String prefix = "What is ";
+		String prefix = Constants.MAN_MSG_PREFIX;
 		String fraction = tc.toFraction();
 		String numPeople = "" + getNumForFraction(tc.isStink(), useAllCards);
-		return prefix + fraction + " of " + numPeople + "?";
+		return prefix + fraction + Constants.MAN_MSG_OF + numPeople + "?";
 	}
 
 	public int generateAnswer(TrickCard tc, boolean useAllCards) {
@@ -185,10 +185,14 @@ public class PlayDeck extends Deck {
 				errorMsg = Constants.ERROR_STINKS_LEFT_DIV;
 			}else{
 				//errorMsg = "A " + c + " card has to be evenly divisible to be used on the " + team;
-				errorMsg = Constants.ERROR_NOT_WHOLE_NUM;
+				errorMsg = generateNotAWholeNumberMessage();
 			}
 		}
 		return isDivisible;
+	}
+	
+	private String generateNotAWholeNumberMessage() {
+		return Constants.ERROR_NOT_WHOLE_NUM + Constants.ERROR_NOT_WHOLE_NUM_DIV;
 	}
 
 	private boolean canApplyAir(TrickCard c) {
@@ -196,7 +200,7 @@ public class PlayDeck extends Deck {
 		boolean someStinkies = (team.getValue() - calculateStinksAndAirs()) > 0;
 		if(!isDivisible) {
 			//errorMsg = "An " + c + " card has to be evenly divisible to be used on the " + team;
-			errorMsg = Constants.ERROR_NOT_WHOLE_NUM;
+			errorMsg = generateNotAWholeNumberMessage();
 		}else if(!someStinkies) {
 			if(numStinks() > 0) {
 				//errorMsg = "An " + c + " card has to have some stinky teammates before you can use it";

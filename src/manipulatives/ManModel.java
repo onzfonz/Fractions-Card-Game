@@ -22,12 +22,14 @@ public class ManModel extends BasicModel implements ManipInterface {
 	private int desiredY;
 	private boolean transform;
 	private int prevState; //constants has the 3 states reg, stinky fresh -1 to 1 respectively
+	private boolean useImage;
 	
 	public ManModel() {
 		rgen = RandomGenerator.getInstance();
 		dx = 0;
 		dy = 0;
 		alpha = 255;
+		useImage = false;
 	}
 	
 	public ManModel(ManipInterface m) {
@@ -224,5 +226,13 @@ public class ManModel extends BasicModel implements ManipInterface {
 
 	public void setSelected(boolean selected) {
 		this.selected = selected;
+	}
+	
+	public void setShouldUseImage(boolean use) {
+		useImage = use;
+	}
+	
+	public boolean shouldUseImage() {
+		return useImage;
 	}
 }

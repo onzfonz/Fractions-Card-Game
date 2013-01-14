@@ -45,7 +45,7 @@ public class DealerTester {
 				System.out.println(card);
 				Integer num = cardFrequencies.get(card.toReadableStream());
 				if(num == null) {
-					num = new Integer(0);
+					num = Integer.valueOf(0);
 				}
 				num++;
 				cardFrequencies.put(card.toReadableStream(), num);

@@ -31,7 +31,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 
 import pebblebag.PebbleListener;
-import tutorial.SimpleGameClientThread;
 import basic.Constants;
 import basic.FYIMessage;
 import cards.CardGamePanel;
@@ -271,7 +270,7 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 			System.out.println("Received: " + fromServer);
 		}
 		if(myName == null) {
-			System.out.println(fromServer);
+			Debug.println("handing msg: " + fromServer);
 			if(!fromServer.startsWith(".error")) {
 				moveToLobby();
 				makeWindowShowUp();
@@ -377,7 +376,7 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 		if(enterTyped(ke)) {
 			String fromUser = field.getText();
 			if(fromUser != null) {
-				System.out.println(additional);
+				Debug.println("checkTextField: " + additional);
 				sendToServer(fromUser);
 				field.setText("");
 			}else{

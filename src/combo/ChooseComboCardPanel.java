@@ -52,11 +52,11 @@ public class ChooseComboCardPanel extends JPanel {
 	public static void main(String[] args) {
 		PlayDeck p1 = new PlayDeck(new TeammateCard("", "Johnson Family", "", 8));
 
-		TrickCard halfStink = new TrickCard(Constants.HALF_STINK_FILENAME, 1, 2, "Stink");
-		TrickCard qtrStink = new TrickCard(Constants.HALF_STINK_FILENAME, 1, 4, "Stink");
-		TrickCard threeQtrStink = new TrickCard(Constants.HALF_STINK_FILENAME, 3, 4, "Stink");
-		TrickCard twoThirdStink = new TrickCard(Constants.HALF_STINK_FILENAME, 2, 3, "Stink");
-		TrickCard thirdStink = new TrickCard(Constants.HALF_STINK_FILENAME, 1, 3, "Stink");
+		TrickCard halfStink = new TrickCard(Constants.HALF_FILENAME, 1, 2, "Stink");
+		TrickCard qtrStink = new TrickCard(Constants.HALF_FILENAME, 1, 4, "Stink");
+		TrickCard threeQtrStink = new TrickCard(Constants.HALF_FILENAME, 3, 4, "Stink");
+		TrickCard twoThirdStink = new TrickCard(Constants.HALF_FILENAME, 2, 3, "Stink");
+		TrickCard thirdStink = new TrickCard(Constants.HALF_FILENAME, 1, 3, "Stink");
 
 		TrickCard halfAir = new TrickCard(Constants.HALF_AIR_FILENAME, 1, 2, "Air");
 		TrickCard qtrAir = new TrickCard(Constants.HALF_AIR_FILENAME, 1, 4, "Air");

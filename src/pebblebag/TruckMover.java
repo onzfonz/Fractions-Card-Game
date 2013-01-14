@@ -62,7 +62,7 @@ public class TruckMover implements ActionListener {
 		manPanel.repaint();
 		numTimesMoved++;
 		if(numTimesMoved >= MAX_MOVES) {
-			Debug.println("pebble ended at " + curManX + ", " + curManY);
+			Debug.println("truckmover ended at " + curManX + ", " + curManY);
 			completelyFinishTimer();
 		}
 	}

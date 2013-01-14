@@ -21,6 +21,7 @@ import java.util.Map;
 
 import basic.Constants;
 import basic.ServerDealer;
+import extras.Debug;
 import extras.RandomGenerator;
 
 public class InGameProtocol {
@@ -59,17 +60,18 @@ public class InGameProtocol {
 		List<String> names = getPlayerNames();
 		dealTeamsToThreads(names);
 		dealTricksToThreads(names);
-		enablePlayerTurn();
+		enablePlayerTurn(names);
 	}
 	
-	public void enablePlayerTurn() {
-		enablePlayerToStart(currentPlayer);
+	public void enablePlayerTurn(List<String> names) {
+		enablePlayerToStart(currentPlayer, names);
 		currentPlayer = serverPairs.get(currentPlayer);
 	}
 	
-	private void enablePlayerToStart(String name) {
+	private void enablePlayerToStart(String name, List<String> names) {
 		GameServerThread gt = allSocks.get(name);
 		gt.notifyTurn(true);
+		notifyOthersTurnGiven(names, name);
 	}
 	
 	private List<String> getPlayerNames() {
@@ -100,6 +102,17 @@ public class InGameProtocol {
 		for(String n:names) {
 			if(!n.equals(name)) {
 				dealCardToClient(n, card, command, false);
+			}
+		}
+	}
+	
+	private void notifyOthersTurnGiven(List<String> names, String name) {
+//		Debug.println("turn given to " + name);
+		for(String n:names) {
+			if(!n.equals(name)) {
+//				Debug.println("name: " +  n + " not equal to " + name);
+				GameServerThread gt = allSocks.get(n);
+				gt.notifyTurn(false);
 			}
 		}
 	}

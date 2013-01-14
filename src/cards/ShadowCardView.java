@@ -103,7 +103,7 @@ public class ShadowCardView extends CardView{
 			f = f.deriveFont(f.getSize2D()-1);
 		}
 		//g.drawString(s, (int) (xCoord + (double) (width/denX)), (int) (yCoord + ((double) height/denY)*numY));
-		g.drawString(s, (int) (xCoord + (width/2-sWidth/2)), (int) (yCoord + ((double) height/denY)*numY));
+		g.drawString(s, (int) (xCoord + (width/2-sWidth/2)), (int) (yCoord + (((double) height)/denY)*numY));
 		g.setFont(origFont);
 	}
 

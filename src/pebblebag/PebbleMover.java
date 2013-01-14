@@ -70,7 +70,7 @@ public class PebbleMover implements ActionListener {
 	}
 	
 	public void choosePebbleDebug() {
-		Debug.println(pPanel.oppoSelectedPebble(isOrange).isOrange());
+		Debug.println("choosePebbleDebug: " + pPanel.oppoSelectedPebble(isOrange).isOrange());
 	}
 	
 	private void completelyFinishTimer() {

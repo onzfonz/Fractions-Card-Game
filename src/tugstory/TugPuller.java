@@ -39,7 +39,7 @@ public class TugPuller implements ActionListener {
 		//numTugs = Math.max(numTugs, numToFall);
 		if(numTugs > (travelDistance / TICKS_BW_TUGS)+1) {
 			numTugs = Math.max(numTugs, numToFall);
-			tugTicksInterval = (int) (((travelDistance / numTugs)/((double) NUM_ROPE_MOVEMENTS))*TICKS_BW_TUGS);
+			tugTicksInterval = (int) (((((double)travelDistance) / numTugs)/((double) NUM_ROPE_MOVEMENTS))*TICKS_BW_TUGS);
 			maxTicks = (numTugs * tugTicksInterval)-1;
 		}else{
 			maxTicks = (TICKS_BW_TUGS * numTugs);
@@ -70,15 +70,17 @@ public class TugPuller implements ActionListener {
 				closeAnimation();
 			}
 			return;
+		}else{
+			tPanel.tugAction();
 		}
-		tPanel.tugAction();
 		if(ticks % TICKS_BW_TUGS == 0) {
 			tPanel.moveFlagNextTime();
 		}
 		if(ticks % tugTicksInterval == 0) {
 			tPanel.makeOneSetFall();
+//			Debug.println("one set down");
 		}
-		if((ticks >= maxTicks || tPanel.contestOver()) && !Constants.NETWORK_MODE && stillAnimating) {
+		if((ticks >= maxTicks || tPanel.contestOver()) && stillAnimating) {
 			stopPulling();
 		}
 	}
@@ -86,11 +88,15 @@ public class TugPuller implements ActionListener {
 	public void closeAnimation() {
 		tPanel.tugPanelDone();
 		timer.stop();
-		Debug.println("Animation Done");
+		Debug.println("Animation Done in the Tug Panel");
 	}
 	
 	public void stopPulling() {
+//		timer.stop();
+		Debug.println("no longer pulling");
 		stillAnimating = false;
 		tPanel.endTugOfWar(false);
+		ticks = maxTicks;
+//		timer.start();
 	}
 }

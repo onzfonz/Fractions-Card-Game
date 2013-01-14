@@ -46,21 +46,44 @@ public class DeckView {
 	protected ArrayList<ManipInterface> manips;
 	protected RandomGenerator rgen;
 	protected boolean manipsDiscarded;
+	protected boolean manipsSaved;
 	protected ArrayList<AssetView> gamePanelManips;
+	protected boolean isRoundOver;
 
+	public boolean isManipsSaved() {
+		return manipsSaved;
+	}
+	
 	public boolean isManipsDiscarded() {
 		return manipsDiscarded;
+	}
+	
+	public boolean isRoundOver() {
+		return isRoundOver;
 	}
 
 	public void setManipsDiscarded(boolean manipsDiscarded) {
 		this.manipsDiscarded = manipsDiscarded;
+	}
+	
+	public void setManipsSaved(boolean saved) {
+		manipsSaved = saved;
+	}
+	
+	public void setRoundOver(boolean roundOver) {
+		isRoundOver = roundOver;
+		if(isRoundOver) {
+			for(ManipInterface manip: manips) {
+				manip.setXY(getX()+getCardWidth()+manip.getX(), getY()+manip.getY());
+			}
+		}
 	}
 
 	private boolean highlighted;
 
 	public DeckView(TeammateCard c, Player p) {
 		player = p;
-		Debug.println(c);
+		Debug.println("Creating a new DeckView with TeammateCard:" + c);
 		teammateCard = CardViewFactory.createCard(c);
 		if(c.isShadowPlayer()) {
 			teammateCard = new ShadowCardView(c);
@@ -71,6 +94,7 @@ public class DeckView {
 		justFreshened = false;
 		labelShown = true;
 		hasLaunchedFreshPoof = false;
+		isRoundOver = false;
 		numFrames = -1;
 		manips = new ArrayList<ManipInterface>();
 		createManipModels();
@@ -175,7 +199,8 @@ public class DeckView {
 			drawDeckRectangle(g, rectColor);
 		}
 		/* something here to override the labelShown */
-		if((labelShown || isManipsDiscarded()) && Constants.SHOW_DECK_MANIPS) {
+		if((labelShown || isManipsDiscarded() || isRoundOver()) && Constants.SHOW_DECK_MANIPS) {
+			Debug.printlnVerbose("drawing manipulatives");
 			drawManipulatives(g);
 		}
 		if(labelShown && Constants.SHOW_DECK_LABEL_NUMBER) {
@@ -347,7 +372,7 @@ public class DeckView {
 	}
 	
 	public void setManipsDesiredLocation(int x, int y) {
-		Debug.println("setting manips to x:" + x + ", " + y);
+		Debug.printlnVerbose("setting manips to x:" + x + ", " + y);
 		for(ManipInterface m:manips) {
 			m.setDesiredX(x);
 			m.setDesiredY(y);
@@ -365,7 +390,7 @@ public class DeckView {
 		ManipInterface m = manModels.get(numSoFar);
 		int newX = calcManipX(baseX, numSoFar, numOnSide, manImage.getWidth());
 		int newY = calcManipY(baseY, numSoFar, numOnSide, manImage.getHeight());
-		Debug.println("setting manipulative to: " + newX + ", " + newY);
+		Debug.printlnVerbose("setting manipulative to: " + newX + ", " + newY);
 		if(isDesired) {
 			m.setDesiredX(newX);
 			m.setDesiredY(newY);
@@ -390,8 +415,8 @@ public class DeckView {
 		poofer.graphicDrawn();
 		for(int i = 0; i < 5; i++) {
 			DoublePoint newPt = GraphicUtils.getPolarProjectedPoint(centerPt, numFrames*2, (360/5)*i);
-			int xCoord = (int) (newPt.getX()-circleWidth/2);
-			int yCoord = (int) (newPt.getY()-circleWidth/2);
+			int xCoord = (int) (newPt.getX()-circleWidth/2.0);
+			int yCoord = (int) (newPt.getY()-circleWidth/2.0);
 			g.fillOval(xCoord, yCoord, circleWidth, circleWidth);
 		}
 		g.setColor(orig);
@@ -430,6 +455,10 @@ public class DeckView {
 	private void drawOneMan(Graphics g, ManipInterface man) {
 		int x = getCardWidth() + getX();
 		int y = getY();
+		if(isRoundOver()) {
+			x = 0;
+			y = 0;
+		}
 		BufferedImage imgToUse = GameImages.getMan();
 		BufferedImage origImg = imgToUse;
 		if(Constants.USE_CHARACTER_MANIPS_IN_GAME) {
@@ -441,9 +470,15 @@ public class DeckView {
 		}else if(man.isStinky()) {
 			addedLayer = GameImages.getStinkyLayer();
 		}
-		g.drawImage(imgToUse, x + man.getX(), y + man.getY(), origImg.getWidth(), origImg.getHeight(), null);
+		int width = origImg.getWidth();
+		int height = origImg.getHeight();
+		if(isRoundOver()) {
+			width = imgToUse.getWidth();
+			height = imgToUse.getHeight();
+		}
+		g.drawImage(imgToUse, x + man.getX(), y + man.getY(), width, height, null);
 		if(addedLayer != null) {
-			g.drawImage(addedLayer, x + man.getX(), y + man.getY(), origImg.getWidth(), origImg.getHeight(), null);
+			g.drawImage(addedLayer, x + man.getX(), y + man.getY(), width, height, null);
 		}
 	}
 
@@ -541,6 +576,11 @@ public class DeckView {
 	public boolean isLegalAdd() {
 		return legalAdd;
 	}
+	
+	public boolean hasStinkyPpl() {
+		TeammateCard team = deck.getTeammateCard();
+		return deck.calculateDeck() != team.getValue();
+	}
 
 	public void showLabel(boolean lS, boolean hasChanged) {
 		labelShown = lS;
@@ -566,7 +606,15 @@ public class DeckView {
 	}
 	
 	public void setAssetManips(ArrayList<AssetView> assets) {
+//		ArrayList<AssetView> oldManips = gamePanelManips;
 		gamePanelManips = assets;
+//		if(oldManips != null && assets.size() != oldManips.size()) {
+//			int limit = assets.size();
+//			for(int i = oldManips.size()-1; i >= assets.size(); i++) {
+//				gamePanelManips.add(oldManips.get(i));
+//			}
+//		}
+		Debug.println("Asset Manips set");
 	}
 	
 	// Deprecated or unsupported methods now

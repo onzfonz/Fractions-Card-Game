@@ -16,6 +16,7 @@ public interface PanelListener {
 	public void disableControls();
 	public void opponentTurn();
 	public boolean possibleComputerTurn();
+	public void doComputerTurn();
 	public void manViewCreated(ManCardPanel mPanel);
 	public boolean manViewDone(ManCardPanel mPanel);
 	public void toggleManipView();
