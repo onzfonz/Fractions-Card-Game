@@ -1393,7 +1393,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 				if(Constants.NETWORK_MODE) {
 					/* This is the condition where an ice cream has been played but we have to wait on the other */
 					deckUsed = dv;
-					updateStatus("Waiting to see if your opponent will play a radio");
+					updateStatus(Constants.STATUS_WAIT_RADIO);
 				} else {
 					ComputerPlayer cp = (ComputerPlayer) p;
 					numRadiosInPlay = 1;
@@ -1724,7 +1724,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		add(statusBox, BorderLayout.NORTH);
 		status = new JLabel(" ");
 		status.setForeground(Constants.STATUS_FOREGROUND);
-		status.setFont(Constants.FONT_SMALL);
+		status.setFont(Constants.FONT_XTRA_SMALL);
 		statusBox.add(status);
 		statusBox.add(Box.createHorizontalGlue());
 
@@ -2120,7 +2120,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 	}
 
 	public void tidyUpCalculationClosing(DeckView deck) {
-		boolean shouldChangeText = status != null && (status.getText().length() < 5 || !status.getText().substring(0, Constants.ERROR_SORRY.length()).equals(Constants.ERROR_SORRY));
+		boolean shouldChangeText = status != null && (status.getText().length() < Constants.ERROR_CANT_PLACE_PREFIX.length() || !status.getText().substring(0, Constants.ERROR_CANT_PLACE_PREFIX.length()).equals(Constants.ERROR_CANT_PLACE_PREFIX));
 		String formerText = "";
 		if(shouldChangeText || status.getText().contains(Constants.ERROR_NOT_WHOLE_NUM_DIV)) {
 			formerText = status.getText();

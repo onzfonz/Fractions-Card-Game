@@ -404,7 +404,18 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 			public void actionPerformed(ActionEvent ae) {
 				int num = Integer.parseInt(questionAnswer.getText());
 				manPanel.clearAll();
-				manPanel.drawPeople(num, num);
+				manPanel.drawPeople(num, 4);
+			}
+		});
+		
+		final JButton circleButton = createDebugButton(box, "drawShaded");
+		circleButton.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				int num = Integer.parseInt(questionAnswer.getText());
+				manPanel.clearAll();
+				for(int i = 0; i < 2; i++) {
+					manPanel.addACircle(i, manPanel.calculateTheta(num), manPanel.calculateLineLength(), manPanel.getCenter(), num);
+				}
 			}
 		});
 		

@@ -9,10 +9,12 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.geom.Arc2D;
 import java.awt.image.BufferedImage;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -39,7 +41,6 @@ import extras.Debug;
 import extras.GameImages;
 import extras.GraphicUtils;
 import extras.RandomGenerator;
-import extras.Utils;
 
 public class ManPanel extends JPanel implements ManipPanelListener {
 	/**
@@ -52,7 +53,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	private ArrayList<ManipInterface> manips;
 	private ArrayList<Line> lines;
 	private ArrayList<Line> circles;
-	private ArrayList<Arc> arcs;
+	private ArrayList<Arc2D> arcs;
 	private static RandomGenerator rgen = RandomGenerator.getInstance();
 
 	public static final int DRAG_VS_CLICK = 25;
@@ -104,7 +105,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		manips = new ArrayList<ManipInterface>();
 		lines = new ArrayList<Line>();
 		circles = new ArrayList<Line>();
-		arcs = new ArrayList<Arc>();
+		arcs = new ArrayList<Arc2D>();
 		currentDeckGiven = dv;
 		currentCardPlayed = cv;
 		clear();
@@ -133,7 +134,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		message = new JLabel("");
 		numberMen.setFont(Constants.FONT_LARGE);
 		message.setFont(Constants.FONT_LARGE);
-		if(ManPanelUtils.isShadowOnly(dv, cv)) {
+		if(isShadowPanel()) {
 			numberMen.setForeground(Constants.MANIP_SHADOW_TEXT_FOREGROUND);
 			message.setForeground(Constants.MANIP_SHADOW_TEXT_FOREGROUND);
 		}
@@ -236,6 +237,10 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 			leftDrag(x, y, latestPoint);
 		}
 		repaint();
+	}
+	
+	public boolean isShadowPanel() {
+		return ManPanelUtils.isShadowOnly(currentDeckGiven, currentCardPlayed);
 	}
 	
 	public void manPanelMouseReleased(MouseEvent e) {
@@ -706,6 +711,25 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		// so JPanel will draw the white background for us.
 		super.paintComponent(g);
 		Color origColor = g.getColor();
+		g.setColor(Color.BLACK);
+		for(Line l:circles) {
+			g.drawLine((int) l.getX1(), (int) l.getY1(), (int) l.getX2(), (int) l.getY2());
+		}
+		if(!isShadowPanel()) {
+			g.setColor(Constants.MANIP_ARC_SHADE_COLOR);
+		}else{
+			g.setColor(Constants.MANIP_ARC_SHADOW_SHADE_COLOR);
+		}
+		for(Arc2D l:arcs) {
+			Graphics2D g2 = (Graphics2D) g;
+			g2.fill(l);
+//			g.fillArc((int) l.getX1(), (int) l.getY1(), (int) (l.getWidth()+150), (int) (l.getHeight()+150), (int) l.getStartAngle(), (int) l.getSweep());
+//			g.fillArc((int) l.getX1()-(Constants.ARC_BUFFER/2), (int) l.getY1()-(Constants.ARC_BUFFER/2), (int) (l.getWidth()+Constants.ARC_BUFFER), (int) (l.getHeight()+Constants.ARC_BUFFER), (int) l.getStartAngle(), (int) l.getSweep());
+//			g.fillArc((int) l.getX1(), (int) l.getY1(), (int) l.getWidth()+1, (int) l.getHeight()+1, (int) l.getStartAngle()-1, (int) l.getSweep());
+//			g.drawArc((int) l.getX1(), (int) l.getY1(), (int) l.getWidth()+1, (int) l.getHeight()+1, (int) l.getStartAngle()-1, (int) l.getSweep());
+			
+		}
+		g.setColor(origColor);
 		for (Line l:lines) {
 			if(l.isPencil()) {
 				g.setColor(Color.RED);
@@ -735,9 +759,9 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 			//g.drawImage(img, dotModel.getX() - MAN_WIDTH/2, dotModel.getY() - MAN_HEIGHT/2, MAN_WIDTH, MAN_HEIGHT, null);
 			BufferedImage imgToDraw = img;
 			if(dotModel.isShadow()) {
-				if(Constants.USE_CHARACTER_MANIPS_IN_CALC) {
-					imgToDraw = ((AssetView) dotModel).getImage();
-				}
+//				if(Constants.USE_CHARACTER_MANIPS_IN_CALC) {
+//					imgToDraw = ((AssetView) dotModel).getImage();
+//				}
 				drawShadows(g, dotModel, imgToDraw);
 			}else{
 //				g.drawImage(imgToDraw, dotModel.getX()-Constants.MAN_WIDTH/2, dotModel.getY()-Constants.MAN_HEIGHT/2, null);
@@ -761,16 +785,6 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 			}
 		}
 		
-		g.setColor(Color.RED);
-		for(Line l:circles) {
-			g.drawLine((int) l.getX1(), (int) l.getY1(), (int) l.getX2(), (int) l.getY2());
-		}
-		
-		for(Arc l:arcs) {
-			g.drawArc((int) l.getX1(), (int) l.getY1(), (int) l.getWidth(), (int) l.getHeight(), (int) l.getStartAngle(), (int) l.getSweep());
-			//g.drawArc((int) l.getX1(), (int) l.getY1(), (int) l.getWidth()+1, (int) l.getHeight()+1, l.getStartAngle()-1, l.getSweep());
-			
-		}
 		g.setColor(Color.BLACK);
 	}
 	
@@ -779,9 +793,20 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		drawSinglePersonLayers(g, layers, man);
 	}
 	
+	private void drawSinglePerson(Graphics g, BufferedImage imgToDraw, ManipInterface man, int width, int height) {
+		ArrayList<BufferedImage> layers = getImgsToDraw(imgToDraw, man);
+		drawSinglePersonLayers(g, layers, man, width, height);
+	}
+	
 	private void drawSinglePersonLayers(Graphics g, ArrayList<BufferedImage> layers, ManipInterface man) {
 		for(BufferedImage layer: layers) {
 			g.drawImage(layer, man.getX()-layer.getWidth()/2, man.getY()-layer.getHeight()/2, null);
+		}
+	}
+	
+	private void drawSinglePersonLayers(Graphics g, ArrayList<BufferedImage> layers, ManipInterface man, int width, int height) {
+		for(BufferedImage layer: layers) {
+			g.drawImage(layer, man.getX()-width/2, man.getY()-height/2, width, height, null);
 		}
 	}
 	
@@ -836,12 +861,14 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		int circleD = img.getHeight()+getShadowOffset();
 		if(dotModel.isShadowPlayer()) {
 //			g.fillOval(dotModel.getX()-circleD/2, dotModel.getY()-circleD/2, circleD, circleD);
-			drawSinglePerson(g, img, dotModel);
+			drawSinglePerson(g, img, dotModel, img.getWidth(), img.getHeight());
 		}
 		int alpha = dotModel.getAlpha();
 		Color curColor = g.getColor();
 		g.setColor(new Color(curColor.getRed(), curColor.getGreen(), curColor.getBlue(), alpha));
 		g.fillOval(dotModel.getX()-circleD/2, dotModel.getY()-circleD/2, circleD, circleD);
+		g.setColor(Constants.MANIP_SHADOW_CENTER_BACKGROUND);
+		g.drawOval(dotModel.getX()-circleD/2, dotModel.getY()-circleD/2, circleD, circleD);
 		g.setColor(orig);
 	}
 	
@@ -1111,7 +1138,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	public void launchPeopleAddAnimation(int ppl, int den, int numer, int ans) {
 		ManipAdder mAdd = new ManipAdder(this, ppl, den, numer, ans);
 		Timer manipTimer = new Timer(1000, mAdd);
-		displayMessage("Count off " + ppl + " " + ((ppl==1)?"person":"people") + ".");
+		displayMessage("Count off " + ppl + " " + ((ppl==1)?Constants.MAN_HELP_PERSON:Constants.MAN_HELP_PEOPLE) + ".");
 		frame.firePplExplained();
 		manipTimer.setInitialDelay(3000);
 		mAdd.setTimer(manipTimer);
@@ -1203,7 +1230,9 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	}
 	
 	public void addAnArc(int i, double theta) {
-		Arc temp = new Arc(new DoublePoint(0, 0), new DoublePoint(getWidth(), getHeight()), -90 + (int) (i*theta), (int) theta);
+//		Arc temp = new Arc(new DoublePoint(0, 0), new DoublePoint(getWidth(), getHeight()), (int) (-90 + (double) (i*theta)), (d) theta);
+		int buf = Constants.ARC_BUFFER;
+		Arc2D temp = new Arc2D.Double((getWidth()-getHeight())/2-buf/2, 0-buf/2, getHeight()+buf, getHeight()+buf, ((double) (theta*i))-90, theta, Arc2D.PIE); 
 		arcs.add(temp);
 	}
 	
@@ -1327,14 +1356,22 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	
 	public void addAManip(int ithPerson, double theta, double r, DoublePoint center, int divs, boolean isStinky, boolean isShadow) {
 		DoublePoint pos = null;
+		int numTimesPlaced = 0;
+		double origR = r;
+		Debug.println("add A Manip r is: " + r);
 		while(true) {
 			double offset = calculateOffsetAngle(theta);
 			double angle = theta*ithPerson+offset;
+			if(numTimesPlaced >= Constants.TRIED_ADDING_LIMIT-1){
+				r = origR * 2;
+			}
 			pos = GraphicUtils.getPolarProjectedPoint(center, r, angle);
 			movePointInBounds(pos);
-			if(findDotArea((int) pos.getX(), (int) pos.getY()) == null) {
+			if(findDotArea((int) pos.getX(), (int) pos.getY(), numTimesPlaced) == null) {
 				break;
 			}
+			r*=Constants.TRIED_ADDING_MODIFIER;
+			numTimesPlaced++;
 		}
 		doAdd((int) pos.getX(), (int) pos.getY(), isStinky, isShadow);
 	}
@@ -1360,24 +1397,24 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		}
 	}
 	
-	public void drawOvals(int num, int divs) {
-		addLines(circles, num+1, divs);
-		addArcs(divs);
-	}
+//	public void drawOvals(int num, int divs) {
+//		addLines(circles, num+1, divs);
+//		addArcs(divs);
+//	}
+//	
+//	private void addArcs(int divs) {
+//		double theta = calculateTheta(divs);
+//		for(int i = 0; i < circles.size()-1; i++) {
+//			Line nextLine = circles.get((i + 1) % circles.size());
+//			DoublePoint start = circles.get(i).getEnd();
+//			Arc2D temp = new Arc2D.Double(0, 0, getWidth(), getHeight(), -90 + (i*theta), theta, Arc2D.PIE);
+//			Debug.println(start + ", " + nextLine.getEnd() + "start: " + (i*theta) + ", with sweep: " + theta);
+//			arcs.add(temp);
+//		}
+//	}
 	
-	private void addArcs(int divs) {
-		double theta = calculateTheta(divs);
-		for(int i = 0; i < circles.size()-1; i++) {
-			Line nextLine = circles.get((i + 1) % circles.size());
-			DoublePoint start = circles.get(i).getEnd();
-			Arc temp = new Arc(new DoublePoint(0, 0), new DoublePoint(getWidth(), getHeight()), -90 + (int) (i*theta), (int) theta+5);
-			Debug.println(start + ", " + nextLine.getEnd() + "start: " + (i*theta) + ", with sweep: " + theta);
-			arcs.add(temp);
-		}
-	}
-	
-	private ManipInterface findDotArea(int x, int y) {
-		return findOverlap(x, y);
+	private ManipInterface findDotArea(int x, int y, int numTimesPlaced) {
+		return findOverlap(x, y, numTimesPlaced);
 //		if(Constants.MANIPS_OVERLAP) {
 //			return null;
 //		}
@@ -1396,10 +1433,10 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 //		}
 //		return null;
 	}
-	
+
 	//new model based on web search for rectangle overlap.
-	private ManipInterface findOverlap(int x, int y) {
-		if(Constants.MANIPS_OVERLAP) {
+	private ManipInterface findOverlap(int x, int y, int numTimesPlaced) {
+		if(Constants.MANIPS_OVERLAP || numTimesPlaced > Constants.TRIED_ADDING_LIMIT) {
 			return null;
 		}
 		if(findManip(x, y) != null) {

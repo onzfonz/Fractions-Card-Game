@@ -37,7 +37,7 @@ public class ManipAdder implements ActionListener {
 			center = mPanel.getCenter();
 			theta = mPanel.calculateTheta(sections);
 		}
-		mPanel.addAManip(numPeopleAdded, theta, center, sections);
+		mPanel.addAManip(numPeopleAdded, theta, center, sections, false, mPanel.isShadowPanel());
 		mPanel.repaint();
 		numPeopleAdded++;
 		if(numPeopleAdded % 8 == 0) {

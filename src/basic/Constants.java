@@ -112,6 +112,7 @@ public class Constants {
 	public static final String INFO_ASK_B4_CLOSING;
 	public static final String INFO_SHADOW_PLAYER;
 	public static final String INFO_NEXT_ROUND;
+	public static final String INFO_ASK_4_KEY;
 		
 	//Status messages
 	//public static final String STATUS_NEW_ROUND = "A new round has started; choose which tricks you want to play.";
@@ -124,6 +125,8 @@ public class Constants {
 	public static final String STATUS_NO_SUCH_CMD;
 	public static final String STATUS_DECIDING_WHOS_FIRST;
 	public static final String STATUS_START_GAME_HELP;
+	public static final String STATUS_WAIT_RADIO;
+	public static final String STATUS_PLAYED_RADIO;
 	
 	public static final String STATUS_THEY;
 	public static final String STATUS_FALL;
@@ -161,6 +164,8 @@ public class Constants {
 	public static final String MAN_HELP_PLACE_SUFFIX;
 	public static final String MAN_HELP_CIRCLE_PREFIX;
 	public static final String MAN_HELP_CIRCLE_SUFFIX;
+	public static final String MAN_HELP_PERSON;
+	public static final String MAN_HELP_PEOPLE;
 	
 	//Pebble bag messages
 	public static final String ICE_MSG_RAN;
@@ -201,6 +206,13 @@ public class Constants {
 	public static final String THEIR_INIT_SCORE;
 	public static final String YOUR_LABEL;
 	public static final String THEIR_LABEL;
+
+	//Card type messages
+	public static final String STINK_TYPE;
+	public static final String AIR_TYPE;
+	public static final String ICE_TYPE;
+	public static final String RADIO_TYPE;
+	public static final String MONEY_TYPE;
 	
 	//Question prompts
 	public static final String ASK_FOR_RADIOS;
@@ -228,6 +240,7 @@ public class Constants {
 	public static final boolean USE_CHARACTER_MANIPS_IN_GAME;
 	public static final boolean ASK_USERS_TO_PICK_PPL;
 	public static final boolean GIVE_USERS_INSTRUCTIONS;
+	public static final boolean ASK_FOR_KEY;
 	
 	public static int ANIMATION_DELAY;
 	public static final int ANIMATION_MS_PAUSE;
@@ -336,6 +349,7 @@ public class Constants {
 		INFO_ASK_B4_CLOSING = propValue("INFO_ASK_B4_CLOSING");
 		INFO_SHADOW_PLAYER = propValue("INFO_SHADOW_PLAYER");
 		INFO_NEXT_ROUND = propValue("INFO_NEXT_ROUND");
+		INFO_ASK_4_KEY = propValue("INFO_ASK_4_KEY");
 
 		STATUS_OPPO_NO_MOVES = propValue("STATUS_OPPO_NO_MOVES");
 		STATUS_CALC_FRACTION = propValue("STATUS_CALC_FRACTION");
@@ -358,6 +372,8 @@ public class Constants {
 		STATUS_NEW_ROUND = propValue("STATUS_NEW_ROUND");
 		STATUS_SUGGEST_DONE_W_TURN = propValue("STATUS_SUGGEST_DONE_W_TURN");
 		STATUS_START_GAME_HELP = propValue("STATUS_START_GAME_HELP");
+		STATUS_WAIT_RADIO = propValue("STATUS_WAIT_RADIO");
+		STATUS_PLAYED_RADIO = propValue("STATUS_PLAYED_RADIO");
 
 		PARTS_PREFIX_YOU = propValue("PARTS_PREFIX_YOU");
 		PARTS_SUFFIX_YOU = propValue("PARTS_SUFFIX_YOU");
@@ -382,6 +398,8 @@ public class Constants {
 		MAN_HELP_PLACE_SUFFIX = propValue("MAN_HELP_PLACE_SUFFIX");
 		MAN_HELP_CIRCLE_PREFIX = propValue("MAN_HELP_CIRCLE_PREFIX"); 
 		MAN_HELP_CIRCLE_SUFFIX = propValue("MAN_HELP_CIRCLE_SUFFIX");
+		MAN_HELP_PERSON = propValue("MAN_HELP_PERSON");
+		MAN_HELP_PEOPLE = propValue("MAN_HELP_PEOPLE");
 		COMBO_MSG_SIDE = propValue("COMBO_MSG_SIDE");
 		
 		ICE_MSG_RAN = propValue("ICE_MSG_RAN");
@@ -424,6 +442,12 @@ public class Constants {
 		THEIR_LABEL = propValue("THEIR_LABEL");
 		ASK_FOR_RADIOS = propValue("ASK_FOR_RADIOS");
 		
+		STINK_TYPE = propValue("STINK_TYPE");
+		AIR_TYPE = propValue("AIR_TYPE");
+		ICE_TYPE = propValue("ICE_TYPE");
+		RADIO_TYPE = propValue("RADIO_TYPE");
+		MONEY_TYPE = propValue("MONEY_TYPE");
+		
 		REGULAR_MODE = propTFValue("REGULAR_MODE");
 		ALLOW_ILLEGAL_MOVES = propTFValue("ALLOW_ILLEGAL_MOVES");
 		SHOW_DECK_MANIPS = propTFValue("SHOW_DECK_MANIPS");
@@ -444,10 +468,11 @@ public class Constants {
 		USE_CHARACTER_MANIPS_IN_GAME = propTFValue("USE_CHARACTER_MANIPS_IN_GAME");
 		ASK_USERS_TO_PICK_PPL = propTFValue("ASK_USERS_TO_PICK_PPL");
 		GIVE_USERS_INSTRUCTIONS = propTFValue("GIVE_USERS_INSTRUCTIONS") && !DEBUG_MODE;
+		ASK_FOR_KEY = propTFValue("ASK_FOR_KEY");
 		
 		ANIMATION_DELAY = propIntValue("ANIMATION_DELAY");
 		ANIMATION_MS_PAUSE = propIntValue("ANIMATION_MS_PAUSE") / ((DEBUG_MODE)?2:1);
-		BETWEEN_GAME_PAUSE = 2500 / ((DEBUG_MODE)?5:1);
+		BETWEEN_GAME_PAUSE = 2500 / ((DEBUG_MODE)?1:1);
 		
 	}
 	
@@ -475,6 +500,7 @@ public class Constants {
 	public static final int HUGE_CARD_WIDTH = MAX_CARD_WIDTH * 2;
 	public static final int MAX_CARD_HEIGHT = (int) (ORIG_CARD_HEIGHT*SCALE);
 	public static final int HUGE_CARD_HEIGHT = MAX_CARD_HEIGHT * 2;
+	public static final int ARC_BUFFER = 500;
 
 	public static final int DEFAULT_X = 0;
 	public static final int DEFAULT_Y = 0;
@@ -596,6 +622,7 @@ public class Constants {
 	public static final int MINI_GAME_PAUSE = 300;
 	public static final int RESULT_ANIMATION_FIRE_WINDOW_PAUSE = 300;
 	public static final Font FONT_TINY = new Font("sans-serif", Font.BOLD, 16);
+	public static final Font FONT_XTRA_SMALL = new Font("sans-serif", Font.BOLD, 22);
 	public static final Font FONT_SMALL = new Font("sans-serif", Font.BOLD, 24);
 	public static final Font FONT_REG = new Font("sans-serif", Font.BOLD, 32);
 	public static final Font FONT_LARGE = new Font("sans-serif", Font.BOLD, 48);
@@ -610,6 +637,8 @@ public class Constants {
 	public static final Color MANIP_SHADOW_LEFT_BACKGROUND = new Color(140, 152, 163);
 	public static final Color MANIP_SHADOW_CENTER_BACKGROUND = new Color(50, 50, 50);
 	public static final Color MANIP_SHADOW_TEXT_FOREGROUND = new Color(255, 255, 255);
+	public static final Color MANIP_ARC_SHADE_COLOR = new Color(50, 50, 50, 50);
+	public static final Color MANIP_ARC_SHADOW_SHADE_COLOR = new Color (255, 255, 255, 50);
 	public static final Color TINY_SHADOW_COLOR = Color.black;
 	public static final Color COLOR_SKIN_TONE = new Color(244, 213, 183);
 	public static final Color COLOR_ORANGE = new Color(245, 140, 105);
@@ -631,6 +660,8 @@ public class Constants {
 	public static final int LEFT_MOUSE_BTN = MouseEvent.BUTTON1;
 	public static final int SOCKET_PORT = 1604;
 	public static final int NUM_MANIPS_PER_ROW = 4;
+	public static final int TRIED_ADDING_LIMIT = 10;
+	public static final double TRIED_ADDING_MODIFIER = 1.1;
 	public static final String SENTENCE_SEP = "  ";
 	
 	//Constants for legal moves
@@ -644,13 +675,6 @@ public class Constants {
 	public static final String OPTION_SOUTH = "South";
 	public static final String OPTION_CENTER = "Center";
 	public static final String OPTION_OUTER = "Outer";
-	
-	//Card type messages
-	public static final String STINK_TYPE = "Stink Bomb";
-	public static final String AIR_TYPE = "Air Freshener";
-	public static final String ICE_TYPE = "Ice Cream Truck";
-	public static final String RADIO_TYPE = "Radio";
-	public static final String MONEY_TYPE = "Ice Cream Truck";
 	
 	//Network constants
 	public static final String NETWORK_SEND_DEBUG = "Send via Network: ";

@@ -77,9 +77,9 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 
 		windows.add(lobbyPanel, LOBBY_PANEL);
 		windows.add(gamePanel, GAME_PANEL);
-		if(Constants.NETWORK_MODE && !Constants.DEBUG_MODE) {
-			alertMsg = new FYIMessage(null, Constants.INFO_STARTING);
-		}
+//		if(Constants.NETWORK_MODE && !Constants.DEBUG_MODE) {
+//			alertMsg = new FYIMessage(null, Constants.INFO_STARTING);
+//		}
 		add(windows);
 		initialize();
 		askNamesAndSend("", "DPlayer1 & DPlayer2");
@@ -112,12 +112,7 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 			start.addActionListener( new ActionListener() {
 
 				public void actionPerformed(ActionEvent e) {
-					String challenger = (String) jLobbyPeople.getSelectedValue(); 
-					if(challenger != null) {
-						moveToGame();
-						sendToServer(challenger);
-						lobbyLabel.setText("Please wait while we check with " + challenger);
-					}
+					maybeStartGame();
 				}
 			});
 		}
@@ -143,6 +138,16 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 	private void createGamePanel(JPanel parentPanel) {
 		game = new CardGamePanel(this);
 		parentPanel.add(game);
+	}
+	
+	private void maybeStartGame() {
+		if(Constants.ASK_FOR_KEY && !"aaa".equals(JOptionPane.showInputDialog(this, Constants.INFO_ASK_4_KEY, Constants.INFO_ASK_4_KEY, JOptionPane.QUESTION_MESSAGE, null, null, ""))) return;
+		String challenger = (String) jLobbyPeople.getSelectedValue(); 
+		if(challenger != null) {
+			moveToGame();
+			sendToServer(challenger);
+			lobbyLabel.setText("Please wait while we check with " + challenger);
+		}
 	}
 
 	private void askNamesAndSend(String prefix, String names) {

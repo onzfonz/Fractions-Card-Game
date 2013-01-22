@@ -431,8 +431,8 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	}
 
 	public void enableControls() {
-		userTurn();
 		setAllControls(true);
+		userTurn();
 	}
 
 	public void setAllControls(boolean enabled) {
@@ -486,11 +486,13 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 	public void userTurn() {
 		oppoScore.setForeground(Constants.TOOLBOX_FOREGROUND);
 		playerScore.setForeground(Constants.TOOLBOX_FOREGROUND_LOUD);
+		manipButton.setEnabled(false);
 	}
 
 	public void opponentTurn() {
 		oppoScore.setForeground(Constants.TOOLBOX_FOREGROUND_LOUD);
 		playerScore.setForeground(Constants.TOOLBOX_FOREGROUND);
+		manipButton.setEnabled(true);
 	}
 
 	private String determineWinMessage(int playerPoints, int oppoPoints) {
