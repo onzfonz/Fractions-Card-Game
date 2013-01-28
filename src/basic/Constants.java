@@ -72,6 +72,8 @@ public class Constants {
 	public static final String UP_SOON;
 	public static final String ICE_CREAM_ORANGE_DESC;
 	public static final String ICE_CREAM_PURPLE_DESC;
+	public static final String ICE_CREAM_GOOD;
+	public static final String ICE_CREAM_BAD;
 
 	//Error Messages
 	public static final String ERROR_PLACING_RADIO;
@@ -241,6 +243,7 @@ public class Constants {
 	public static final boolean ASK_USERS_TO_PICK_PPL;
 	public static final boolean GIVE_USERS_INSTRUCTIONS;
 	public static final boolean ASK_FOR_KEY;
+	public static final boolean FORCE_WINDOW_ON_TOP;
 	
 	public static int ANIMATION_DELAY;
 	public static final int ANIMATION_MS_PAUSE;
@@ -314,6 +317,8 @@ public class Constants {
 		UP_SOON = propValue("UP_SOON");
 		ICE_CREAM_ORANGE_DESC = propValue("ICE_CREAM_ORANGE_DESC");
 		ICE_CREAM_PURPLE_DESC = propValue("ICE_CREAM_PURPLE_DESC");
+		ICE_CREAM_GOOD = propValue("ICE_CREAM_GOOD");
+		ICE_CREAM_BAD = propValue("ICE_CREAM_BAD");
 		
 		ERROR_PLACING_RADIO = propValue("ERROR_PLACING_RADIO");
 		ERROR_INPUT_NO_INT = propValue("ERROR_INPUT_NO_INT");
@@ -469,6 +474,7 @@ public class Constants {
 		ASK_USERS_TO_PICK_PPL = propTFValue("ASK_USERS_TO_PICK_PPL");
 		GIVE_USERS_INSTRUCTIONS = propTFValue("GIVE_USERS_INSTRUCTIONS") && !DEBUG_MODE;
 		ASK_FOR_KEY = propTFValue("ASK_FOR_KEY");
+		FORCE_WINDOW_ON_TOP = propTFValue("FORCE_WINDOW_ON_TOP");
 		
 		ANIMATION_DELAY = propIntValue("ANIMATION_DELAY");
 		ANIMATION_MS_PAUSE = propIntValue("ANIMATION_MS_PAUSE") / ((DEBUG_MODE)?2:1);
@@ -567,6 +573,10 @@ public class Constants {
 	public static final String PPL_ICON_IMG_PATH = IMG_PATH + "pplicon.png";
 	public static final String MOUSE_ICON = "MousePointer.png";
 	public static final String MOUSE_DOWN_ICON = "MousePointerClicked.png";
+	public static final String NUM_LINE_FILENAME = "numberline-825.png";
+	public static final String NUM_LINE_HALF_FILENAME = "numberline-825-half.png";
+	public static final String NUM_LINE_QTR_FILENAME = "numberline-825-qtr.png";
+	public static final String NUM_LINE_3_QTRS_FILENAME = "numberline-825-3qtrs.png";
 	
 	//Character Filenames
 	public static final String CHAR_GEEKS_FILENAME = "MusicGeeks";
@@ -625,6 +635,7 @@ public class Constants {
 	public static final Font FONT_XTRA_SMALL = new Font("sans-serif", Font.BOLD, 22);
 	public static final Font FONT_SMALL = new Font("sans-serif", Font.BOLD, 24);
 	public static final Font FONT_REG = new Font("sans-serif", Font.BOLD, 32);
+	public static final Font FONT_MED_LARGE = new Font("sans-serif", Font.BOLD, 44);
 	public static final Font FONT_LARGE = new Font("sans-serif", Font.BOLD, 48);
 	public static final Color GAME_BACKGROUND = new Color(80, 100, 60);
 	public static final Color STATUS_BACKGROUND = new Color(200, 0, 0);

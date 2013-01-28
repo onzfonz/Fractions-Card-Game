@@ -12,6 +12,9 @@ import cards.TrickCard;
 import deck.DeckView;
 
 public class GameUtils {
+	private static final String TRUE_STR = "1";
+	private static final String FALSE_STR = "0";
+	
 	public static String formQuestion(int num, int den, int value) {
 		return "What is " + num + "/" + den + " of " + value + "?";
 	}
@@ -24,9 +27,13 @@ public class GameUtils {
 	
 	public static String determineIfDecimal(String val) {
 		if(val.indexOf(".") != -1) {
-			return "1";
+			return TRUE_STR;
 		}
-		return "0";
+		return FALSE_STR;
+	}
+	
+	public static boolean isQuestionDecimalQuestion(String question) {
+		return determineIfDecimal(question).equals(TRUE_STR);
 	}
 	
 	public static int generateAnswer(String question) {

@@ -133,7 +133,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		numberMen = new JLabel("0");
 		message = new JLabel("");
 		numberMen.setFont(Constants.FONT_LARGE);
-		message.setFont(Constants.FONT_LARGE);
+		message.setFont(Constants.FONT_MED_LARGE);
 		if(isShadowPanel()) {
 			numberMen.setForeground(Constants.MANIP_SHADOW_TEXT_FOREGROUND);
 			message.setForeground(Constants.MANIP_SHADOW_TEXT_FOREGROUND);
@@ -726,8 +726,11 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 //			g.fillArc((int) l.getX1(), (int) l.getY1(), (int) (l.getWidth()+150), (int) (l.getHeight()+150), (int) l.getStartAngle(), (int) l.getSweep());
 //			g.fillArc((int) l.getX1()-(Constants.ARC_BUFFER/2), (int) l.getY1()-(Constants.ARC_BUFFER/2), (int) (l.getWidth()+Constants.ARC_BUFFER), (int) (l.getHeight()+Constants.ARC_BUFFER), (int) l.getStartAngle(), (int) l.getSweep());
 //			g.fillArc((int) l.getX1(), (int) l.getY1(), (int) l.getWidth()+1, (int) l.getHeight()+1, (int) l.getStartAngle()-1, (int) l.getSweep());
-//			g.drawArc((int) l.getX1(), (int) l.getY1(), (int) l.getWidth()+1, (int) l.getHeight()+1, (int) l.getStartAngle()-1, (int) l.getSweep());
-			
+			Color prevColor = g.getColor();
+			g.setColor(Constants.LOUD_BUTTON_TEXT_COLOR);
+			double buf = Constants.ARC_BUFFER;
+			g.drawArc((int) (l.getX() + buf/2-getWidth()/6), (int) (l.getY() + buf/2), (int) (l.getWidth()-1-buf+getWidth()/3), (int) (l.getHeight()-1-buf), (int) l.getAngleStart(), (int) l.getAngleExtent());
+			g.setColor(prevColor);
 		}
 		g.setColor(origColor);
 		for (Line l:lines) {

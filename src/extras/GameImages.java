@@ -39,6 +39,10 @@ public final class GameImages {
 	private static BufferedImage mouseButtonDown;
 	private static BufferedImage highlightLayer;
 	private static BufferedImage selectLayer;
+	private static BufferedImage numLine;
+	private static BufferedImage numLineHalf;
+	private static BufferedImage numLineQtr;
+	private static BufferedImage numLine3Qtrs;
 	
 	private static BufferedImage[] musicGeeks;
 	private static BufferedImage[] pirates;
@@ -213,6 +217,41 @@ public final class GameImages {
 	public static BufferedImage getSelectedLayer() {
 		selectLayer = retrieveImage(selectLayer, Constants.LAYER_SELECT_FILENAME);
 		return selectLayer;
+	}
+	
+	public static BufferedImage getNormalNumberLine() {
+		numLine = retrieveImage(numLine, Constants.NUM_LINE_FILENAME);
+		return numLine;
+	}
+	
+	public static BufferedImage getHighlightedNumberLine(int num, int den) {
+		if(den == 2 && num == 1) {
+			return getHalfNumberLine();
+		}else if(den == 4) {
+			if(num == 1) {
+				return getQtrNumberLine();
+			}else if(num == 3) {
+				return get3QtrsNumberLine();
+			}else if(num == 2) {
+				return getHalfNumberLine();
+			}
+		}
+		return getNormalNumberLine();
+	}
+	
+	private static BufferedImage getHalfNumberLine() {
+		numLineHalf = retrieveImage(numLineHalf, Constants.NUM_LINE_HALF_FILENAME);
+		return numLineHalf;
+	}
+	
+	private static BufferedImage getQtrNumberLine() {
+		numLineQtr = retrieveImage(numLineQtr, Constants.NUM_LINE_QTR_FILENAME);
+		return numLineQtr;
+	}
+	
+	private static BufferedImage get3QtrsNumberLine() {
+		numLine3Qtrs = retrieveImage(numLine3Qtrs, Constants.NUM_LINE_3_QTRS_FILENAME);
+		return numLine3Qtrs;
 	}
 	
 	public static BufferedImage getCharacterImage(int index, TeammateCard tc) {

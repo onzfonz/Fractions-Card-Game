@@ -84,6 +84,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 	private JLabel numeratorLabel;
 	private JLabel denominatorLabel;
 	private JLabel peopleLabel;
+	private JLabel numLineGraphic;
 	private JPanel questionBox;
 	private NetDelegate netRep;
 	private boolean clickedShowedMeHow;
@@ -276,11 +277,11 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 			}
 		});
 		add(questionBox, BorderLayout.NORTH);
-		JLabel addMany = new JLabel(new ImageIcon(CardGameUtils.getCardImageViaFilename("numberline-825.png")));
+		numLineGraphic = new JLabel(new ImageIcon(GameImages.getNormalNumberLine()));
 		statusBox.setBackground(Color.WHITE);
 //		statusBox.setVisible(Constants.SHOW_WORK_ON_COMPUTER || isMessingAround);
-		statusBox.add(addMany);
-		controls.add(addMany);
+		statusBox.add(numLineGraphic);
+		controls.add(numLineGraphic);
 
 		//		JButton shufButton = new JButton("Shuffle Objects");
 		//		box.add(shufButton);
@@ -415,6 +416,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 				manPanel.clearAll();
 				for(int i = 0; i < 2; i++) {
 					manPanel.addACircle(i, manPanel.calculateTheta(num), manPanel.calculateLineLength(), manPanel.getCenter(), num);
+//					manPanel.addAnArc(i, manPanel.calculateTheta(num));
 				}
 			}
 		});
@@ -546,6 +548,7 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 		for(JComponent jc:controls) {
 			jc.setEnabled(canControl);
 		}
+		numLineGraphic.setEnabled(true);
 		manPanel.setMouseClicks(canControl);
 	}
 	
@@ -870,24 +873,59 @@ public class ManCardPanel extends JPanel implements KeyListener, ManPanelListene
 	public void keyTyped(KeyEvent arg0) {
 	}
 	
+	private void resetLabel(JLabel label) {
+		label.setForeground(Constants.DEFAULT_BUTTON_TEXT_COLOR);
+		label.setOpaque(false);
+		label.setFont(Constants.FONT_REG);
+	}
+	
+	private void highlightLabel(JLabel label) {
+		label.setForeground(Constants.LOUD_BUTTON_TEXT_COLOR);
+		label.setOpaque(true);
+		label.setBackground(Color.WHITE);
+		label.setFont(Constants.FONT_LARGE);
+	}
+	
 	public void fireDenomExplained() {
-		denominatorLabel.setForeground(Constants.LOUD_BUTTON_TEXT_COLOR);
+		highlightLabel(denominatorLabel);
+		highlightNumberLine();
 	}
 	
 	public void fireNumerExplained() {
-		peopleLabel.setForeground(Constants.DEFAULT_BUTTON_TEXT_COLOR);
-		numeratorLabel.setForeground(Constants.LOUD_BUTTON_TEXT_COLOR);
+		resetLabel(peopleLabel);
+		highlightLabel(numeratorLabel);
+		highlightNumberLine();
 	}
 	
 	public void firePplExplained() {
-		denominatorLabel.setForeground(Constants.DEFAULT_BUTTON_TEXT_COLOR);
-		peopleLabel.setForeground(Constants.LOUD_BUTTON_TEXT_COLOR);
+		resetLabel(denominatorLabel);
+		highlightLabel(peopleLabel);
+		resetNumberLine();
 	}
 	
 	public void fireExplainDone() {
-		denominatorLabel.setForeground(Constants.DEFAULT_BUTTON_TEXT_COLOR);
-		numeratorLabel.setForeground(Constants.DEFAULT_BUTTON_TEXT_COLOR);
-		peopleLabel.setForeground(Constants.DEFAULT_BUTTON_TEXT_COLOR);
+		resetLabel(denominatorLabel);
+		resetLabel(numeratorLabel);
+		resetLabel(peopleLabel);
+		resetNumberLine();
+	}
+	
+	private void resetNumberLine() {
+		if(GameUtils.isQuestionDecimalQuestion(question)) {
+			numLineGraphic.setIcon(new ImageIcon(GameImages.getNormalNumberLine()));
+			repaint();
+		}
+	}
+	
+	private void highlightNumberLine() {
+		if(GameUtils.isQuestionDecimalQuestion(question)) {
+			numLineGraphic.setIcon(new ImageIcon(GameImages.getHighlightedNumberLine(GameUtils.extractNumerator(question), GameUtils.extractDenominator(question))));
+			repaint();
+		}
+	}
+	
+	private boolean isDecimal() {
+		return !(denominatorLabel == null || denominatorLabel.getText().length() <= 0);
 	}
 	
 //  These are older versions of methods that are no longer used

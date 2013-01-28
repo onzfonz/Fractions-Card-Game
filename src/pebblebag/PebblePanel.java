@@ -115,8 +115,9 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		add(southBox, BorderLayout.SOUTH);
 	
 		statusLineDirections = createLabelInBox(" ", southBox, Constants.DEFAULT_BUTTON_TEXT_COLOR);
-		statusLineOrange = createLabelInBox("Orange = Lose", southBox, Constants.COLOR_ORANGE);
-		statusLinePurple = createLabelInBox("Purple = Safe", southBox, Constants.COLOR_PURPLE);
+		
+		statusLineOrange = createLabelInBox(Constants.ICE_CREAM_ORANGE_DESC+getOrangeSuffix(playerStarts), southBox, Constants.COLOR_ORANGE);
+		statusLinePurple = createLabelInBox(Constants.ICE_CREAM_PURPLE_DESC+getPurpleSuffix(playerStarts), southBox, Constants.COLOR_PURPLE);
 		statusLineDrawsLeft = createLabelInBox(" ", southBox, Constants.DEFAULT_BUTTON_TEXT_COLOR);
 		
 		setPreferredSize(new Dimension(w, h));
@@ -195,6 +196,20 @@ public class PebblePanel extends JPanel implements PebbleListener {
 				}
 			}
 		});
+	}
+	
+	private String getOrangeSuffix(boolean playerStarts) {
+		if(playerStarts) {
+			return Constants.ICE_CREAM_GOOD;
+		}
+		return Constants.ICE_CREAM_BAD;
+	}
+	
+	private String getPurpleSuffix(boolean playerStarts) {
+		if(playerStarts) {
+			return Constants.ICE_CREAM_BAD;
+		}
+		return Constants.ICE_CREAM_GOOD;
 	}
 	
 	private JLabel createLabelInBox(String text, JPanel box, Color c) {

@@ -13,14 +13,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -36,7 +35,7 @@ import basic.FYIMessage;
 import cards.CardGamePanel;
 import extras.Debug;
 
-public class GameClientGUI extends JFrame implements GClientInterface, KeyListener, NetDelegate, WindowListener {
+public class GameClientGUI extends JDialog implements GClientInterface, KeyListener, NetDelegate, WindowListener {
 	private Socket socket = null;
 	private PrintWriter out = null;
 	private BufferedReader read = null;
@@ -63,7 +62,7 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 
 	public GameClientGUI() {
 		setTitle("GameClient GUI");
-
+		setAlwaysOnTop(!Constants.DEBUG_MODE && Constants.FORCE_WINDOW_ON_TOP);
 		windows = new JPanel(new CardLayout());
 
 		lobbyPeople = new DefaultListModel();
@@ -90,7 +89,12 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 			if(alertMsg != null) {
 				alertMsg.killMessage();
 			}
+			waitForPassword();
 		}
+	}
+	
+	private void waitForPassword() {
+		while(Constants.ASK_FOR_KEY && !"bbb".equals(JOptionPane.showInputDialog(this, Constants.INFO_ASK_4_KEY, Constants.INFO_ASK_4_KEY, JOptionPane.QUESTION_MESSAGE, null, null, ""))) {}
 	}
 
 	private void createLobbyPanel(JPanel parentPanel) {
@@ -141,7 +145,6 @@ public class GameClientGUI extends JFrame implements GClientInterface, KeyListen
 	}
 	
 	private void maybeStartGame() {
-		if(Constants.ASK_FOR_KEY && !"aaa".equals(JOptionPane.showInputDialog(this, Constants.INFO_ASK_4_KEY, Constants.INFO_ASK_4_KEY, JOptionPane.QUESTION_MESSAGE, null, null, ""))) return;
 		String challenger = (String) jLobbyPeople.getSelectedValue(); 
 		if(challenger != null) {
 			moveToGame();
