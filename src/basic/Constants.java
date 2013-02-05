@@ -109,6 +109,7 @@ public class Constants {
 	public static final String INFO_ERR_REAL_NAME;
 	public static final String INFO_PICK_SERVER;
 	public static final String INFO_ERR_SERVER_404;
+	public static final String SERVER_ERR_BASE_IP;
 	public static final String INFO_ERR_NAMES_TAKEN;
 	public static final String INFO_NET_ERR_LOST_CONN;
 	public static final String INFO_ASK_B4_CLOSING;
@@ -349,6 +350,7 @@ public class Constants {
 		INFO_ERR_REAL_NAME = propValue("INFO_ERR_REAL_NAME");
 		INFO_PICK_SERVER = propValue("INFO_PICK_SERVER");
 		INFO_ERR_SERVER_404 = propValue("INFO_ERR_SERVER_404");
+		SERVER_ERR_BASE_IP = propValue("SERVER_ERR_BASE_IP");
 		INFO_ERR_NAMES_TAKEN = propValue("INFO_ERR_NAMES_TAKEN");
 		INFO_NET_ERR_LOST_CONN = propValue("INFO_NET_ERR_LOST_CONN"); 
 		INFO_ASK_B4_CLOSING = propValue("INFO_ASK_B4_CLOSING");

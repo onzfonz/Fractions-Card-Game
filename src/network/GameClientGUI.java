@@ -56,6 +56,7 @@ public class GameClientGUI extends JDialog implements GClientInterface, KeyListe
 	private CardGamePanel game;
 	private FYIMessage alertMsg;
 	private GameClientLogger log;
+	private boolean passwordRequired;
 
 	private static final String LOBBY_PANEL = "Lobby Panel";
 	private static final String GAME_PANEL = "Game Panel";
@@ -94,7 +95,8 @@ public class GameClientGUI extends JDialog implements GClientInterface, KeyListe
 	}
 	
 	private void waitForPassword() {
-		while(Constants.ASK_FOR_KEY && !"bbb".equals(JOptionPane.showInputDialog(this, Constants.INFO_ASK_4_KEY, Constants.INFO_ASK_4_KEY, JOptionPane.QUESTION_MESSAGE, null, null, ""))) {}
+		passwordRequired = true;
+		while(Constants.ASK_FOR_KEY && (passwordRequired && !"bbb".equals(JOptionPane.showInputDialog(this, Constants.INFO_ASK_4_KEY, Constants.INFO_ASK_4_KEY, JOptionPane.QUESTION_MESSAGE, null, null, "")))) {}
 	}
 
 	private void createLobbyPanel(JPanel parentPanel) {
@@ -227,11 +229,11 @@ public class GameClientGUI extends JDialog implements GClientInterface, KeyListe
 		String[] ipAddrs = { Constants.LOCAL_SERVER_IP2, Constants.SERVER_IP, Constants.SERVER_ADDR, Constants.SERVER_IP_STANFORD, Constants.LOCALHOST};
 		switch(timesAttempted) {
 		case 0: return new Socket(Constants.LOCAL_SERVER_IP, Constants.SOCKET_PORT);
-		case 1: ind = JOptionPane.showOptionDialog(this, Constants.INFO_PICK_SERVER, "IP", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, ipAddrs, Constants.LOCAL_SERVER_IP2);
-		if(ind != JOptionPane.CLOSED_OPTION) {
-			input = ipAddrs[ind]; break;
-		}
-		case 2: input = JOptionPane.showInputDialog(Constants.INFO_ERR_SERVER_404);
+//		case 1: ind = JOptionPane.showOptionDialog(this, Constants.INFO_PICK_SERVER, "IP", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, ipAddrs, Constants.LOCAL_SERVER_IP2);
+//		if(ind != JOptionPane.CLOSED_OPTION) {
+//			input = ipAddrs[ind]; break;
+//		}
+		case 1: input = JOptionPane.showInputDialog(Constants.INFO_ERR_SERVER_404, Constants.SERVER_ERR_BASE_IP);
 		break;
 		default: return null;
 		}
@@ -274,9 +276,7 @@ public class GameClientGUI extends JDialog implements GClientInterface, KeyListe
 	}
 
 	public void handleMsg(String fromServer) {
-		if(Constants.DEBUG_MODE){
-			System.out.println("Received: " + fromServer);
-		}
+		Debug.println("Received: " + fromServer);
 		if(myName == null) {
 			Debug.println("handing msg: " + fromServer);
 			if(!fromServer.startsWith(".error")) {
@@ -302,6 +302,7 @@ public class GameClientGUI extends JDialog implements GClientInterface, KeyListe
 			oppoName = name;
 			lobbyPeople.removeAllElements();
 			moveToGame();
+			passwordRequired = false;
 			sendToServer(Constants.NET_CMD_READY_TO_START);
 		} else if(fromServer.startsWith(Constants.NET_CMD_QUIT)) {
 			lobbyLabel.setText(Constants.INFO_NET_ERR_LOST_CONN + name);

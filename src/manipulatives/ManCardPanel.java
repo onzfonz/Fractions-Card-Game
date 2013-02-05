@@ -52,9 +52,6 @@ import extras.ManPanelHelp;
 import extras.RandomGenerator;
 
 public class ManCardPanel extends JPanel implements KeyListener, ManPanelListener{
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -36920913712532509L;
 	private static RandomGenerator rgen = RandomGenerator.getInstance();
 	private ManCardPanel myFrame;

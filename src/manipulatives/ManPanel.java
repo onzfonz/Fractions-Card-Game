@@ -1130,27 +1130,27 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	public void launchDividingAnimation(int den, int ppl, int numer, int ans) {
 		clearAll();
 		PageDivider pDiv = new PageDivider(this, den, ppl, numer, ans);
-		Timer divTimer = new Timer(1500, pDiv);
+		Timer divTimer = new Timer(3000, pDiv);
 		displayMessage("Make " + den + " equal area" + ((den==1)?"":"s"));
 		frame.fireDenomExplained();
-		divTimer.setInitialDelay(3000);
+		divTimer.setInitialDelay(6000);
 		pDiv.setTimer(divTimer);
 		divTimer.start();
 	}
 	
 	public void launchPeopleAddAnimation(int ppl, int den, int numer, int ans) {
 		ManipAdder mAdd = new ManipAdder(this, ppl, den, numer, ans);
-		Timer manipTimer = new Timer(1000, mAdd);
+		Timer manipTimer = new Timer(2000, mAdd);
 		displayMessage("Count off " + ppl + " " + ((ppl==1)?Constants.MAN_HELP_PERSON:Constants.MAN_HELP_PEOPLE) + ".");
 		frame.firePplExplained();
-		manipTimer.setInitialDelay(3000);
+		manipTimer.setInitialDelay(6000);
 		mAdd.setTimer(manipTimer);
 		manipTimer.start();
 	}
 	
 	public void launchCirclerAnimation(int ppl, int den, int numer, int ans) {
 		GroupCircler gCir = new GroupCircler(this, den, numer, ans);
-		Timer manipTimer = new Timer(1000, gCir);
+		Timer manipTimer = new Timer(2000, gCir);
 		if(ans == -1) {
 			displayMessage(Constants.MAN_MSG_GROUPS_NOT_EQUAL);
 		}else{
@@ -1158,7 +1158,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 			frame.fireNumerExplained();
 		}
 		
-		manipTimer.setInitialDelay(3000);
+		manipTimer.setInitialDelay(6000);
 		gCir.setTimer(manipTimer);
 		manipTimer.start();
 	}
