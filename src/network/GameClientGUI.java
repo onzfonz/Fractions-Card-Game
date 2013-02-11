@@ -96,7 +96,7 @@ public class GameClientGUI extends JDialog implements GClientInterface, KeyListe
 	
 	private void waitForPassword() {
 		passwordRequired = true;
-		while(Constants.ASK_FOR_KEY && (passwordRequired && !"bbb".equals(JOptionPane.showInputDialog(this, Constants.INFO_ASK_4_KEY, Constants.INFO_ASK_4_KEY, JOptionPane.QUESTION_MESSAGE, null, null, "")))) {}
+		while(Constants.ASK_FOR_KEY && (passwordRequired && !"qqq".equals(JOptionPane.showInputDialog(this, Constants.INFO_ASK_4_KEY, Constants.INFO_ASK_4_KEY, JOptionPane.QUESTION_MESSAGE, null, null, "")))) {}
 	}
 
 	private void createLobbyPanel(JPanel parentPanel) {
