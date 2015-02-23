@@ -73,10 +73,12 @@ public class CardRepresentationPanel extends RepPanel {
 		}
 	}
 	
+	@Override
 	public void setNumerator(int n) {
 		rep.setNumerator(n);
 	}
 	
+	@Override
 	public void setDenominator(int d) {
 		rep.setDenominator(d);
 	}

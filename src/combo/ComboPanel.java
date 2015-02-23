@@ -67,6 +67,7 @@ public class ComboPanel extends JPanel{
 		setPreferredSize(new Dimension(Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT));
 
 		addMouseListener( new MouseAdapter() {
+			@Override
 			public void mousePressed(MouseEvent e) {
 				if(e.getButton() == Constants.LEFT_MOUSE_BTN) {
 					leftButtonDown = true;
@@ -75,6 +76,7 @@ public class ComboPanel extends JPanel{
 				}
 			}
 
+			@Override
 			public void mouseReleased(MouseEvent e) {
 				if(e.getButton() == Constants.LEFT_MOUSE_BTN) { 
 					leftButtonDown = false;
@@ -91,6 +93,7 @@ public class ComboPanel extends JPanel{
 		});
 
 		addMouseMotionListener(new MouseMotionAdapter() {
+			@Override
 			public void mouseMoved(MouseEvent e) {
 				int comboLineX = (getWidth()-(Constants.HUGE_CARD_WIDTH/2));
 				if(e.getY() > Constants.HUGE_CARD_HEIGHT/5 && e.getY() < 4*(Constants.HUGE_CARD_HEIGHT/5)){
@@ -104,6 +107,7 @@ public class ComboPanel extends JPanel{
 				repaint();
 			}
 
+			@Override
 			public void mouseDragged(MouseEvent e) {
 				if(leftButtonDown) {
 					int lastX = e.getX();

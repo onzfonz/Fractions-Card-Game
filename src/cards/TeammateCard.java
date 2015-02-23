@@ -23,6 +23,7 @@ public class TeammateCard extends Card {
 		return value;
 	}
 	
+	@Override
 	public String toString() {
 		if(!isShadowPlayer()) {
 			return name + ":" + value;
@@ -31,10 +32,12 @@ public class TeammateCard extends Card {
 		}
 	}
 	
+	@Override
 	public String toReadableText() {
 		return toString();
 	}
 	
+	@Override
 	public String toStream() {
 		return name + ", " + description + ", " + imgName + ", " + value;
 	}

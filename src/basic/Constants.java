@@ -15,7 +15,9 @@ public class Constants {
 	public static final String BASE_IMG_PATH;
 	public static final String FNAME_TEAM_DECK;
 	public static final String FNAME_TEAM_DECK_ALT;
+	public static final String FNAME_TEAM_DECK_MINE = "Team1DeckMine.txt";
 	public static final String FNAME_TRICK_DECK;
+	public static final String FNAME_TRICK_DECK_MINE = "Tricks1DeckMine.txt";
 	public static final String FNAME_SEQ_PREFIX;
 	public static final int SCORE_TO_WIN;
 	public static final int NUM_ROUNDS_B4_SHADOW;

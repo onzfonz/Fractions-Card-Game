@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import extras.GameUtils;
@@ -37,7 +36,7 @@ public class PopulateQuestionsTable
 	public static void main(String[] args)
 	{
 		ArrayList<String> qs = DBUtils.readFilesIntoList(DBUtils.USER_LOG_NAMES);
-//		DBUtils.printArrayList(teams);
+//		DBUtils.printArrayList(qs);
 
 		PopulateQuestionsTable db = new PopulateQuestionsTable();
 		db.uploadData(qs);
@@ -51,7 +50,7 @@ public class PopulateQuestionsTable
 
 	public void uploadData(ArrayList<String> questions) {
 		try {
-			conn = DBUtils.getDBConnection("TUG", "tugofwar", DBUtils.DB_PROTOCOL);
+			conn = DBUtils.getDBConnection(DBUtils.DB_SCHEMA, DBUtils.DB_NAME, DBUtils.DB_PROTOCOL);
 			conn.setAutoCommit(false);
 			statements.add(conn.createStatement());
 

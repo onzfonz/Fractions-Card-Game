@@ -49,6 +49,7 @@ public class LogState implements SQLType{
 	}
 	
 	//This is for the log that we do when we have to change it into that state.
+	@Override
 	public String toString() {
 		return ""+gid+", "+plog.getPairLogId()+", "+stringArr(pteamids)+", "+stringArr(pnumLeft)+", "+stringArr(ptrickids);
 	}
@@ -125,6 +126,9 @@ public class LogState implements SQLType{
 		if(lc.isAttack(optIndex)) { //flip pairIndex if an Attack
 			pairIndex = (pairIndex+1)%2;
 			index = calcIndex(teamIndex, pairIndex, pteamOrig);
+			if(pnumLeft[index]==null) {
+				System.out.println("trying to calculate a change on a team that isn't there");
+			}
 			ppl = Integer.parseInt(pnumLeft[index]);
 		}else{
 			ppl = Integer.parseInt(pteamOrig[index]);
@@ -151,7 +155,8 @@ public class LogState implements SQLType{
 	public int getTeamIndex(LogPair lp) {
 		String content = lp.getContent();
 		int semiPos = content.indexOf(";");
-		return Integer.parseInt(content.substring(semiPos+1));
+		int spacePos = content.indexOf(" ");
+		return Integer.parseInt(content.substring(semiPos+1,spacePos));
 	}
 	
 	public LogState deepCopy(LogState ls, LogPair lp) {
@@ -261,7 +266,7 @@ public class LogState implements SQLType{
 		for(int i = 0; i < cards.length; i++) {
 			LogCard lc = cardMap.get(cards[i]);
 			if(lc == null) {
-				System.out.println("uh oh");
+				System.out.println("uh oh cuz lc is null: " + content);
 			}
 			lcs[i] = lc;
 		}

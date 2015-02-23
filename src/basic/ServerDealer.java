@@ -7,12 +7,8 @@ package basic;
  * Another file asks the dealer to deal or draw a card from one of the two decks.
  */
 
-import cards.Card;
 import cards.TeammateCard;
 import cards.TrickCard;
-import deck.Deck;
-import deck.TeammatesDeck;
-import deck.TricksDeck;
 
 
 public class ServerDealer{

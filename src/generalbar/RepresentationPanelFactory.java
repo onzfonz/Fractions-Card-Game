@@ -1,11 +1,5 @@
 package generalbar;
 
-import basic.Constants;
-import cards.Card;
-import cards.CardView;
-import cards.ComboCardView;
-import cards.ShadowCardView;
-import cards.TeammateCard;
 import cards.TrickCard;
 
 public class RepresentationPanelFactory {

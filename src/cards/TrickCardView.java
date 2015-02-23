@@ -28,16 +28,19 @@ public class TrickCardView extends CardView {
 		this(c, width, height, true);
 	}
 	
+	@Override
 	public void drawCard(Graphics g) {
 		drawCard(g, getX(), getY(), true);
 	}
 
+	@Override
 	public void drawCard(Graphics g, int x, int y, boolean useScaledImage) {
 		super.drawCard(g, x, y, useScaledImage);
 		Debug.println("x: " + x + ", y: " + y + ", xS: " + xScale + ", yS: " + yScale);
 		rPanel.drawCardRepresentation(g, x, y, xScale, yScale);
 	}
 	
+	@Override
 	public void drawBigCard(Graphics g, int panelWidth, int panelHeight) {
 		super.drawBigCard(g, panelWidth, panelHeight);
 		rPanel.drawCardRepresentation(g, panelWidth-Constants.HUGE_CARD_WIDTH, panelHeight-Constants.HUGE_CARD_HEIGHT, Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT);

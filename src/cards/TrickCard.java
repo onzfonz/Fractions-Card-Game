@@ -2,8 +2,6 @@ package cards;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
-import java.util.Scanner;
-
 import basic.Constants;
 
 /* File: TrickCard.java
@@ -146,6 +144,7 @@ public class TrickCard extends Card {
 		return trickType;
 	}
 	
+	@Override
 	public String toString() {
 		if(!isIceCream() && !isCombo() && !isRadio()) {
 			return trickType + ":" + toFraction();
@@ -170,6 +169,7 @@ public class TrickCard extends Card {
 		return "Unknown Card";
 	}
 	
+	@Override
 	public String toReadableText() {
 		String prefix = "";
 		if(isStink() || isAir()) {
@@ -178,12 +178,14 @@ public class TrickCard extends Card {
 		return prefix + readableType();
 	}
 	
+	@Override
 	public boolean equals(Object o) {
 		if(!(o instanceof TrickCard)) return false;
 		TrickCard tc = (TrickCard) o;
 		return getType().equals(tc.getType()) && getNumerator() == tc.getNumerator() && getDenominator() == tc.getDenominator() && isDecimal == tc.isDecimal;
 	}
 	
+	@Override
 	public String toStream() {
 		return trickType + ", " + imgName + ", " + num + ", " + den;
 	}

@@ -18,6 +18,7 @@ public class LogCard {
 		realVals = vals;
 	}
 	
+	@Override
 	public String toString() {
 		return ""+cardId+", "+stringArr(realVals);
 	}

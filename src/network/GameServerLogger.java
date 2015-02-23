@@ -22,6 +22,7 @@ public class GameServerLogger {
 			boolean append = true;
 			FileHandler fh = new FileHandler("HawesServerLog%g.log", limit, numLogFiles);
 			fh.setFormatter(new Formatter() {
+				@Override
 				public String format(LogRecord rec) {
 					StringBuffer buf = new StringBuffer(1000);
 					buf.append(new java.util.Date());

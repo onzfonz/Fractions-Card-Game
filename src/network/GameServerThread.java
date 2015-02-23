@@ -3,7 +3,6 @@ package network;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.InterruptedIOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
@@ -38,6 +37,7 @@ public class GameServerThread extends Thread {
 		sgp = new GameProtocol(dict, pairs, this);
 	}
 
+	@Override
 	public void run() {
 		String inputLine, outputLine;
 

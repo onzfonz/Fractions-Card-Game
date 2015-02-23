@@ -1,0 +1,90 @@
+
+Fri Apr 29 13:18:32 PDT 2011 INFO Edgar & Emilliano sending myHand:{stink, Point-5.png, 1, 2_air, One-Quarter.png, 1, 4_stink, One-Third.png, 1, 3_air, Point-5.png, 1, 2}
+Fri Apr 29 13:18:32 PDT 2011 INFO Dianna & Kiara sending oHand:{stink, Point-5.png, 1, 2_air, One-Quarter.png, 1, 4_stink, One-Third.png, 1, 3_air, Point-5.png, 1, 2}
+Fri Apr 29 13:18:32 PDT 2011 INFO Dianna & Kiara sending myHand:{combo[stink:1/3;air:1/3], Combo-2---One-Third-Bar.png, 1, 2_combo[stink:1/2;ice:2/2], Combo-1---Point-5-Ice.png, 1, 2_radio, Radio---General.png, 1, 1_ice, Two-Thirds.png, 2, 1}
+Fri Apr 29 13:18:32 PDT 2011 INFO Edgar & Emilliano sending oHand:{combo[stink:1/3;air:1/3], Combo-2---One-Third-Bar.png, 1, 2_combo[stink:1/2;ice:2/2], Combo-1---Point-5-Ice.png, 1, 2_radio, Radio---General.png, 1, 1_ice, Two-Thirds.png, 2, 1}
+Fri Apr 29 13:18:32 PDT 2011 INFO Edgar & Emilliano sending myTeam:{The Pirates, The Pirates Have Joined Your Team, The-Pirates.png, 2_The 1st Graders, The 1st Graders Have Joined Your Team, 1st-Graders.png, 4}
+Fri Apr 29 13:18:32 PDT 2011 INFO Dianna & Kiara sending oTeam:{The Pirates, The Pirates Have Joined Your Team, The-Pirates.png, 2_The 1st Graders, The 1st Graders Have Joined Your Team, 1st-Graders.png, 4}
+Fri Apr 29 13:18:32 PDT 2011 INFO Dianna & Kiara sending myTeam:{Shadow Players, What Is 1/3 of 24?, Shadow-Players.png, 8_Shadow Players, What Is 2/3 of 18?, Shadow-Players.png, 12}
+Fri Apr 29 13:18:32 PDT 2011 INFO Edgar & Emilliano sending oTeam:{Shadow Players, What Is 1/3 of 24?, Shadow-Players.png, 8_Shadow Players, What Is 2/3 of 18?, Shadow-Players.png, 12}
+
+Commands
+Dylan
+myHand:{stink, Point-5.png, 1, 2_air, One-Quarter.png, 1, 4_stink, One-Third.png, 1, 3_air, Point-5.png, 1, 2}
+oHand:{combo[stink:1/3;air:1/3], Combo-2---One-Third-Bar.png, 1, 2_combo[stink:1/2;ice:2/2], Combo-1---Point-5-Ice.png, 1, 2_radio, Radio---General.png, 1, 1_ice, Two-Thirds.png, 2, 1}
+myTeam:{The Pirates, The Pirates Have Joined Your Team, The-Pirates.png, 2_The 1st Graders, The 1st Graders Have Joined Your Team, 1st-Graders.png, 4}
+oTeam:{Shadow Players, What Is 1/3 of 24?, Shadow-Players.png, 8_Shadow Players, What Is 2/3 of 18?, Shadow-Players.png, 12}
+myTurn:
+
+Osvaldo
+oHand:{stink, Point-5.png, 1, 2_air, One-Quarter.png, 1, 4_stink, One-Third.png, 1, 3_air, Point-5.png, 1, 2}
+myHand:{combo[stink:1/3;air:1/3], Combo-2---One-Third-Bar.png, 1, 2_combo[stink:1/2;ice:2/2], Combo-1---Point-5-Ice.png, 1, 2_radio, Radio---General.png, 1, 1_ice, Two-Thirds.png, 2, 1}
+oTeam:{The Pirates, The Pirates Have Joined Your Team, The-Pirates.png, 2_The 1st Graders, The 1st Graders Have Joined Your Team, 1st-Graders.png, 4}
+myTeam:{Shadow Players, What Is 1/3 of 24?, Shadow-Players.png, 8_Shadow Players, What Is 2/3 of 18?, Shadow-Players.png, 12}
+
+Dylan
+move 2:1; 1/3 stink on 12
+
+move 0c1:1 1/3 air on 12
+
+move 0:1 .5 stink on 12
+
+try to move other combocard on 2 or 4
+
+
+Fri Apr 29 13:18:36 PDT 2011 INFO Edgar & Emilliano sent log:Edgar - Started What Is 1/3 of 24?
+Fri Apr 29 13:18:36 PDT 2011 INFO Dianna & Kiara sent log:Dianna - Started What Is 1/3 of 24?
+Fri Apr 29 13:18:36 PDT 2011 INFO Edgar & Emilliano sent log:Emilliano - Started What Is 2/3 of 18?
+Fri Apr 29 13:18:37 PDT 2011 INFO Dianna & Kiara sent log:Kiara - Started What Is 2/3 of 18?
+
+
+Fri Apr 29 13:20:59 PDT 2011 INFO Edgar & Emilliano sent log:Emilliano - Done tried 6| ppl 18, lines 2, marks 53| shownHow? n
+Fri Apr 29 13:21:54 PDT 2011 INFO Dianna & Kiara sent log:Kiara - Done tried 6, 3, 9| ppl 18, , marks 44| shownHow? n
+Fri Apr 29 13:22:30 PDT 2011 INFO Dianna & Kiara sent log:Dianna - Done tried | ppl 17, lines 1, | shownHow? n
+Fri Apr 29 13:23:21 PDT 2011 INFO Edgar & Emilliano sent log:Edgar - Done tried | ppl 24, , marks 3| shownHow? n
+Fri Apr 29 13:23:43 PDT 2011 INFO Edgar & Emilliano sent log:Edgar - Started What is 1/3 of 12?
+Fri Apr 29 13:24:10 PDT 2011 INFO Edgar & Emilliano sent log:Edgar - Done tried | ppl 12, , | shownHow? n
+Fri Apr 29 13:24:10 PDT 2011 INFO Edgar & Emilliano sent move:2;1
+Fri Apr 29 13:24:17 PDT 2011 INFO Dianna & Kiara sent log:Dianna - Started What is 1/3 of 12?
+Fri Apr 29 13:24:30 PDT 2011 INFO Dianna & Kiara sent log:Dianna - Done tried | , , | shownHow? n
+Fri Apr 29 13:24:50 PDT 2011 INFO Dianna & Kiara sent log:Kiara - Started What is 1/2 of 4?
+Fri Apr 29 13:25:02 PDT 2011 INFO Dianna & Kiara sent log:Kiara - Done tried | , , | shownHow? n
+Fri Apr 29 13:25:26 PDT 2011 INFO Dianna & Kiara sent log:Dianna - Started What is 1/3 of 12?
+Fri Apr 29 13:25:38 PDT 2011 INFO Dianna & Kiara sent log:Dianna - Done tried | , , | shownHow? n
+Fri Apr 29 13:25:38 PDT 2011 INFO Dianna & Kiara sent move:0c1;1
+Fri Apr 29 13:25:44 PDT 2011 INFO Edgar & Emilliano sent log:Emilliano - Started What is 1/3 of 12?
+Fri Apr 29 13:26:33 PDT 2011 INFO Edgar & Emilliano sent log:Emilliano - Done tried | ppl 12, , marks 16| shownHow? n
+Fri Apr 29 13:26:52 PDT 2011 INFO Edgar & Emilliano sent log:Edgar - Started What is 1/2 (.5)  of 12?
+Fri Apr 29 13:27:07 PDT 2011 INFO Edgar & Emilliano sent log:Edgar - Done tried | , , | shownHow? n
+Fri Apr 29 13:27:07 PDT 2011 INFO Edgar & Emilliano sent move:0;1
+Fri Apr 29 13:27:14 PDT 2011 INFO Dianna & Kiara sent log:Kiara - Started What is 1/2 (.5)  of 12?
+Fri Apr 29 13:27:33 PDT 2011 INFO Dianna & Kiara sent log:Kiara - Done tried | , , | shownHow? n
+Fri Apr 29 13:27:40 PDT 2011 INFO Dianna & Kiara sent log:Dianna - Started What is 1/3 of 2?
+Fri Apr 29 13:28:21 PDT 2011 INFO Dianna & Kiara sent log:Dianna - Done tried | ppl 2, , | shownHow? n
+Fri Apr 29 13:28:47 PDT 2011 INFO Dianna & Kiara sent log:Kiara - Started What is 1/3 of 4?
+Fri Apr 29 13:29:22 PDT 2011 INFO Dianna & Kiara sent log:Kiara - Done tried | , , | shownHow? n
+Fri Apr 29 13:30:19 PDT 2011 INFO Dianna & Kiara sent move:2;1
+Fri Apr 29 13:30:23 PDT 2011 INFO Edgar & Emilliano sent radios:0
+Fri Apr 29 13:30:43 PDT 2011 INFO Dianna & Kiara sent shaked:
+Fri Apr 29 13:30:54 PDT 2011 INFO Edgar & Emilliano sent chip:true
+Fri Apr 29 13:31:25 PDT 2011 INFO Edgar & Emilliano sent log:Emilliano - Started What is 1/2 (.5)  of 2?
+Fri Apr 29 13:31:36 PDT 2011 INFO Edgar & Emilliano sent log:Emilliano - Done tried | , , | shownHow? n
+Fri Apr 29 13:31:54 PDT 2011 INFO Edgar & Emilliano sent log:Edgar - Started What is 1/2 (.5)  of 8?
+Fri Apr 29 13:32:06 PDT 2011 INFO Edgar & Emilliano sent log:Edgar - Done tried | , , | shownHow? n
+Fri Apr 29 13:32:17 PDT 2011 INFO Edgar & Emilliano sent log:Emilliano - Started What is 1/2 (.5)  of 8?
+Fri Apr 29 13:32:27 PDT 2011 INFO Edgar & Emilliano sent log:Emilliano - Done tried | ppl 1, , | shownHow? n
+Fri Apr 29 13:32:48 PDT 2011 INFO Edgar & Emilliano sent log:Edgar - Started What is 1/2 (.5)  of 12?
+Fri Apr 29 13:33:09 PDT 2011 INFO Edgar & Emilliano sent log:Edgar - Done tried | , , | shownHow? n
+Fri Apr 29 13:33:11 PDT 2011 INFO Edgar & Emilliano sent nomoves:
+
+
+
+Fri Apr 29 13:33:43 PDT 2011 INFO Edgar & Emilliano sending myHand:{combo[air:1/2;ice:2/2], Combo-3---Bar-Ice-1-Half.png, 1, 2_combo[stink:3/4;air:3/4], Combo-2---Three-Quarters-Bar.png, 1, 2_stink, Point-75.png, 3, 4_stink, One-Half.png, 1, 2}
+Fri Apr 29 13:33:43 PDT 2011 INFO Dianna & Kiara sending oHand:{combo[air:1/2;ice:2/2], Combo-3---Bar-Ice-1-Half.png, 1, 2_combo[stink:3/4;air:3/4], Combo-2---Three-Quarters-Bar.png, 1, 2_stink, Point-75.png, 3, 4_stink, One-Half.png, 1, 2}
+Fri Apr 29 13:33:43 PDT 2011 INFO Dianna & Kiara sending myHand:{air, Two-Thirds.png, 2, 3_ice, One-Quarter.png, 1, 3_ice, One-Third.png, 1, 2_stink, Point-25.png, 1, 4}
+Fri Apr 29 13:33:43 PDT 2011 INFO Edgar & Emilliano sending oHand:{air, Two-Thirds.png, 2, 3_ice, One-Quarter.png, 1, 3_ice, One-Third.png, 1, 2_stink, Point-25.png, 1, 4}
+Fri Apr 29 13:33:43 PDT 2011 INFO Edgar & Emilliano sending myTeam:{Shadow Players, What Is 1/3 of 21?, Shadow-Players.png, 7_The Music Geeks, The Music Geeks Have Joined Your Team, Music-Geeks.png, 6}
+Fri Apr 29 13:33:43 PDT 2011 INFO Dianna & Kiara sending oTeam:{Shadow Players, What Is 1/3 of 21?, Shadow-Players.png, 7_The Music Geeks, The Music Geeks Have Joined Your Team, Music-Geeks.png, 6}
+Fri Apr 29 13:33:43 PDT 2011 INFO Dianna & Kiara sending myTeam:{The Johnson Family, The Johnson Family Have Joined Your Team, Johnson-Family.png, 8_The 1st Graders, The 1st Graders Have Joined Your Team, 1st-Graders.png, 4}
+Fri Apr 29 13:33:43 PDT 2011 INFO Edgar & Emilliano sending oTeam:{The Johnson Family, The Johnson Family Have Joined Your Team, Johnson-Family.png, 8_The 1st Graders, The 1st Graders Have Joined Your Team, 1st-Graders.png, 4}
+F

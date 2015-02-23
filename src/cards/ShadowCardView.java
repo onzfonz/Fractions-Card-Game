@@ -43,10 +43,12 @@ public class ShadowCardView extends CardView{
 		this(c, width, height, true);
 	}
 
+	@Override
 	public void drawCard(Graphics g) {
 		drawCard(g, getX(), getY(), true);
 	}
 
+	@Override
 	public void drawCard(Graphics g, int x, int y, boolean useScaledImage) {
 		if(visible) {
 			if(useScaledImage) {
@@ -66,12 +68,14 @@ public class ShadowCardView extends CardView{
 		}
 	}
 	
+	@Override
 	public void drawCard(Graphics g, int x, int y, int width, int height) {
 		super.drawCard(g, x, y, width, height);
 		height = (int) getDimensionForScalingCard(images.get(0), new Dimension(width, height)).getHeight();
 		drawCardText(g, Constants.FONT_SMALL, x, y, SHADOW_DEN_X, SHADOW_DEN_Y, SHADOW_NUM_Y, width, height);
 	}
 	
+	@Override
 	public void drawBigCard(Graphics g, int panelWidth, int panelHeight) {
 		int xCoord = panelWidth-Constants.HUGE_CARD_WIDTH;
 		int yCoord = panelHeight-Constants.HUGE_CARD_HEIGHT;

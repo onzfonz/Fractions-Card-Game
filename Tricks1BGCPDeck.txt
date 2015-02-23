@@ -1,0 +1,16 @@
+type, img, numerator, denominator, quantity
+stink, One-Half.png, 1, 2, 6
+stink, One-Quarter.png, 1, 4, 3
+stink, Three-Quarters.png, 3, 4, 3
+stink, Two-Thirds.png, 2, 3, 3
+stink, One-Third.png, 1, 3, 3
+air, One-Half.png, 1, 2, 6
+air, One-Quarter.png, 1, 4, 3
+air, Three-Quarters.png, 3, 4, 3
+air, Two-Thirds.png, 2, 3, 3
+air, One-Third.png, 1, 3, 3
+combo[stink:1/2;air:1/2], Combo-2---One-Half-Bar.png, 1, 2, 1
+combo[stink:1/3;air:1/3], Combo-2---One-Third-Bar.png, 1, 2, 1
+combo[stink:1/4;air:1/4], Combo-2---One-Quarter-Bar.png, 1, 2, 1
+combo[stink:2/3;air:2/3], Combo-2---Two-Thirds-Bar.png, 1, 2, 1
+combo[stink:3/4;air:3/4], Combo-2---Three-Quarters-Bar.png, 1, 2, 1

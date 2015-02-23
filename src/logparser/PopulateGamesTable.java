@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import basic.Constants;
-
 import extras.GameUtils;
 
 /*
@@ -32,7 +31,7 @@ public class PopulateGamesTable
 				
 		PopulateGamesTable db = new PopulateGamesTable();
 		db.uploadData(qs);
-//      System.out.println("PopulateCardsTable finished");
+//      System.out.println("PopulateGamesTable finished");
 	}
 
 	public PopulateGamesTable() {
@@ -42,13 +41,13 @@ public class PopulateGamesTable
 
 	public void uploadData(ArrayList<ArrayList<String>> sessions) {
 		try {
-			conn = DBUtils.getDBConnection("TUG", "tugofwar", DBUtils.DB_PROTOCOL);
+			conn = DBUtils.getDBConnection(DBUtils.DB_SCHEMA, DBUtils.DB_NAME, DBUtils.DB_PROTOCOL);
 			conn.setAutoCommit(false);
 			statements.add(conn.createStatement());
 
 			// parameter 1 is num (int), parameter 2 is addr (varchar)
-//			psInsert = conn.prepareStatement(DBUtils.SQL_INSERT_GAMES);
-//			statements.add(psInsert);
+			psInsert = conn.prepareStatement(DBUtils.SQL_INSERT_GAMES);
+			statements.add(psInsert);
 			
 			PreparedStatement psSelect = conn.prepareStatement(DBUtils.SQL_PID_FROM_UIDS);
 			statements.add(psSelect);
@@ -59,22 +58,24 @@ public class PopulateGamesTable
 			PreparedStatement psGetUid = conn.prepareStatement(DBUtils.SQL_UID_FROM_NAME);
 			statements.add(psGetUid);
 
-			ArrayList<String> teams = DBUtils.readFileIntoList(Constants.FNAME_TEAM_DECK);
+			ArrayList<String> teams = DBUtils.readFileIntoList(Constants.FNAME_TEAM_DECK_MINE);
 			cleanUpTeams(teams);
-			teams.addAll(DBUtils.readFileIntoList(Constants.FNAME_TRICK_DECK));
+			teams.addAll(DBUtils.readFileIntoList(Constants.FNAME_TRICK_DECK_MINE));
 			HashMap<String, LogCard> cardMap = cleanUpAndMapCards(111, teams);
 
 			ArrayList<LogGame> allGames = new ArrayList<LogGame>();
 			for(int i = 0; i < sessions.size(); i++) {
 				ArrayList<String> session = sessions.get(i);
-				insertGamesIntoTable(session, psInsert, psSelect, psSelectNull, psGetUid, conn, allGames, cardMap);            
+				System.out.println("Session file started");
+				insertGamesIntoTable(session, psInsert, psSelect, psSelectNull, psGetUid, conn, allGames, cardMap); 
 			}
 			
-			//insertStatementsSQL(DBUtils.SQL_INSERT_GAMES, allGames, DBUtils.SQL_TYPES_GAMES);
+			//boolean argument at end specifies whether to print the statement or not
+			insertStatementsSQL(DBUtils.SQL_INSERT_GAMES, allGames, DBUtils.SQL_TYPES_GAMES, false);
 			for(LogGame lg: allGames) {
-//				insertStatementsSQL(DBUtils.SQL_INSERT_PLOGS, lg.getPairLogs(), DBUtils.SQL_TYPES_PLOGS);
-//				insertStatementsSQL(DBUtils.SQL_INSERT_ULOGS, lg.getUserLogs(), DBUtils.SQL_TYPES_ULOGS);
-//				insertStatementsSQL(DBUtils.SQL_INSERT_SLOGS, lg.getStateLogs(), DBUtils.SQL_TYPES_SLOGS);
+				insertStatementsSQL(DBUtils.SQL_INSERT_PLOGS, lg.getPairLogs(), DBUtils.SQL_TYPES_PLOGS, false);
+				insertStatementsSQL(DBUtils.SQL_INSERT_ULOGS, lg.getUserLogs(), DBUtils.SQL_TYPES_ULOGS, true);
+				insertStatementsSQL(DBUtils.SQL_INSERT_SLOGS, lg.getStateLogs(), DBUtils.SQL_TYPES_SLOGS, false);
 			}
 		}
 		catch (SQLException sqle) {
@@ -85,13 +86,15 @@ public class PopulateGamesTable
 		}
 	}
 	
-	private void insertStatementsSQL(String sqlString, ArrayList games, int[] types) throws SQLException{
+	private void insertStatementsSQL(String sqlString, ArrayList games, int[] types, boolean shouldPrint) throws SQLException{
 		PreparedStatement ps = conn.prepareStatement(sqlString);
 		statements.add(ps);
 		for(int i = 0; i < games.size(); i++) {
 			SQLType lg = (SQLType) games.get(i);
+			if(shouldPrint) {
+				System.out.println(Arrays.asList(lg.toSQLString()));
+			}
 			DBUtils.prepareSingleInsertIntoTable(lg.toSQLString(), ps, types, false);
-//			System.out.println(Arrays.asList(lg.toSQLString()));
 		}
 		conn.commit();
 	}
@@ -112,6 +115,7 @@ public class PopulateGamesTable
 			String newStr = line.substring(0, lastComma);
 			String[] vals = DBUtils.cleanUpCardData(line);
 			LogCard lc = new LogCard(startPos, vals);
+//			System.out.println("mapping card: " + newStr);
 			cardMap.put(newStr, lc);
 			startPos++;
 		}
@@ -122,15 +126,17 @@ public class PopulateGamesTable
 	private void insertGamesIntoTable(ArrayList<String> lines, PreparedStatement psInsert, PreparedStatement ps, PreparedStatement psNull, PreparedStatement psGetUId, Connection conn, ArrayList<LogGame> allGames, HashMap<String, LogCard> cardMap) throws SQLException {
 		HashMap<String, LogGame> gamesMap;
 		ArrayList<String> pairList = generatePairList(lines);
+		System.out.println(pairList);
 		System.out.println("--------------");
 		
 		ArrayList<String[]> gamePairs = generateGamePairs(lines, pairList);
-//		DBUtils.printArrayOfArrayList(gamePairs);
-//		System.out.println("***************");
+		DBUtils.printArrayOfArrayList(gamePairs);
+		System.out.println("***************");
 		HashMap<String, String> pairMapping = new HashMap<String, String>();
 		gamePairs = cleanUpGamePairs(gamePairs, pairMapping);
-//		DBUtils.printArrayOfArrayList(gamePairs);
+		DBUtils.printArrayOfArrayList(gamePairs);
 		
+		System.out.println("******pairs to IDs******");
 		ArrayList<String[]> pairIDs = convertPairsToIDs(gamePairs, ps, psNull);
 		ArrayList<LogGame> gamesList = generateLogGamesList(gamePairs, pairIDs, allGames, psGetUId, pairList, cardMap);
 		gamesMap = generateLogGamesMap(pairList, gamesList, gamePairs);
@@ -138,7 +144,7 @@ public class PopulateGamesTable
 		for(int i = 0; i < gamesList.size(); i++) {
 			LogGame lg = gamesList.get(i);
 			lg.populateFieldsFromFullLog();
-//			System.out.println(Arrays.asList(lg.getSQLString()));
+			System.out.println(Arrays.asList(lg.toSQLString()));
 		}
 		//DBUtils.printArrayOfArrayList(gamePairs);
 		//Next thing is to convert the pair name to the appropriate game table. Could do this with a hashmap, with names to the specific game
@@ -161,23 +167,30 @@ public class PopulateGamesTable
 	
 	private void mapLogFileToGames(ArrayList<String> lines, HashMap<String, LogGame> gamesMap) {
 		for(String l: lines) {
+//			System.out.println("l - " + l);
 			String name = DBUtils.getNameLineFromRegex(l);
 			LogGame game = gamesMap.get(name);
+			if(game == null && name != null) {
+				name = MiningUtils.reversePairNames(name);
+				game = gamesMap.get(name);	
+			}
 			if(game != null) {
 				game.addToFullLog(l);
+			}else{
+				System.out.println(name + " not found in the list for line:" + l);
 			}
 		}
 	}
 	
 	private HashMap<String, LogGame> generateLogGamesMap(ArrayList<String> pairList, ArrayList<LogGame> gamesList, ArrayList<String[]> gamePairs) {
 		HashMap<String, LogGame> gamesMap = new HashMap<String, LogGame>();
-		
+		int index=1;
 		for(String pair: pairList) {
 			String[] names = DBUtils.getParsedNames(pair);
 			int i = getGamePairIndex(gamePairs, names);
 			if(i != -1) {
 				gamesMap.put(pair, gamesList.get(i));
-				//System.out.println("linking " + pair + " to " + Arrays.asList(gamePairs.get(i)));
+//				System.out.println(index++ + ") linking " + pair + " to " + Arrays.asList(gamePairs.get(i)));
 			}
 		}
 		return gamesMap;
@@ -275,8 +288,8 @@ public class PopulateGamesTable
 			String l = lines.get(i);
 			ArrayList<String> parsed = DBUtils.getParsedRegex(l);
 			if(parsed != null) {
-				String pairName2 = parsed.get(1);
-				if(pairName != null && pairName.equals(pairName2)) {
+				String pairName2 = DBUtils.getParsedNameString(parsed.get(1));
+				if(DBUtils.pairNamesAreTheSame(pairName, pairName2)) {
 					if(actionHasDeck(parsed)) {
 						String otherPair = findOppositePair(lines, i, pairName, parsed.get(2), pairsNotMatched);
 						if(otherPair != null) {
@@ -306,12 +319,14 @@ public class PopulateGamesTable
 	
 	private String findOppositePair(ArrayList<String> lines, int start, String pairName, String cardType, ArrayList<String> pairsNotMatched) {
 		cardType = cardType.substring(cardType.indexOf("{"));
-		for(String l: lines) {
+		for(int i = start; i < lines.size(); i++) {
+			String l = lines.get(i);
 			ArrayList<String> parsed = DBUtils.getParsedRegex(l);
-			if(parsed != null && !parsed.get(1).equals(pairName) && actionHasODeck(parsed)) {
+			String parsedName = DBUtils.getParsedNameString(parsed.get(1));
+			if(parsed != null && !DBUtils.pairNamesAreTheSame(parsedName, pairName) && actionHasODeck(parsed)) {
 				String oCardType = parsed.get(2).substring(parsed.get(2).indexOf("{"));
 				if(oCardType.equals(cardType)) {
-					return parsed.get(1);
+					return parsedName;
 				}
 			}
 		}
@@ -322,7 +337,7 @@ public class PopulateGamesTable
 		ArrayList<String> pairNames = new ArrayList<String>();
 		for(String l:lines) {
 			String pName = DBUtils.getNameLineFromRegex(l);
-			if(pName != null && !pName.equals("null") && !pairNames.contains(pName)) {
+			if(pName != null && !pName.equals("null") && !pairNames.contains(pName) && !pairNames.contains(MiningUtils.reversePairNames(pName))) {
 				pairNames.add(pName);
 			}
 		}

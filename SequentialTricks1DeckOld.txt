@@ -1,0 +1,64 @@
+2nd line must have the 3 dashes to tell that it's a sequential deck (will ignore any of the three dashes, just have those for readability)
+---
+stink, One-Half.png, 1, 2, 1
+air, Point-5.png, 1, 2, 1
+ice, One-Half.png, 2, 2, 1
+radio, Radio---General.png, 1, 1, 1
+stink, Three-Quarters.png, 3, 4, 1
+combo[stink:2/3;air:2/3], Combo-2---Two-Thirds-Bar.png, 1, 2, 1
+combo[air:1/3;ice:1/2], Combo-3---Bar-Ice-1-Third.png, 1, 2, 1
+radio, Radio---General.png, 1, 1, 1
+---
+combo[stink:1/4;ice:1/3], Combo-1---Point-25-Ice.png, 1, 2, 1
+combo[stink:2/3;ice:2/1], Combo-1---Bar-Ice-2-Thirds.png, 1, 2, 1
+combo[air:1/2;ice:2/2], Combo-3---Bar-Ice-1-Half.png, 1, 2, 1
+combo[stink:1/2;air:1/2], Combo-2---One-Half-Bar.png, 1, 2, 1
+combo[stink:1/3;air:1/3], Combo-2---One-Third-Bar.png, 1, 2, 1
+combo[stink:3/4;ice:3/1], Combo-1---Point-75-Ice.png, 1, 2, 1
+combo[stink:1/4;air:1/4], Combo-2---One-Quarter-Bar.png, 1, 2, 1
+combo[stink:3/4;air:3/4], Combo-2---Three-Quarters-Bar.png, 1, 2, 1
+---
+radio, Radio---General.png, 1, 1, 1
+radio, Radio---General.png, 1, 1, 1
+radio, Radio---General.png, 1, 1, 1
+radio, Radio---General.png, 1, 1, 1
+stink, One-Half.png, 1, 2, 1
+stink, Three-Quarters.png, 3, 4, 1
+stink, One-Half.png, 1, 2, 1
+air, Point-5.png, 1, 2, 1
+---
+air, One-Half.png, 1, 2, 1
+stink, One-Half.png, 1, 2, 1
+ice, Three-Quarters.png, 1, 1, 1
+air, One-Third.png, 2, 3, 1
+ice, One-Half.png, 0, 2, 1
+stink, Three-Quarters.png, 3, 4, 1
+radio, Radio---General.png, 1, 1, 1
+air, Point-5.png, 1, 2, 1
+---
+air, One-Half.png, 1, 2, 1
+air, Point-5.png, 1, 2, 1
+air, One-Quarter.png, 1, 4, 1
+air, Point-25.png, 1, 4, 1
+air, Three-Quarters.png, 3, 4, 1
+air, Point-75.png, 3, 4, 1
+air, Two-Thirds.png, 2, 3, 1
+air, One-Third.png, 1, 3, 1
+---
+ice, One-Half.png, 2, 2, 1
+ice, One-Quarter.png, 1, 3, 1
+ice, Three-Quarters.png, 3, 1, 1
+ice, One-Third.png, 1, 2, 1
+ice, Two-Thirds.png, 2, 1, 1
+radio, Radio---General.png, 1, 1, 1
+combo[stink:1/2;ice:2/2], Combo-1---Point-5-Ice.png, 1, 2, 1
+combo[stink:1/3;ice:1/2], Combo-1---Bar-Ice-1-Third.png, 1, 2, 1
+---
+combo[air:1/2;ice:2/2], Combo-3---Bar-Ice-1-Half.png, 1, 2, 1
+combo[air:1/3;ice:1/2], Combo-3---Bar-Ice-1-Third.png, 1, 2, 1
+combo[air:1/4;ice:1/3], Combo-3---Point-25-Ice.png, 1, 2, 1
+combo[air:2/3;ice:2/1], Combo-3---Two-Thirds-Ice.png, 1, 2, 1
+combo[air:3/4;ice:3/1], Combo-3---Three-Quarters-Ice.png, 1, 2, 1
+air, Point-25.png, 1, 4, 1
+air, Three-Quarters.png, 3, 4, 1
+air, Point-75.png, 3, 4, 1

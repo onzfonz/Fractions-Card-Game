@@ -49,9 +49,13 @@ public class GameStateMachine {
 	private ArrayList<Boolean> subsequentChipsDrawn(ArrayList<LogPair> pairLogs, int index) {
 		ArrayList<Boolean> chips = new ArrayList<Boolean>();
 		LogPair lp = pairLogs.get(index);
-		while(chipDrawn(lp)) {
+		while(chipDrawn(lp) && index < pairLogs.size()) {
 			chips.add(Boolean.parseBoolean(lp.getContent()));
 			index++;
+			if(index >= pairLogs.size()) {
+				System.out.println("chip at the end");
+				break;
+			}
 			lp = pairLogs.get(index);
 		}
 		return chips;
@@ -103,6 +107,7 @@ public class GameStateMachine {
 	}
 	
 	//This is for the log that we do when we have to change it into that state.
+	@Override
 	public String toString() {
 		return "";
 	}

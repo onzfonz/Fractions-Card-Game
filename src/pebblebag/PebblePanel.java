@@ -132,6 +132,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		playerShouldStartShaking = playerStarts;
 
 		addMouseListener( new MouseAdapter() {
+			@Override
 			public void mousePressed(MouseEvent e) {
 				if(userCanClick) {
 					//					if(e.getButton() == MouseEvent.BUTTON3) {
@@ -149,6 +150,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 				}
 			}
 
+			@Override
 			public void mouseReleased(MouseEvent e) {
 				if(userCanClick) {
 					if(e.getButton() == Constants.LEFT_MOUSE_BTN) { 
@@ -172,6 +174,7 @@ public class PebblePanel extends JPanel implements PebbleListener {
 		});
 
 		addMouseMotionListener( new MouseMotionAdapter() {
+			@Override
 			public void mouseDragged(MouseEvent e) {
 				if(userCanClick) {
 					if(leftButtonDown) {

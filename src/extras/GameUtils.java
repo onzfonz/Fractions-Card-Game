@@ -2,8 +2,6 @@ package extras;
 
 import java.util.ArrayList;
 
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MoveAction;
-
 import basic.Constants;
 import basic.Player;
 import basic.PossibleMove;

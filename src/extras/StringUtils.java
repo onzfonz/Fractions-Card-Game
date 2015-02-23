@@ -42,6 +42,23 @@ public class StringUtils {
 		return newStr + convertWordToSentenceCase(words.get(i)); 
 	}
 	
+	public static String removeNumbers(String word) {
+		int startPos, endPos;
+		for(endPos = word.length()-1; endPos >= 0; endPos--) {
+			char ch = word.charAt(endPos);
+			if(Character.isLetter(ch)) {
+				break;
+			}
+		}
+		for(startPos = 0; startPos < word.length(); startPos++) {
+			char ch = word.charAt(startPos);
+			if(Character.isLetter(ch)) {
+				break;
+			}
+		}
+		return word.substring(startPos, endPos+1);
+	}
+	
 	private static String convertWordToSentenceCase(String word) {
 		String str = word.toLowerCase();
 		char firstChar = str.charAt(0);

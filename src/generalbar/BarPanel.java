@@ -120,6 +120,7 @@ public class BarPanel extends RepPanel {
 		return num;
 	}
 
+	@Override
 	public void setNumerator(int num) {
 		this.num = num;
 	}
@@ -128,6 +129,7 @@ public class BarPanel extends RepPanel {
 		return den;
 	}
 
+	@Override
 	public void setDenominator(int den) {
 		this.den = den;
 	}

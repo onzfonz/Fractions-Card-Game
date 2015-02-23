@@ -201,6 +201,7 @@ public class PebbleView {
 		y += dy;
 	}
 	
+	@Override
 	public String toString() {
 		return "" + kidsRunToTruck;
 	}

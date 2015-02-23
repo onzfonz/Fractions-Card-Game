@@ -15,6 +15,7 @@ public class LogTester extends TestCase {
 		super(name);
 	}
 	
+	@Override
 	protected void setUp() {
 		//command for parsing certain commands
 		logCheck2 = Pattern.compile("(.*)\\sINFO\\s(.+)\\ssen\\w+\\s\\.(\\w+)");
@@ -25,6 +26,7 @@ public class LogTester extends TestCase {
 		
 	}
 	
+	@Override
 	protected void tearDown() {
 		
 	}

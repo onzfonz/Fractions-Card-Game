@@ -94,6 +94,7 @@ public class TeammatesDeck extends Deck {
 		}
 	}
 	
+	@Override
 	public Card drawTopCard() {
 		Card myCard;
 		if(numDraws < Constants.NUM_PLAYERS*Constants.TEAM_HAND_SIZE*Constants.NUM_ROUNDS_B4_SHADOW && alternateDeck != null) {

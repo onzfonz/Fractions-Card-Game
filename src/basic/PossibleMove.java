@@ -75,6 +75,7 @@ public class PossibleMove {
 		return pm != null && pm.getTrickCard().equals(tc) && pm.getDeck().getPlayDeck().equals(dv.getPlayDeck());
 	}
 	
+	@Override
 	public String toString() {
 		TrickCard tc = getTrickCard();
 		String s = tc.toReadableStream() + " on ";

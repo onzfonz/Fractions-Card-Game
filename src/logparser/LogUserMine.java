@@ -20,16 +20,18 @@ public class LogUserMine implements SQLType{
 	ArrayList<LogUser> earlyQuestions, lateQuestions, earlyShadow, lateShadow;
 	int numSessionsPlayed;
 	int numQuestionsAnswered;
-	int uid, midtest, postest, star3rd, star4th, midsub, postsub;
+	int numWrongMoves;
+	int uid, midtest, postest, star4th, midsub, postsub;
+	private boolean hasLaxRules;
 	
-	public LogUserMine(String user, String s3rd, String s4th, String mqtot, String zqtot, String msub, String zsub) {
+	public LogUserMine(String user, String s4th, String mqtot, String zqtot, String msub, String zsub, boolean hasLaxRules) {
 		uid = Integer.parseInt(user);
-		star3rd = convertToInt(s3rd);
 		star4th = convertToInt(s4th);
 		midtest = convertToInt(mqtot);
 		postest = convertToInt(zqtot);
 		midsub = convertToInt(msub);
 		postsub = convertToInt(zsub);
+		this.hasLaxRules = hasLaxRules;
 	}
 	
 	public void setEarlyQuestions(ArrayList<LogUser> eqs) {
@@ -71,6 +73,10 @@ public class LogUserMine implements SQLType{
 	public void setNumQuestionsAnswered(int numQuestionsAnswered) {
 		this.numQuestionsAnswered = numQuestionsAnswered;
 	}
+	
+	public void setNumWrongMoves(int nWrong) {
+		this.numWrongMoves = nWrong;
+	}
 
 	private int convertToInt(String s) {
 		if(s == null || s.length() == 0) {
@@ -93,35 +99,35 @@ public class LogUserMine implements SQLType{
 		return qidsClickedShow.size() > 0;
 	}
 	
-	public static int numCorrectQuestions(ArrayList<LogUser> qs) {
-		return totalQuestions(qs) - numAnsweredIncorrectly(qs);
+	public static int numCorrectQuestions(ArrayList<LogUser> qs, boolean laxRules) {
+		return totalQuestions(qs, laxRules) - numAnsweredIncorrectly(qs);
 	}
 	
-	public static int totalQuestions(ArrayList<LogUser> qs) {
+	public static int totalQuestions(ArrayList<LogUser> qs, boolean laxRules) {
 		HashSet<Integer> answeredquestion = new HashSet<Integer>();
 		for(int i = 0; i < qs.size(); i++) {
 			LogUser lu = qs.get(i);
-			if(lu.finishedQuestion()) {
+			if(laxRules || lu.finishedQuestion()) {
 				answeredquestion.add(lu.getQaid());
 			}
 		}
 		return answeredquestion.size();
 	}
 	
-	public static double getPercentWrong(ArrayList<LogUser> qs) {
+	public static double getPercentWrong(ArrayList<LogUser> qs, boolean laxRules) {
 		int wrong = numAnsweredIncorrectly(qs);
-		int total = totalQuestions(qs);
+		int total = totalQuestions(qs, laxRules);
 		return getPercentage(wrong, total);
 	}
 	
-	public static double getPercentCorrect(ArrayList<LogUser> qs) {
-		int correct = numCorrectQuestions(qs);
-		int total = totalQuestions(qs);
+	public static double getPercentCorrect(ArrayList<LogUser> qs, boolean laxRules) {
+		int correct = numCorrectQuestions(qs, laxRules);
+		int total = totalQuestions(qs, laxRules);
 		return getPercentage(correct, total);
 	}
 	
-	public static double getAverageTimeSpent(ArrayList<LogUser> qs) {
-		int total = totalQuestions(qs);
+	public static double getAverageTimeSpent(ArrayList<LogUser> qs, boolean laxRules) {
+		int total = totalQuestions(qs, laxRules);
 		long secs = getSecondsSpent(qs);
 		return getPercentage(secs, total);
 	}
@@ -201,23 +207,23 @@ public class LogUserMine implements SQLType{
 	}
 	
 	public String[] toSQLString() {
-		int earlytot = totalQuestions(earlyQuestions);
-		int earlyright = numCorrectQuestions(earlyQuestions);
-		int latetot = totalQuestions(lateQuestions);
-		int lateright = numCorrectQuestions(lateQuestions);
-		int earlyshadtot = totalQuestions(earlyShadow);
-		int lateshadtot = totalQuestions(lateShadow);
+		int earlytot = totalQuestions(earlyQuestions, hasLaxRules);
+		int earlyright = numCorrectQuestions(earlyQuestions, hasLaxRules);
+		int latetot = totalQuestions(lateQuestions, hasLaxRules);
+		int lateright = numCorrectQuestions(lateQuestions, hasLaxRules);
+		int earlyshadtot = totalQuestions(earlyShadow, hasLaxRules);
+		int lateshadtot = totalQuestions(lateShadow, hasLaxRules);
 		
-		double earlyacc = getPercentCorrect(earlyQuestions);
-		double lateacc = getPercentCorrect(lateQuestions);
-		double earlysecsper = getAverageTimeSpent(earlyQuestions);
-		double latesecsper = getAverageTimeSpent(lateQuestions);
-		double earlyshad = getPercentCorrect(earlyShadow);
-		double lateshad = getPercentCorrect(lateShadow);
-		double earlyshadtime = getAverageTimeSpent(earlyShadow);
-		double lateshadtime = getAverageTimeSpent(lateShadow);
+		double earlyacc = getPercentCorrect(earlyQuestions, hasLaxRules);
+		double lateacc = getPercentCorrect(lateQuestions, hasLaxRules);
+		double earlysecsper = getAverageTimeSpent(earlyQuestions, hasLaxRules);
+		double latesecsper = getAverageTimeSpent(lateQuestions, hasLaxRules);
+		double earlyshad = getPercentCorrect(earlyShadow, hasLaxRules);
+		double lateshad = getPercentCorrect(lateShadow, hasLaxRules);
+		double earlyshadtime = getAverageTimeSpent(earlyShadow, hasLaxRules);
+		double lateshadtime = getAverageTimeSpent(lateShadow, hasLaxRules);
 		
-		String[] sql = {""+uid, toStr(midtest), toStr(postest), toStr(midsub), toStr(postsub), toStr(star3rd), toStr(star4th), ""+clickedShowHow(), ""+qidsClickedShow.size(), ""+qidsIncorrect.size(), ""+qtriedids.size(), ""+numQuestionsAnswered, ""+numSessionsPlayed, ""+earlyright, ""+earlytot, ""+lateright, ""+latetot, ""+earlyacc, ""+lateacc, ""+getSecondsSpent(earlyQuestions), ""+getSecondsSpent(lateQuestions), ""+earlysecsper, ""+latesecsper, ""+earlyshadtot, ""+lateshadtot, ""+earlyshad, ""+lateshad, ""+earlyshadtime, ""+lateshadtime};
+		String[] sql = {""+uid, toStr(midtest), toStr(postest), toStr(midsub), toStr(postsub), toStr(star4th), ""+clickedShowHow(), ""+qidsClickedShow.size(), ""+qidsIncorrect.size(), ""+qtriedids.size(), ""+numQuestionsAnswered, ""+numSessionsPlayed, ""+earlyright, ""+earlytot, ""+lateright, ""+latetot, ""+earlyacc, ""+lateacc, ""+getSecondsSpent(earlyQuestions), ""+getSecondsSpent(lateQuestions), ""+earlysecsper, ""+latesecsper, ""+earlyshadtot, ""+lateshadtot, ""+earlyshad, ""+lateshad, ""+earlyshadtime, ""+lateshadtime, ""+numQuestionsAnswered};
 		return sql;
 	}
 	

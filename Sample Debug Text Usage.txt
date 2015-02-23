@@ -1,0 +1,4 @@
+oTeam:{The Music Geeks,The Music Geeks Have Joined Your Team,Music-Geeks.png,6_The 1st Graders,The 1st Graders Have Joined Your Team,1st-Graders.png,4,5}
+myTeam:{The Twins,The Twins Have Joined Your Team,The-Twins.png,2_The Twins,The Twins Have Joined Your Team,The-Twins.png,2}
+myHand:{combo[stink:2/3;air:2/3], Combo-2---Two-Thirds-Bar.png, 1, 2_air, One-Half.png, 1, 2_air, Two-Thirds.png, 2, 3_combo[stink:1/3;air:1/3], Combo-2---One-Third-Bar.png, 1, 2}
+oHand:{combo[stink:2/3;air:2/3], Combo-2---Two-Thirds-Bar.png, 1, 2_air, One-Half.png, 1, 2_air, Two-Thirds.png, 2, 3_combo[stink:1/3;air:1/3], Combo-2---One-Third-Bar.png, 1, 2}

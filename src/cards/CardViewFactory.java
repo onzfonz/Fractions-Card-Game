@@ -1,11 +1,5 @@
 package cards;
 
-import java.awt.Dimension;
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.imageio.ImageIO;
-
 import extras.Debug;
 
 import basic.Constants;

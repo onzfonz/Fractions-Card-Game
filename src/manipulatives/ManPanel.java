@@ -153,10 +153,12 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 		 */
 
 		addMouseListener( new MouseAdapter() {
+			@Override
 			public void mousePressed(MouseEvent e) {
 				manPanelMousePressed(e);
 			}
 			
+			@Override
 			public void mouseReleased(MouseEvent e) {
 				manPanelMouseReleased(e);
 			}
@@ -164,10 +166,12 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 
 
 		addMouseMotionListener( new MouseMotionAdapter() {
+			@Override
 			public void mouseDragged(MouseEvent e) {
 				manPanelMouseDragged(e);
 			}
 			
+			@Override
 			public void mouseMoved(MouseEvent e) {
 				if(leftToChoose > 0) {
 					ManipInterface manip = findManip(e.getX(), e.getY());
@@ -1235,7 +1239,7 @@ public class ManPanel extends JPanel implements ManipPanelListener {
 	public void addAnArc(int i, double theta) {
 //		Arc temp = new Arc(new DoublePoint(0, 0), new DoublePoint(getWidth(), getHeight()), (int) (-90 + (double) (i*theta)), (d) theta);
 		int buf = Constants.ARC_BUFFER;
-		Arc2D temp = new Arc2D.Double((getWidth()-getHeight())/2-buf/2, 0-buf/2, getHeight()+buf, getHeight()+buf, ((double) (theta*i))-90, theta, Arc2D.PIE); 
+		Arc2D temp = new Arc2D.Double((getWidth()-getHeight())/2-buf/2, 0-buf/2, getHeight()+buf, getHeight()+buf, ((theta*i))-90, theta, Arc2D.PIE); 
 		arcs.add(temp);
 	}
 	

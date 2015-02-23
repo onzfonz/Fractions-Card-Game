@@ -1,0 +1,7 @@
+Name, Description, Image, Value, Quantity
+The Twins,The Twins Have Joined Your Team,The-Twins.png,2,3
+The Pirates,The Pirates Have Joined Your Team,The-Pirates.png,2,3
+The 1st Graders,The 1st Graders Have Joined Your Team,1st-Graders.png,4,5
+The Music Geeks,The Music Geeks Have Joined Your Team,Music-Geeks.png,6,4
+The Johnson Family,The Johnson Family Have Joined Your Team,Johnson-Family.png,8,3
+The Basketball Team,The Basketball Team Have Joined Your Team,Basketball-Team.png,12,2

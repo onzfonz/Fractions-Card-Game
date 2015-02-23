@@ -32,6 +32,7 @@ public class LogGame implements SQLType {
 	private ArrayList<String> allLogs;
 	private ArrayList<LogPair> pairLogs;	
 	private ArrayList<LogUser> userLogs;
+	private ArrayList<LogUserMove> userMoveLogs;
 	private ArrayList<LogState> stateLogs;
 	private HashMap<String, Stack<LogQaId>> userLogStacks;
 	private HashMap<String, LogCard> cardMap;
@@ -43,6 +44,7 @@ public class LogGame implements SQLType {
 		cardMap = cMap;
 		pairLogs = new ArrayList<LogPair>();
 		userLogs = new ArrayList<LogUser>();
+		userMoveLogs = new ArrayList<LogUserMove>();
 		stateLogs = new ArrayList<LogState>();
 		allLogs = new ArrayList<String>();
 		
@@ -127,7 +129,9 @@ public class LogGame implements SQLType {
 	}
 	
 	private void divideLogs() {
+		System.out.println("Dividing logs");
 		for(String l:allLogs) {
+//			System.out.println("line - " + l);
 			ArrayList<String> parsed = DBUtils.getParsedRegex(l);
 			boolean isUserLog = DBUtils.decideIfUserLog(parsed);
 			if(isUserLog) {
@@ -140,19 +144,50 @@ public class LogGame implements SQLType {
 	
 	private void addToUserLog(ArrayList<String> parsed) {
 		ArrayList<String> parsedUser = DBUtils.getParsedUserLog(parsed);
-		String userName = StringUtils.convertToSentenceCase(parsedUser.get(0));
+		String userName = StringUtils.convertToSentenceCase(DBUtils.getParsedNameString(parsedUser.get(0)));
 		Stack<LogQaId> stack = userLogStacks.get(userName);
+		/* Added due to the reversals */
+		if(stack == null) {
+			userName = MiningUtils.reversePairNames(userName);
+			stack = userLogStacks.get(userName);
+		}
 		String uid = uidMap.get(userName);
-		ArrayList<String> acts = pairOrder.get(pairsToPids.get(parsed.get(1)));
-		if(parsedUser.get(1).equals("Started")) {
+		String userName2 = DBUtils.getParsedNameString(parsed.get(1));
+		String pids = pairsToPids.get(userName2);
+		if(pids == null) {
+			userName2 = MiningUtils.reversePairNames(userName2);
+			pids = pairsToPids.get(userName2);
+		}
+		ArrayList<String> acts = pairOrder.get(pids);
+		String userAction = parsedUser.get(1);
+		if(userAction.equals("Started")) {
 			startQuestionLog(parsed, parsedUser, stack, uid, acts);
-		}else{
+		}else if(userAction.equals("Done")) {
 			endQuestionLog(parsed, parsedUser, stack, uid, acts);
+		}else if(userAction.equals("attempting")) {
+//			createUserAttemptLog(parsed, parsedUser, stack, uid, acts);
+		}else if(userAction.equals("suggesting")) {
+//			createUserSuggestLog(parsed, parsedUser, stack, uid, acts);
+		}else if(userAction.equals("Opened")) {
+//			createUserOpenedLog(parsed, parsedUser, stack, uid, acts);
+		}else if(userAction.equals("Closed")) {
+//			createUserClosedLog(parsed, parsedUser, stack, uid, acts);
+		}else if(userAction.equals("Help")) {
+			helpedQuestionLog(parsed, parsedUser, stack, uid, acts);
+		}else if(userAction.equals("Oops")) {
+			triedQuestionLog(parsed, parsedUser, stack, uid, acts);
+		}else{
+			System.out.println(userAction + " Didn't fall into anything");
 		}
 	}
 	
 	private void addToPairLog(ArrayList<String> parsed) {
-		String pid = pairsToPids.get(parsed.get(1));
+		String userName = DBUtils.getParsedNameString(parsed.get(1));
+		String pid = pairsToPids.get(userName);
+		if(pid == null) {
+			userName = MiningUtils.reversePairNames(userName);
+			pid = pairsToPids.get(userName);
+		}
 		ArrayList<String> acts = pairOrder.get(pid);
 		//we are ignoring ready to start and 
 		String type = parsed.get(2);
@@ -173,9 +208,9 @@ public class LogGame implements SQLType {
 	
 	private void startQuestionLog(ArrayList<String> parsed, ArrayList<String> parsedUser, Stack<LogQaId> stack, String uid, ArrayList<String> acts) {
 		LogPair previousPairLog = pairLogs.get(pairLogs.size()-1);
-		if(previousPairLog.shouldBeRevised()) {
+		if(previousPairLog.shouldBeRevised() && lastQaId != null) {
+//			System.out.println("REVISED? " + previousPairLog);
 			previousPairLog.setQaId(""+lastQaId.getQaId());
-//			System.out.println("REVISED! " + previousPairLog);
 		}
 		String qid = DBUtils.getFractKeyFromQuestion(parsedUser.get(2));
 		LogQaId qaid = new LogQaId(qid);
@@ -185,7 +220,7 @@ public class LogGame implements SQLType {
 	}
 	
 	private void addQStartToPairLog(ArrayList<String> parsed, ArrayList<String> parsedUser, LogQaId qaid, ArrayList<String> acts) {
-		int pid = findPairId(parsedUser.get(0));
+		int pid = findPairId(DBUtils.getParsedNameString(parsedUser.get(0)));
 		createPairLog(""+pid, acts, ""+qaid.getQaId(), parsed, DBUtils.QATYPE, qaid.getQId());
 	}
 	
@@ -198,9 +233,43 @@ public class LogGame implements SQLType {
 		return -1;
 	}
 	
+	private void helpedQuestionLog(ArrayList<String> parsed, ArrayList<String> parsedUser, Stack<LogQaId> stack, String uid, ArrayList<String> acts) {
+		doQuestionLog(parsed, parsedUser, stack, uid, acts, DBUtils.LOG_QSHOWN);
+	}
+	
+	private void triedQuestionLog(ArrayList<String> parsed, ArrayList<String> parsedUser, Stack<LogQaId> stack, String uid, ArrayList<String> acts) {
+		doQuestionLog(parsed, parsedUser, stack, uid, acts, DBUtils.LOG_QTRIED);
+	}
+	
+	private void doQuestionLog(ArrayList<String> parsed, ArrayList<String> parsedUser, Stack<LogQaId> stack, String uid, ArrayList<String> acts, String action) {
+		LogQaId qaid = null;
+		if(stack.isEmpty()) {
+			System.out.println("Stack was empty and on QTried or QShown, so skipping " + parsed.get(0));
+			return;
+		}
+		qaid = stack.peek();
+		DBUtils.removeExtraTriesFromLog(parsedUser);
+		ArrayList<String> parts = DBUtils.getParsedUserTriedLog(parsedUser);
+		DBUtils.removeMarksFromHelpLog(parts);
+		addUserToLog(uid, qaid, action, parts.get(0), parts.get(1), parts.get(2), parts.get(3), null, acts, parsed, qaid.incrementOrder());		
+	}
+	
 	private void endQuestionLog(ArrayList<String> parsed, ArrayList<String> parsedUser, Stack<LogQaId> stack, String uid, ArrayList<String> acts) {
+		if(stack == null || stack.size() == 0) {
+//			System.out.println("stack was null, maybe a duplicate end call?" + parsed);
+			return;
+		}
 		LogQaId qaid = null;
 		qaid = stack.pop();
+		ArrayList<String> parts = DBUtils.getParsedUserDoneLog(parsedUser);
+		addUserToLog(uid, qaid, DBUtils.LOG_QDONE, null, parts.get(1), parts.get(2), parts.get(3), parts.get(4), acts, parsed, qaid.incrementOrder());
+		lastQaId = qaid;
+	}
+	
+	private void endQuestionLogOld(ArrayList<String> parsed, ArrayList<String> parsedUser, Stack<LogQaId> stack, String uid, ArrayList<String> acts) {
+		LogQaId qaid = null;
+		qaid = stack.pop();
+		
 		ArrayList<String> parts = DBUtils.getParsedUserDoneLog(parsedUser);
 		int order = 2;
 		if(parts.get(0) != null) {

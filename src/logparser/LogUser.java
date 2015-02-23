@@ -45,6 +45,7 @@ public class LogUser implements SQLType{
 		tstamp = time;
 	}
 	
+	@Override
 	public String toString() {
 		return ""+uid+", "+qaid+", "+uorder+", "+qid+", "+ulogtime+", "+ulogtype+", "+ulogattempt+", "+ulogppl+", "+uloglines+", "+ulogmarks+", "+ulogshown;
 	}

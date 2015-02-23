@@ -8,13 +8,10 @@ package basic;
  * the teammate cards previously. If not the program will crash.
  */
 
-import java.util.ArrayList;
-
 import cards.Card;
 import cards.TeammateCard;
 import cards.TrickCard;
 import deck.Deck;
-import deck.PlayDeck;
 import deck.TeammatesDeck;
 import deck.TricksDeck;
 

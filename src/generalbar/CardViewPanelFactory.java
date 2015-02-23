@@ -2,12 +2,8 @@ package generalbar;
 
 import basic.Constants;
 import cards.Card;
-import cards.CardView;
-import cards.ComboCardView;
-import cards.ShadowCardView;
 import cards.TeammateCard;
 import cards.TrickCard;
-import cards.TrickCardView;
 
 public class CardViewPanelFactory {
 	public static CardViewPanel createCard(Card c) {

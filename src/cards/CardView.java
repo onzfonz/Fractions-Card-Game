@@ -111,7 +111,7 @@ public class CardView {
 	
 	public static Dimension getDimensionForScalingCard(BufferedImage image, Dimension d) {
 		double ratio = ((double) image.getHeight())/image.getWidth();
-		double windowRatio = ((double) d.getHeight())/d.getWidth();
+		double windowRatio = (d.getHeight())/d.getWidth();
 		int xStatScale = (int) d.getWidth();
 		int yStatScale = (int) d.getHeight();
 		if(windowRatio < ratio) {
@@ -518,6 +518,7 @@ public class CardView {
 		setLocation(getX()+dx, getY()+dy);
 	}
 
+	@Override
 	public String toString() {
 		return card.toString();
 	}
@@ -544,7 +545,7 @@ public class CardView {
 
 		TrickCard t0 = new TrickCard(Constants.RADIO_FILENAME, 1, 1, "radio");
 		TrickCard t1 = new TrickCard(Constants.HALF_AIR_FILENAME, 1, 2, "air");
-		TrickCard t2 = new TrickCard(Constants.BBALL_TEAM_FILENAME, 2, 2, "ice");
+		TrickCard t2 = new TrickCard(Constants.HALF_FILENAME, 2, 2, "ice");
 		TrickCard t3 = new TrickCard(Constants.HALF_FILENAME, 1, 2, "stink");
 
 		CardView pdm0 = CardViewFactory.createCard(tm0, 100, 400);

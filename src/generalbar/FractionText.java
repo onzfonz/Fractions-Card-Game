@@ -64,6 +64,7 @@ public class FractionText extends RepPanel {
 		this.text = text;
 	}
 	
+	@Override
 	public void setNumerator(int n) {
 		int pos = text.indexOf("/");
 		if(pos == -1) {
@@ -73,6 +74,7 @@ public class FractionText extends RepPanel {
 		
 	}
 	
+	@Override
 	public void setDenominator(int d) {
 		int pos = text.indexOf("/");
 		if(pos == -1) {

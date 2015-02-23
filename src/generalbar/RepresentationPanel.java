@@ -49,12 +49,14 @@ public class RepresentationPanel extends RepPanel {
 		//Debug.println("w:" + getWidth() + ", h:" + getHeight());
 	}
 	
+	@Override
 	public void setNumerator(int n) {
 		card = new TrickCard(card.getImageName(), n, card.getDenominator(), card.getType());
 		fract.setText(card.toFraction());
 		rPanel.setNumerator(n);
 	}
 	
+	@Override
 	public void setDenominator(int d) {
 		card = new TrickCard(card.getImageName(), card.getNumerator(), d, card.getType());
 		fract.setText(card.toFraction());

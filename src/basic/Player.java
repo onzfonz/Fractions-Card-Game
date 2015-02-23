@@ -94,6 +94,7 @@ public class Player {
 		}
 		if(i == 0) {
 			System.out.println("Cancelling option...");
+			s.close();
 			return;
 		}
 		DeckView curDeck = decks.get(i-1);
@@ -101,6 +102,7 @@ public class Player {
 			System.out.println("That trick card cannot be applied, Please wait for next turn");
 		}
 		firePlayDeckChanged();
+		s.close();
 	}
 	
 	private boolean addToPlayDeck(DeckView dv, CardView cv) {
@@ -294,7 +296,7 @@ public class Player {
 		System.out.println("Decks");
 		for(int i = 0; i < decks.size(); i++) {
 			int iplus = i+1;
-			System.out.println(iplus+") " + ((PlayDeck) (decks.get(i)).getPlayDeck()).getTeammateCard());
+			System.out.println(iplus+") " + ((decks.get(i)).getPlayDeck()).getTeammateCard());
 		}
 	}
 	

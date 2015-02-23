@@ -58,7 +58,7 @@ public class PlayDeck extends Deck {
 		}else if(c.isIceCream()) {
 			noRemainder = true;
 		}else if(c.isRadio()) {
-			ArrayList<TrickCard> tCards = (ArrayList<TrickCard>) cards;
+			ArrayList<TrickCard> tCards = cards;
 			for(TrickCard tc:tCards) {
 				if(tc.isIceCream()) {
 					return true;
@@ -157,22 +157,22 @@ public class PlayDeck extends Deck {
 
 	@SuppressWarnings("unchecked")
 	private ArrayList<TrickCard> getIceCreamCards() {
-		return getIceCreamCards((ArrayList<TrickCard>) cards);
+		return getIceCreamCards(cards);
 	}
 
 	@SuppressWarnings("unchecked")
 	private int numRadios() {
-		return numRadios((ArrayList<TrickCard>) cards);
+		return numRadios(cards);
 	}
 
 	@SuppressWarnings("unchecked")	
 	private int numAirs() {
-		return numAirs((ArrayList<TrickCard>) cards);
+		return numAirs(cards);
 	}
 
 	@SuppressWarnings("unchecked")
 	private int numStinks() {
-		return numStinks((ArrayList<TrickCard>) cards);
+		return numStinks(cards);
 	}
 
 
@@ -280,11 +280,11 @@ public class PlayDeck extends Deck {
 	 * We are not making a chance decision and then subtracting all of the units or keeping them.
 	 */
 	private static double applyHypoIceFraction(double teammates, TrickCard t) {
-		return (teammates / ((double) (t.getDenominator()+t.getNumerator()))* t.getDenominator());
+		return (teammates / ((t.getDenominator()+t.getNumerator()))* t.getDenominator());
 	}
 
 	public static int applyHypoNumbers(double teammates, int num, int den) {
-		return (int) Math.round((teammates / ((double) (num+den)))*den);
+		return (int) Math.round((teammates / ((num+den)))*den);
 	}
 
 	public static int calculateStinksAndAirsOld(ArrayList<TrickCard> tcs, int curPosse) {
@@ -371,7 +371,7 @@ public class PlayDeck extends Deck {
 
 	public static int numLeftAfterStink(ArrayList<TrickCard> tcs, int curPosse) {
 		for(int i = 0; i < tcs.size(); i++) {
-			TrickCard curTrick = (TrickCard) tcs.get(i);
+			TrickCard curTrick = tcs.get(i);
 			if(curTrick.isStink()) {
 				curPosse -= applyFraction(curPosse, curTrick);	
 			}
@@ -382,7 +382,7 @@ public class PlayDeck extends Deck {
 	public static int numFreshened(ArrayList<TrickCard> tcs, int curPosse) {
 		int numFreshened = 0;
 		for(int i = 0; i < tcs.size(); i++) {
-			TrickCard curTrick = (TrickCard) tcs.get(i);
+			TrickCard curTrick = tcs.get(i);
 			if(curTrick.isAir()) {
 				numFreshened += applyFraction(curPosse, curTrick);
 			}
@@ -393,9 +393,9 @@ public class PlayDeck extends Deck {
 	private static ArrayList<TrickCard> getIceCreamCards(ArrayList<TrickCard> tcs) {
 		ArrayList<TrickCard> ices = new ArrayList<TrickCard>();
 		for(int i = 0; i < tcs.size(); i++) {
-			TrickCard curTrick = (TrickCard) tcs.get(i);
+			TrickCard curTrick = tcs.get(i);
 			if(curTrick.isIceCream()) {
-				ices.add((TrickCard) curTrick);
+				ices.add(curTrick);
 			}
 		}
 		return ices;
@@ -404,7 +404,7 @@ public class PlayDeck extends Deck {
 	public static int numRadios(ArrayList<TrickCard> tcs) {
 		int numRad = 0;
 		for(int i = 0; i < tcs.size(); i++) {
-			TrickCard curTrick = (TrickCard) tcs.get(i);
+			TrickCard curTrick = tcs.get(i);
 			if(curTrick.isRadio()) {
 				numRad++;
 			}
@@ -426,7 +426,7 @@ public class PlayDeck extends Deck {
 	public static int numAirs(ArrayList<TrickCard> tcs) {
 		int numRad = 0;
 		for(int i = 0; i < tcs.size(); i++) {
-			TrickCard curTrick = (TrickCard) tcs.get(i);
+			TrickCard curTrick = tcs.get(i);
 			if(curTrick.isAir()) {
 				numRad++;
 			}
@@ -437,7 +437,7 @@ public class PlayDeck extends Deck {
 	public static int numStinks(ArrayList<TrickCard> tcs) {
 		int numRad = 0;
 		for(int i = 0; i < tcs.size(); i++) {
-			TrickCard curTrick = (TrickCard) tcs.get(i);
+			TrickCard curTrick = tcs.get(i);
 			if(curTrick.isStink()) {
 				numRad++;
 			}
@@ -458,12 +458,14 @@ public class PlayDeck extends Deck {
 		return (ArrayList<TrickCard>) cards.clone();
 	}
 
+	@Override
 	public String toString() {
 		String str = team.toString() + ", with ";
 		str += cards;
 		return str;
 	}
 	
+	@Override
 	public boolean equals(Object o) {
 		if(!(o instanceof PlayDeck)) return false;
 		PlayDeck pd = (PlayDeck) o;

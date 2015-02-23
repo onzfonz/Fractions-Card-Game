@@ -1,7 +1,6 @@
 package network;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
@@ -34,6 +33,7 @@ public class SimpleGameClientThread extends Thread {
 	public void close() throws IOException {  
 		if (streamIn != null) streamIn.close();
 	}
+	@Override
 	public void run() {
 		while (true) {  
 			try {

@@ -55,12 +55,14 @@ public class ComboRepresentationPanel extends RepPanel {
 		return new FractionText(tc.toFraction());
 	}
 	
+	@Override
 	public void setNumerator(int n) {
 		card = new TrickCard(card.getImageName(), n, card.getDenominator(), card.getType());
 		firstRep.setNumerator(n);
 		secondRep.setNumerator(n);
 	}
 	
+	@Override
 	public void setDenominator(int d) {
 		card = new TrickCard(card.getImageName(), card.getNumerator(), d, card.getType());
 		firstRep.setDenominator(d);
