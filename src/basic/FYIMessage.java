@@ -16,6 +16,7 @@ public class FYIMessage {
 		message = msg;
 		parentContainer = parent;
 		worker = new SwingWorker() {
+			@Override
 			public Object construct() {
 				JOptionPane.showMessageDialog(parentContainer, message);
 				return "done";

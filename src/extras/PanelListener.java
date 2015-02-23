@@ -4,11 +4,7 @@ import manipulatives.ManCardPanel;
 import pebblebag.IceCreamTruckView;
 import tugstory.TugPanel;
 import basic.Player;
-import cards.CardView;
-
 import combo.ChooseComboCardPanel;
-
-import deck.DeckView;
 
 public interface PanelListener {
 	public void updateLabels(Player p);

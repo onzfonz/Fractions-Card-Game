@@ -7,8 +7,6 @@ import javax.swing.Timer;
 
 import extras.Debug;
 
-import basic.Constants;
-
 public class TugPuller implements ActionListener {
 	private Timer timer;
 	private int ticks;
@@ -39,7 +37,7 @@ public class TugPuller implements ActionListener {
 		//numTugs = Math.max(numTugs, numToFall);
 		if(numTugs > (travelDistance / TICKS_BW_TUGS)+1) {
 			numTugs = Math.max(numTugs, numToFall);
-			tugTicksInterval = (int) (((((double)travelDistance) / numTugs)/((double) NUM_ROPE_MOVEMENTS))*TICKS_BW_TUGS);
+			tugTicksInterval = (int) (((((double)travelDistance) / numTugs)/(NUM_ROPE_MOVEMENTS))*TICKS_BW_TUGS);
 			maxTicks = (numTugs * tugTicksInterval)-1;
 		}else{
 			maxTicks = (TICKS_BW_TUGS * numTugs);

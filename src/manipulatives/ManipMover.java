@@ -9,9 +9,7 @@ import javax.swing.Timer;
 import basic.Constants;
 import deck.DeckView;
 import extras.Debug;
-import extras.GameImages;
 import extras.GraphicUtils;
-import extras.RandomGenerator;
 
 public class ManipMover implements ActionListener {
 	private ManipPanelListener manPanel;

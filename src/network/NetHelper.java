@@ -1,6 +1,5 @@
 package network;
 
-import pebblebag.IceWindowListener;
 import pebblebag.PebbleListener;
 import basic.Constants;
 import extras.Debug;

@@ -4,6 +4,7 @@ public class LogQaId {
 	private static int count;
 	private int myCount;
 	private String qid;
+	private int order;
 	
 	static {
 		count = 0;
@@ -12,6 +13,7 @@ public class LogQaId {
 	public LogQaId(int qid, int start) {
 		count = start;
 		setUp();
+		order = 1;
 	}
 	
 	public LogQaId(String qid) {
@@ -30,5 +32,13 @@ public class LogQaId {
 	
 	public String getQId() {
 		return qid;
+	}
+	
+	public int getOrder() {
+		return order;
+	}
+	
+	public int incrementOrder() {
+		return ++order;
 	}
 }

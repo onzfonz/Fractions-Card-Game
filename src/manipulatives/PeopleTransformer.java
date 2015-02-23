@@ -2,8 +2,6 @@ package manipulatives;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
-
 import javax.swing.Timer;
 
 import basic.Constants;

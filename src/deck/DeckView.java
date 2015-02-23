@@ -11,7 +11,6 @@ import javax.swing.Timer;
 
 import manipulatives.AssetView;
 import manipulatives.DoublePoint;
-import manipulatives.ManModel;
 import manipulatives.ManipInterface;
 import basic.Constants;
 import basic.Player;
@@ -258,11 +257,11 @@ public class DeckView {
 	}
 
 	public int getCenterY(){
-		return getY() + (int) calculateDeckHeight()/2;
+		return getY() + calculateDeckHeight()/2;
 	}
 
 	public int getCenterX() {
-		return getX() + (int) (getCardWidth()/2);
+		return getX() + (getCardWidth()/2);
 	}
 	
 	public ArrayList<ManipInterface> getManipulatives() {
@@ -508,7 +507,7 @@ public class DeckView {
 		int x = getTeammateCard().getX();
 		int y = getTeammateCard().getY();
 		int width = getCardWidth();
-		int height = (int) calculateDeckHeight();
+		int height = calculateDeckHeight();
 		GraphicUtils.drawThickRectangle(x, y, width, height, c, g);
 	}
 

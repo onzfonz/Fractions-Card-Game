@@ -1,0 +1,33 @@
+# this will get you the state at which moves were conducted in the game
+
+select * from tug.statelogs where plogid in (select plogid from TUG.PAIRLOGS where PLOGTYPE = 'move')
+
+# this statement will get you all of the information associated with a move (389 records)
+select * from tug.statelogs inner join tug.pairlogs on tug.pairlogs.plogid = tug.statelogs.plogid and tug.pairlogs.plogtype = 'move'
+
+# this statement will get you all of the information assicated with a move where an ice cream truck was played (162 records)
+select * from tug.statelogs inner join tug.pairlogs on tug.pairlogs.plogid = tug.statelogs.plogid and tug.pairlogs.plogtype = 'move' and tug.pairlogs.qaid IS NULL
+
+# specific search for all of the combo cards
+select * from tug.statelogs inner join tug.pairlogs on tug.pairlogs.plogid = tug.statelogs.plogid and tug.pairlogs.plogtype = 'move' and tug.pairlogs.plogcontent like '%c%'
+
+# specific search for all of the 151 cards
+select * from tug.statelogs inner join tug.pairlogs on tug.pairlogs.plogid = tug.statelogs.plogid and tug.pairlogs.plogtype = 'move' and tug.pairlogs.plogcontent like '%c%' and (tug.statelogs.p1trickid0 = 151 or tug.statelogs.p1trickid1 = 151 or tug.statelogs.p1trickid2 = 151 or tug.statelogs.p1trickid3 = 151 or tug.statelogs.p2trickid0 = 151 or tug.statelogs.p2trickid1 = 151 or tug.statelogs.p2trickid2 = 151 or tug.statelogs.p2trickid3 = 151)
+
+# specific search for all of the 151 cards when done with a chip
+select * from tug.statelogs inner join tug.pairlogs on tug.pairlogs.plogid = tug.statelogs.plogid and tug.pairlogs.plogtype = 'chip' and (tug.statelogs.p1trickid0 = 151 or tug.statelogs.p1trickid1 = 151 or tug.statelogs.p1trickid2 = 151 or tug.statelogs.p1trickid3 = 151 or tug.statelogs.p2trickid0 = 151 or tug.statelogs.p2trickid1 = 151 or tug.statelogs.p2trickid2 = 151 or tug.statelogs.p2trickid3 = 151)
+
+# specific search for all of the 151 cards
+select * from tug.statelogs inner join tug.pairlogs on tug.pairlogs.plogid = tug.statelogs.plogid and (tug.statelogs.p1trickid0 = 151 or tug.statelogs.p1trickid1 = 151 or tug.statelogs.p1trickid2 = 151 or tug.statelogs.p1trickid3 = 151 or tug.statelogs.p2trickid0 = 151 or tug.statelogs.p2trickid1 = 151 or tug.statelogs.p2trickid2 = 151 or tug.statelogs.p2trickid3 = 151)
+
+# only found 3 records that had the 151 card in it, so we want to see if that really got chosen
+select * from tug.statelogs where tug.statelogs.slogid in (128, 129, 130, 131, 132, 133, 134, 135, 274, 275, 276, 277, 278, 279, 280, 807, 808, 809, 810)
+
+# From these 3 records and looking at the statelogs, statelogs 133 to 134 (looked like new cards), 279 to 280, and 809 to 810
+select * from tug.pairlogs inner join tug.statelogs on tug.statelogs.plogid = tug.pairlogs.plogid and tug.statelogs.slogid in (133, 134, 279, 280, 809, 810)
+# this statement will get you all of the information associated with a move where an ice cream truck was present on either side () 
+select * from tug.statelogs inner join tug.pairlogs inner join tug.games
+
+
+# The .75 cards are probably the most difficult for the students to use.  These are cards 142 and 136
+# I think what I want to do is try to figure out how many times were they in a list of possible moves.

@@ -7,7 +7,6 @@ import java.util.List;
 import javax.swing.Timer;
 
 import manipulatives.AssetView;
-import manipulatives.ManModel;
 import manipulatives.ManipInterface;
 import manipulatives.ManipPanelListener;
 import basic.Constants;

@@ -108,7 +108,7 @@ public class CardViewPanel extends JPanel{
 		BufferedImage img = images.get(0);
 		if(img.getWidth() >= d.getWidth() || img.getHeight() >= d.getHeight()) { //need to fix this here
 			double ratio = ((double) img.getHeight())/img.getWidth();
-			double windowRatio = ((double) d.getHeight())/d.getWidth();
+			double windowRatio = (d.getHeight())/d.getWidth();
 			xScale = (int) d.getWidth();
 			yScale = (int) d.getHeight();
 			if(windowRatio < ratio) {
@@ -258,7 +258,7 @@ public class CardViewPanel extends JPanel{
 				drawImages(g, x, y);
 			}
 			if(Constants.DEBUG_MODE) {
-				g.drawString(""+index, x + (int) xScale/2, y + (int) yScale/2);
+				g.drawString(""+index, x + xScale/2, y + yScale/2);
 			}
 			if(rep != null) {
 				drawCardRepresentation(g, x, y, xScale, yScale);

@@ -22,8 +22,6 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.derby.impl.sql.compile.ExtractOperatorNode;
-
 import extras.GameUtils;
 import extras.StringUtils;
 
@@ -35,7 +33,9 @@ public class DBUtils {
 	public static final String LOG_QSTARTED = "QStarted";
 	    
 	public static final String DB_PROTOCOL = "jdbc:derby://localhost:1527/";
-    public static final String DB_DRIVER = "org.apache.derby.jdbc.ClientDriver";  
+    public static final String DB_DRIVER = "org.apache.derby.jdbc.ClientDriver";
+    public static final String DB_SCHEMA = "GAR";
+    public static final String DB_NAME = "tugofwar";
     
     public static final int[] SQL_TYPES_CARDS = {Types.SMALLINT, Types.VARCHAR, Types.VARCHAR, Types.SMALLINT, Types.SMALLINT, Types.SMALLINT};
     public static final String SQL_INSERT_CARDS = "insert into cards (cistrick, ctype, content, cnum, cden, cdecimal) values (?, ?, ?, ?, ?, ?)";
@@ -49,7 +49,7 @@ public class DBUtils {
     public static final int[] SQL_TYPES_GAMES = {Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP};
     public static final String SQL_INSERT_GAMES = "insert into games (gid, pid1, pid2, pstart, pend) values (?, ?, ?, ?, ?)";
     
-    public static final int[] SQL_TYPES_ULOGS = {Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.VARCHAR, Types.SMALLINT, Types.SMALLINT, Types.SMALLINT, Types.SMALLINT, Types.SMALLINT};
+    public static final int[] SQL_TYPES_ULOGS = {Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR, Types.SMALLINT, Types.SMALLINT, Types.SMALLINT, Types.SMALLINT};
     public static final String SQL_INSERT_ULOGS = "insert into userlogs (uid, qaid, uorder, qid, ulogtime, ulogtype, ulogattempt, ulogppl, uloglines, ulogmarks, ulogshown) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     
     public static final int[] SQL_TYPES_PLOGS = {Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR};
@@ -61,38 +61,58 @@ public class DBUtils {
     public static final String SQL_UID_FROM_NAME = "select uid from users where uname = ?";
     public static final String SQL_PID_FROM_UIDS = "select pid from pairs where uid1 = (select uid from users where uname = ?) AND uid2 = (select uid from users where uname = ?)";
     public static final String SQL_PID_FROM_UID = "select pid from pairs where uid1 = (select uid from users where uname = ?) AND uid2 is null";
-    public static final String SQL_B_USERS = "select uid, u3cset, u4cset, mqtot, zqtot, (mq12 + mq13 + mq14 + mq15 + mq16 + mq17), (zq12 + zq13 + zq14 + zq15 + zq16 + zq17) from users where treatment = 'B'";
+    public static final String SQL_ALL_USERS = "select uid,camath,pretot,ptot, (pre1+pre2+pre3+pre10+pre11+pre12+pre13+pre14+pre15), (p1+p2+p3+p10+p11+p12+p13+p14+p15) from users where instudy=1";
     public static final String SQL_SHOWN = "select qid from userlogs where uid = ? AND ulogtype = '"+LOG_QSHOWN+"'";
     public static final String SQL_WRONG_Q = "select qid from userlogs where uid = ? AND ulogtype = '"+LOG_QSTARTED+"' AND qid IN (select qid from questions where qans = -1)";
+    public static final String SQL_WRONG_Q_FROM_GID = "select * from userlogs where uid = ? AND ulogtype = '"+LOG_QSTARTED+"' AND qid IN (select qid from questions where qans = -1) AND qaid in (select qaid from pairlogs where plogtype = 'QuestionAns' AND gid in (select gid from games where pend >= ? and pend <= ? and (pid1 IN (select pid from pairs where uid1 = ? OR uid2 = ?) OR pid2 IN (select pid from pairs where uid1 = ? OR uid2 = ?))))";
     public static final String SQL_TRIED = "select qid, ulogattempt from userlogs where uid = ? AND ulogtype = '"+LOG_QTRIED+"'";
     public static final String SQL_GAMES = "select gid from games where pid1 IN (select pid from pairs where uid1 = ? OR uid2 = ?) OR pid2 IN (select pid from pairs where uid1 = ? OR uid2 = ?)";
     public static final String SQL_NUM_QS = "select qid from userlogs where uid = ? AND ulogtype = '"+LOG_QDONE+"'";
+    public static final String SQL_NUM_QS_ALT = "select qid from userlogs where uid = ? AND ulogtype = '"+LOG_QSTARTED+"'";
     public static final String SQL_QID_ULOGS = "select * from userlogs where qid = ?";
     public static final String SQL_SHADOW_ULOGS = "select * from userlogs where qaid in (select distinct qaid from pairlogs where qaid is not null and plogcontent like '%Shadow%') and uid = ?";
-
+    public static final String SQL_WRONG_MOVES = "select distinct qid from userlogs where uid = ? AND qans = -1";
+    
     public static final String SQL_GET_QIDS = "select qid from questions";
     
     //More complex SQL Statements
-    public static final String SQL_ULOGS_FROM_UIDGID = "select * from userlogs where uid = ? and qaid in (select qaid from pairlogs where plogtype = 'QuestionAns' and gid in (select gid from games where gid >= ? and gid <= ? and (pid1 IN (select pid from pairs where uid1 = ? OR uid2 = ?) OR pid2 IN (select pid from pairs where uid1 = ? OR uid2 = ?))))";
-    public static final String SQL_SHADOW_ULOGS_FROM_UIDGID = "select * from userlogs where uid = ? and qaid in (select distinct qaid from pairlogs where qaid is not null and plogcontent like '%Shadow%' and gid in (select gid from games where gid >= ? and gid <= ? and (pid1 IN (select pid from pairs where uid1 = ? OR uid2 = ?) OR pid2 IN (select pid from pairs where uid1 = ? OR uid2 = ?))))";
+    //From Hawes
+//    public static final String SQL_ULOGS_FROM_UIDGID = "select * from userlogs where uid = ? and qaid in (select qaid from pairlogs where plogtype = 'QuestionAns' and gid in (select gid from games where gid >= ? and gid <= ? and (pid1 IN (select pid from pairs where uid1 = ? OR uid2 = ?) OR pid2 IN (select pid from pairs where uid1 = ? OR uid2 = ?))))";
+//    public static final String SQL_SHADOW_ULOGS_FROM_UIDGID = "select * from userlogs where uid = ? and qaid in (select distinct qaid from pairlogs where qaid is not null and plogcontent like '%Shadow%' and gid in (select gid from games where gid >= ? and gid <= ? and (pid1 IN (select pid from pairs where uid1 = ? OR uid2 = ?) OR pid2 IN (select pid from pairs where uid1 = ? OR uid2 = ?))))";
+    //From Garfield  (going to reintroduce the timestamp part)
+    public static final String SQL_ULOGS_FROM_UIDGID = "select * from userlogs where uid = ? and qaid in (select qaid from pairlogs where plogtype = 'QuestionAns' and gid in (select gid from games where pend >= ? and pend <= ? and (pid1 IN (select pid from pairs where uid1 = ? OR uid2 = ?) OR pid2 IN (select pid from pairs where uid1 = ? OR uid2 = ?))))";
+    public static final String SQL_SHADOW_ULOGS_FROM_UIDGID = "select * from userlogs where uid = ? and qaid in (select distinct qaid from pairlogs where qaid is not null and plogcontent like '%Shadow%' and gid in (select gid from games where pend >= ? and pend <= ? and (pid1 IN (select pid from pairs where uid1 = ? OR uid2 = ?) OR pid2 IN (select pid from pairs where uid1 = ? OR uid2 = ?))))";
     
-    public static final String[] USER_LOG_NAMES = {"Hawes2011-1.log", "Hawes2011-2.log", "Hawes2011-4.log", "Hawes2011-5.log"};
+    
+    /* These were the user log names for hawes */
+//    public static final String[] USER_LOG_NAMES = {"Hawes2011-1.log", "Hawes2011-2.log", "Hawes2011-4.log", "Hawes2011-5.log"};
+    public static final String[] USER_LOG_NAMES_PREFIXES = {"Jazz", "Tree", "Otter"};
+    public static final String USER_LOG_PATH = "logs/";
+    public static final String[] USER_LOG_NAMES_SUFFIXES = {"1-15-2013", "1-22-2013", "1-29-2013", "2-5-2013", "2-12-2013"};
+    public static final String[] DB_DATES = {"2013-01-15", "2013-01-22", "2013-01-29", "2013-02-05", "2013-02-12"};
+    public static final String[] DB_TIMES = {"07:30:00", "17:30:00"};
+    public static final String USER_LOG_EXT = ".log";
+    public static final String USER_LOG_SEPARATOR = " - ";
+    public static String[] USER_LOG_NAMES;
+    //easiest thing to make this work is just to modify the session markers, though it's not the prettiest
+    public static final int[] session1gids = {1, 7, 36, 42, 71, 77};
+    public static final int[] session2gids = {8, 14, 43, 49, 78, 84};
+    public static final int[] session3gids = {15, 21, 50, 56, 85, 91};
+    public static final int[] session4gids = {22, 28, 57, 63, 92, 98};
+    public static final int[] session5gids = {29, 35, 64, 70, 99, 105};
     public static final String[] VALID_MOVES = {"myHand", "myTeam", "move", "radios", "chip"};
-    public static final int[] session1gids = {1, 4};
-    public static final int[] session2gids = {5, 8};
-    public static final int[] session4gids = {9, 13};
-    public static final int[] session5gids = {14, 17};
-    public static final int[][] hawessessionmarkers = {session1gids, session2gids, session4gids, session5gids};
+    public static final int[][] hawessessionmarkers = {session1gids, session2gids, session3gids, session4gids, session5gids};
 	
     public static final String FILE_DELIMITER = "----------------------------";
     public static final String INFO_REGEX = "(.*)\\sINFO\\s(.+)\\ssen\\w+\\s(((\\w+):(.*))|(\\.(\\w+)))";
     public static final String WARNING_REGEX = "(.*)\\sWARNING\\s(.+)\\s(quit)!";
-    public static final String NAMES_REGEX = "(\\w+)\\s&\\s(\\w+)";
+    public static final String NAMES_REGEX = "(\\w+)\\s+&\\s+(\\w+)";
     public static final String NAMES2_REGEX = "(\\w+)\\sand\\s(\\w+)";
     //Dianna - Done tried 6| ppl 13, , | shownHow? n
     //Edgar - Started What is 1/2 (.5)  of 8?
     public static final String USER_LOG_REGEX = "(\\w+)\\s-\\s(\\w+)\\s(.+)";
     public static final String UL_DONE_REGEX = "tried\\s(.*)\\|\\s(.*),\\s(.*),\\s(.*)\\|\\sshownHow\\?\\s(.*)";
+    public static final String UL_TRIED_REGEX = "tried\\s(.*)\\|\\s(.*),\\s(.*),\\s(.*)";
     public static final String UL_NUM_REGEX = "(.+)\\s(\\d+)";
     
     public static final String QATYPE = "QuestionAns";
@@ -103,6 +123,7 @@ public class DBUtils {
     private static Pattern warningPattern;
     private static Pattern userLogPattern;
     private static Pattern uLogDonePattern;
+    private static Pattern uLogTriedPattern;
     private static Pattern uLogNumPattern;
     
     static {
@@ -112,7 +133,73 @@ public class DBUtils {
     	warningPattern = Pattern.compile(WARNING_REGEX);
     	userLogPattern = Pattern.compile(USER_LOG_REGEX);
     	uLogDonePattern = Pattern.compile(UL_DONE_REGEX);
+    	uLogTriedPattern = Pattern.compile(UL_TRIED_REGEX);
     	uLogNumPattern = Pattern.compile(UL_NUM_REGEX);
+    	USER_LOG_NAMES = generateAllLogFiles();
+    }
+    
+    public static void main(String[] args) {
+//    	String[] list = generateAllLogFiles();
+//    	for(int i = 0; i < list.length; i++) {
+//    		System.out.println(list[i]);
+//    	}
+    	String s = "Tue Jan 15 11:05:37 PST 2013 INFO treysi & maria sent log:treysi - Oops tried 2| ppl 4, lines 1, marks 14";
+    	String s1 = "Tue Jan 15 10:40:09 PST 2013 INFO Junior & Carla sent log:Carla - Help tried 6, 236, 2| ppl 6, lines 3, ";
+    	System.out.println(getFullyParsedUserLogTest(s));
+        System.out.println(getFullyParsedUserLogTest(s1));
+    }
+    
+    //Testing method not really used for anything other than to solve some bugs
+    private static ArrayList<String> getFullyParsedUserLogTest(String line) {
+    	ArrayList<String> parsed = DBUtils.getParsedRegex(line);
+    	ArrayList<String> parsedUser = DBUtils.getParsedUserLog(parsed);
+    	removeExtraTriesFromLog(parsedUser);
+    	System.out.println(parsedUser);
+    	ArrayList<String> parts = DBUtils.getParsedUserTriedLog(parsedUser);
+    	removeMarksFromHelpLog(parts);
+    	return parts;
+    }
+    
+    public static void removeExtraTriesFromLog(ArrayList<String> parsedUser) {
+    	parsedUser.set(2, cleanUpTriedInHelp(parsedUser.get(2)));
+    }
+    
+    public static void removeMarksFromHelpLog(ArrayList<String> parts) {
+    	parts.set(parts.size()-1, extractNumber(parts.get(parts.size()-1)));
+    }
+    
+    /* Hack to take out all the extra tried calls in the number */
+    private static String cleanUpTriedInHelp(String s) {
+    	String triedStr = "tried ";
+    	int triedPos = s.indexOf(triedStr);
+    	int pipePos = s.indexOf("|");
+    	int spacePos = s.lastIndexOf(" ", pipePos);
+    	String newPart = s.substring(spacePos+1, pipePos);
+    	return s.substring(0, triedPos + triedStr.length()) + newPart + s.substring(pipePos);
+    }
+    
+    public static String[] generateAllLogFiles() {
+    	int numPerType = USER_LOG_NAMES_SUFFIXES.length;
+    	int types = USER_LOG_NAMES_PREFIXES.length;
+    	int max = types * numPerType;
+    	
+    	String[] logFileNames = new String[max];
+    	for(int i = 0; i < types; i++) {
+    		String[] generatedLogs = generateLogFilesForAGroup(i);
+    		for(int j = 0; j < numPerType; j++) {
+    			logFileNames[i*numPerType+j] = generatedLogs[j];
+    		}
+    	}
+    	return logFileNames;
+    }
+    
+    public static String[] generateLogFilesForAGroup(int index) {
+    	if(index < 0 || index >= USER_LOG_NAMES_PREFIXES.length) return null;
+    	String[] logFileNames = new String[USER_LOG_NAMES_SUFFIXES.length];
+    	for(int i = 0; i < logFileNames.length; i++) {
+    		logFileNames[i] = USER_LOG_PATH + USER_LOG_NAMES_PREFIXES[index] + USER_LOG_SEPARATOR + USER_LOG_NAMES_SUFFIXES[i] + USER_LOG_EXT;
+    	}
+    	return logFileNames;
     }
     
     public static boolean isNull(ResultSet rs, int columnIndex) throws SQLException {
@@ -159,9 +246,17 @@ public class DBUtils {
 		return m.group(2);
 	}
 	
+	public static ArrayList<String> getParsedUserTriedLog(ArrayList<String> parsedUser) {
+		return getParsedLog(parsedUser, uLogTriedPattern);
+	}
+	
 	public static ArrayList<String> getParsedUserDoneLog(ArrayList<String> parsedUser) {
+		return getParsedLog(parsedUser, uLogDonePattern);
+	}
+	
+	private static ArrayList<String> getParsedLog(ArrayList<String> parsedUser, Pattern pattern) {
 		String userInfo = parsedUser.get(2);
-		Matcher m = uLogDonePattern.matcher(userInfo);
+		Matcher m = pattern.matcher(userInfo);
 		if(!m.find()) {
 			return null;
 		}
@@ -194,7 +289,7 @@ public class DBUtils {
 		if(parsed == null) {
 			return null;
 		}
-		return parsed.get(1);
+		return getParsedNameString(parsed.get(1));
 	}
 	
 	public static String getTimestampFromRegex(String line) {
@@ -222,26 +317,48 @@ public class DBUtils {
 		return sqlTStamp;
 	}
 	
-	public static String[] getParsedNames(String nameLine) {
-		String[] names = new String[2];
+	private static boolean isTwoNames(String nameLine) {
+		return nameMatcher(nameLine).find();
+	}
+	
+	private static Matcher nameMatcher(String nameLine) {
 		Matcher temp = namesPattern.matcher(nameLine);
 		boolean foundAMatch = temp.find();
 		if(!foundAMatch) {
 			temp = namesPattern2.matcher(nameLine);
-			foundAMatch = temp.find();
-		}
-		if(!foundAMatch) {
-			names[0] = StringUtils.convertToSentenceCase(nameLine);
 		}else{
-			names[0] = StringUtils.convertToSentenceCase(temp.group(1));
-			names[1] = StringUtils.convertToSentenceCase(temp.group(2));
+			temp = namesPattern.matcher(nameLine);
+		}
+		return temp;
+	}
+	
+	public static String[] getParsedNames(String nameLine) {
+		String[] names = new String[2];
+		if(!isTwoNames(nameLine)) {
+			names[0] = StringUtils.removeNumbers(StringUtils.convertToSentenceCase(nameLine));
+		}else{
+//			System.out.println("two names" + nameLine);
+			Matcher temp = nameMatcher(nameLine);
+			temp.find();
+			names[0] = StringUtils.removeNumbers(StringUtils.convertToSentenceCase(temp.group(1)));
+			names[1] = StringUtils.removeNumbers(StringUtils.convertToSentenceCase(temp.group(2)));
 		}
 		return names;
+	}
+	
+	public static String getParsedNameString(String nameLine) {
+		String[] realVals = getParsedNames(nameLine);
+//		System.out.println(realVals[0] + "|" + realVals[1]);
+		if(isTwoNames(nameLine)) {
+			return realVals[0] + " & " + realVals[1];
+		}
+		return realVals[0];
 	}
     
     public static ArrayList<String> readFilesIntoList(String[] aFileNames) {
     	ArrayList<String> lines = new ArrayList<String>();
     	for(int i = 0; i < aFileNames.length; i++) {
+//    		System.out.println(aFileNames[i]);
     		lines.addAll(readFileIntoList(aFileNames[i]));
     		lines.add(FILE_DELIMITER);
     	}
@@ -309,9 +426,13 @@ public class DBUtils {
 	
     public static void prepareSingleInsertIntoTable(String[] vals, PreparedStatement ps, int[] sql_types, boolean isDebug) throws SQLException{
     	int i;
-    	
+//    	System.out.println("array is " + vals.length);
     	for(i = 0; i < sql_types.length; i++) {
-    		String val = vals[i];
+    		String val = "";
+    		if(i < vals.length) {
+    			val = vals[i];
+    		}
+//    		System.out.println("trying value " + val + " with index " + i);
     		if(isDebug) {
     			try {
     				setObject(val, ps, i, sql_types);
@@ -322,7 +443,9 @@ public class DBUtils {
     			setObject(val, ps, i, sql_types);
     		}
     	}
+//    	System.out.println("Ready to go");
     	ps.executeUpdate();
+//    	System.out.println("exiting the function");
     }
     
     public static String getUIDFromName(String name, PreparedStatement ps) throws SQLException {
@@ -334,15 +457,18 @@ public class DBUtils {
     	return rs.getString(1);
     }
     
-    public static ArrayList<LogUser> getUserQuestionsFromSession(PreparedStatement ps, int uid, int[] sessionLimits) throws SQLException {
+    public static ArrayList<LogUser> getUserQuestionsFromSession(PreparedStatement ps, int uid, String sessionDate) throws SQLException {
     	//1, 4, 5, 6, 7 the uid
     	//2 and 3 the gid
     	ps.setInt(1, uid);
     	for(int i = 4; i <= 7; i++) {
     		ps.setInt(i, uid);
     	}
-    	ps.setInt(2, sessionLimits[0]);
-    	ps.setInt(3, sessionLimits[1]);
+    	String earlyDate = sessionDate + " " + DB_TIMES[0];
+		String lateDate = sessionDate + " " + DB_TIMES[1];
+		
+    	ps.setString(2, earlyDate);
+    	ps.setString(3, lateDate);
     	return constructUserLogs(ps);
     }
     
@@ -356,11 +482,11 @@ public class DBUtils {
     	return logs;
     }
     
-    public static ArrayList<LogUserMine> getAllUsersMineableInfo(PreparedStatement ps) throws SQLException {
+    public static ArrayList<LogUserMine> getAllUsersMineableInfo(PreparedStatement ps, boolean laxRestrictions) throws SQLException {
     	ResultSet rs = ps.executeQuery();
     	ArrayList<LogUserMine> list = new ArrayList<LogUserMine>();
     	while(rs.next()) {
-    		LogUserMine temp = new LogUserMine(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7));
+    		LogUserMine temp = new LogUserMine(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), laxRestrictions);
     		list.add(temp);
     	}
     	return list;
@@ -370,12 +496,6 @@ public class DBUtils {
 		ps.setInt(1, mine.getUid());
 		ArrayList<String> list = getSQLResultList(ps);
 		mine.setClickedShow(list);
-	}
-
-	public static void setMineWrong(LogUserMine mine, PreparedStatement ps) throws SQLException {
-		ps.setInt(1, mine.getUid());
-		ArrayList<String> list = getSQLResultList(ps);
-		mine.setQidsIncorrect(list);
 	}
 
 	public static void setMineAttempts(LogUserMine mine, PreparedStatement ps) throws SQLException {
@@ -404,7 +524,7 @@ public class DBUtils {
 		boolean[] session = new boolean[sessionmarkers.length];
 		for(int gid:gids) {
 			for(int i = 0; i < sessionmarkers.length; i++) {
-				if(gid >= sessionmarkers[i][0] && gid <= sessionmarkers[i][1]) {
+				if((gid >= sessionmarkers[i][0] && gid <= sessionmarkers[i][1]) || (gid >= sessionmarkers[i][2] && gid <= sessionmarkers[i][3]) || (gid >= sessionmarkers[i][4] && gid <= sessionmarkers[i][5])) {
 					session[i] = true;
 				}
 			}
@@ -428,9 +548,29 @@ public class DBUtils {
 		mine.setNumQuestionsAnswered(numAnswered);
 	}
 	
+	public static void setMineWrong(LogUserMine mine, PreparedStatement ps) throws SQLException {
+		ps.setInt(1, mine.getUid());
+		ArrayList<String> list = getSQLResultList(ps);
+		mine.setQidsIncorrect(list);
+	}
+	
+	public static void setMineEarlyLateWrong(LogUserMine mine, PreparedStatement ps) throws SQLException {
+		ArrayList<LogUser> earlyULs = getSomeUserQuestionsFromSessionAlt(ps, mine.getUid(), DB_DATES[2], DB_DATES[0]);
+		ArrayList<LogUser> lateULs = getSomeUserQuestionsFromSessionAlt(ps, mine.getUid(), DB_DATES[2], DB_DATES[4]);
+		mine.setEarlyQuestions(earlyULs);
+		mine.setLateQuestions(lateULs);
+	}
+	
+	public static void setMineEarlyLateWrongAlt(LogUserMine mine, PreparedStatement ps) throws SQLException {
+		ArrayList<LogUser> earlyULs = getSomeUserQuestionsFromSessionAlt(ps, mine.getUid(), DB_DATES[2], DB_DATES[1]);
+		ArrayList<LogUser> lateULs = getSomeUserQuestionsFromSessionAlt(ps, mine.getUid(), DB_DATES[2], DB_DATES[3]);
+		mine.setEarlyShadowQs(earlyULs);
+		mine.setLateShadowQs(lateULs);
+	}
+	
 	public static void setMineEarlyLateQs(LogUserMine mine, PreparedStatement ps) throws SQLException {
-		ArrayList<LogUser> earlyULs = getSomeUserQuestionsFromSession(ps, mine.getUid(), session1gids, session2gids);
-		ArrayList<LogUser> lateULs = getSomeUserQuestionsFromSession(ps, mine.getUid(), session5gids, session4gids);
+		ArrayList<LogUser> earlyULs = getSomeUserQuestionsFromSession(ps, mine.getUid(), DB_DATES[0], DB_DATES[1]);
+		ArrayList<LogUser> lateULs = getSomeUserQuestionsFromSession(ps, mine.getUid(), DB_DATES[4], DB_DATES[3]);
 //		for(LogUser lu: earlyULs) {
 //			System.out.println(Arrays.asList(lu.toSQLString()));
 //		}
@@ -439,17 +579,22 @@ public class DBUtils {
 	}
 	
 	public static void setMineEarlyLateShadowQs(LogUserMine mine, PreparedStatement ps) throws SQLException{
-		ArrayList<LogUser> earlyULs = getSomeUserQuestionsFromSession(ps, mine.getUid(), session1gids, session2gids);
-		ArrayList<LogUser> lateULs = getSomeUserQuestionsFromSession(ps, mine.getUid(), session5gids, session4gids);
+		ArrayList<LogUser> earlyULs = getSomeUserQuestionsFromSession(ps, mine.getUid(), DB_DATES[0], DB_DATES[1]);
+		ArrayList<LogUser> lateULs = getSomeUserQuestionsFromSession(ps, mine.getUid(), DB_DATES[4], DB_DATES[3]);
 		mine.setEarlyShadowQs(earlyULs);
 		mine.setLateShadowQs(lateULs);
 	}
 
-	public static ArrayList<LogUser> getSomeUserQuestionsFromSession(PreparedStatement ps, int uid, int[] gids, int[] altgids) throws SQLException {
-		ArrayList<LogUser> lus = getUserQuestionsFromSession(ps, uid, gids);
+	public static ArrayList<LogUser> getSomeUserQuestionsFromSession(PreparedStatement ps, int uid, String date, String altDate) throws SQLException {
+		ArrayList<LogUser> lus = getUserQuestionsFromSession(ps, uid, date);
 		if(lus.size() <= 0) {
-			lus = getUserQuestionsFromSession(ps, uid, altgids);
+			lus = getUserQuestionsFromSession(ps, uid, altDate);
 		}
+		return lus;
+	}
+	
+	public static ArrayList<LogUser> getSomeUserQuestionsFromSessionAlt(PreparedStatement ps, int uid, String date, String altDate) throws SQLException {
+		ArrayList<LogUser> lus = getUserQuestionsFromSession(ps, uid, date);
 		return lus;
 	}
 		
@@ -753,6 +898,7 @@ public class DBUtils {
          //Connection
          try {
              if (conn != null) {
+            	 conn.commit();
                  conn.close();
                  conn = null;
              }
@@ -803,5 +949,10 @@ public class DBUtils {
 		String oppoPairKey = pair2[0]+pair2[1];
 		String oppoPairKeyAlt = pair2[1]+pair2[0];
 		return ((key1.equals(pairKey) || key1.equals(pairKeyAlt)) && ((key2.equals(oppoPairKey)) || key2.equals(oppoPairKeyAlt))) || ((key1.equals(oppoPairKey) || key1.equals(oppoPairKeyAlt)) && (key2.equals(pairKey) || key2.equals(pairKeyAlt)));
+	}
+	
+	public static boolean pairNamesAreTheSame(String pairName1, String pairName2) {
+		if(pairName1 == null && pairName2 == null) return true;
+		return pairName1 != null && pairName2 != null && (pairName1.equals(pairName2) || pairName1.equals(MiningUtils.reversePairNames(pairName2)));
 	}
 }

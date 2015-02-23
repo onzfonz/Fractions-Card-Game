@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import extras.GameUtils;
@@ -40,7 +39,7 @@ public class PopulatePairsTable
 
 	public void uploadData(ArrayList<String> pairs) {
 		try {
-			conn = DBUtils.getDBConnection("TUG", "tugofwar", DBUtils.DB_PROTOCOL);
+			conn = DBUtils.getDBConnection(DBUtils.DB_SCHEMA, DBUtils.DB_NAME, DBUtils.DB_PROTOCOL);
 			conn.setAutoCommit(false);
 			statements.add(conn.createStatement());
 
@@ -66,19 +65,26 @@ public class PopulatePairsTable
 		for(String l: lines) {
 			ArrayList<String> elems = DBUtils.getParsedRegex(l);
 			if(elems != null) {
+				System.out.println("elem parsed is: " + elems.get(1));
 				String[] realVals = DBUtils.getParsedNames(elems.get(1));
 				String pairKey = realVals[0]+realVals[1];
 				String oppoPairKey = realVals[1]+realVals[0];
+//				System.out.println(pairKey);
 				if(!pairs.containsKey(pairKey) && !pairs.containsKey(oppoPairKey)) {
 					pairs.put(pairKey, realVals);
+					String name1 = realVals[0];
+					String name2 = realVals[1];
 					cleanUpPairData(realVals, ps);
-//					System.out.println(pairKey + ", " + Arrays.asList(realVals));
+//					if(name1.equalsIgnoreCase("The") || name1.equalsIgnoreCase("A") || name1.equalsIgnoreCase("null")) {
+//						System.out.println(elems.get(1));
+//					}
+//					System.out.println(name1 + ", " + name2 + ", " + realVals[0] + ", " + realVals[1] + " -- " + l);
 //					String[] realVals = cleanUpPairData(userPair, types);
-					DBUtils.prepareSingleInsertIntoTable(realVals, psInsert, types, false);
+//					DBUtils.prepareSingleInsertIntoTable(realVals, psInsert, types, false);
 				}
 			}
 		}
-		conn.commit();
+//		conn.commit();
 	}
 	
 	private void cleanUpPairData(String[] pairNames, PreparedStatement ps) throws SQLException {

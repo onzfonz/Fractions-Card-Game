@@ -54,10 +54,8 @@ import cards.TeammateCard;
 import cards.TeammateCardFactory;
 import cards.TrickCard;
 import cards.TrickCardFactory;
-
 import combo.ChooseComboCardPanel;
 import combo.ComboListener;
-
 import deck.DeckView;
 import deck.PlayDeck;
 import extras.Debug;
@@ -1788,9 +1786,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		}
 		status.setText(decideTurn(true));
 		userCanInteract = true;
-		if(panel != null) {
-			panel.enableControls();
-		}
+		setPanelEnabled(true);
 	}
 
 	private String decideTurn(boolean ourTurn) {
@@ -1854,7 +1850,17 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			//cardHidden.setVisible(false);
 		}
 		userCanInteract = false;
-		panel.disableControls();
+		setPanelEnabled(false);
+	}
+	
+	private void setPanelEnabled(boolean enabled) {
+		if(panel != null) {
+			if(enabled) {
+				panel.enableControls();
+			}else{
+				panel.disableControls();
+			}
+		}
 	}
 
 	private void showDeckExtras(boolean visible, boolean changed) {

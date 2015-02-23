@@ -10,7 +10,6 @@ package cards;
  * These will follow our early attempts at creating something where the components are separated.
  */
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
@@ -40,15 +39,18 @@ public class ComboCardView extends CardView{
 		this(c, width, height, true);
 	}
 
+	@Override
 	public void drawCard(Graphics g) {
 		drawCard(g, getX(), getY(), true);
 	}
 
+	@Override
 	public void drawCard(Graphics g, int x, int y, boolean useScaledImage) {
 		super.drawCard(g, x, y, useScaledImage);
 		drawOptionSelection(g);
 	}
 	
+	@Override
 	public void drawBigCard(Graphics g, int panelWidth, int panelHeight) {
 //		Image bimg = getCurrentCardImage().getScaledInstance(Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT, 0);
 //		int xCoord = panelWidth-bimg.getWidth(null);

@@ -51,7 +51,7 @@ public class PopulateQuestionDifficultyTable
 
 	public void analyzeData() {
 		try {
-			conn = DBUtils.getDBConnection("TUG", "tugofwar", DBUtils.DB_PROTOCOL);
+			conn = DBUtils.getDBConnection(DBUtils.DB_SCHEMA, DBUtils.DB_NAME, DBUtils.DB_PROTOCOL);
 			statements.add(conn.createStatement());
 
 			// parameter 1 is num (int), parameter 2 is addr (varchar)

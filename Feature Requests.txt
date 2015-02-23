@@ -1,0 +1,102 @@
+Features Requests or ideas for Tug-of-War
+-----------------------------------------
+Add the circle back to the shading for the help part
+
+There is a weird bug that sometimes causes a program to send it is done multiple times, so we need to either stop it from happening, or delete the extra lines from the log
+
+Check to see what problems arise from clicking on the card before the combo card pops up
+Assign the characters so that they don't overlap.  You can do this by doing bounding sphere placement.  Pick a placement point.
+Do a specific radius.  If there is no space that works at that radius, make the radius smaller, and keep going.
+
+Split up the code base so that they all work the same way.
+Elaborate on the shadow players introduction (How?) ---- Do a zoom in of the card and then an animation saying solve the shadow player problem to see where they land.  or solve the riddle to see how many shadow players will be around.
+Need to do some type of queue checking for network commands.  Like with all the animations, there needs to be a way to wait to execute any statement that comes in until the animation and such is done.  So like a list of commands to execute only when the game is ready.
+Get rid of Local client logger or figure out why it's not producing any info in the log file.
+Put an arrow up near "Done with Turn" when there are no moves.
+Have a transition into the stink bomb or air freshener getting launched into the card.
+fidget around with the game pause to make it longer initially.
+need to think of a better indicator when they split
+
+
+Figure out how to set up the java server on a real server that the kids computers can access
+Think about some type of character selection
+
+
+
+*******************************************
+try to add a circle for the .5 and the decimals for show me how. 
+figure out better language for orange = safe, purple = lose
+Full Screen mode (didn't do this, but made it always on top)
+Change man.png so that it has a darker outline.
+Change the JLabel font to be bigger when they are doing the help.
+"aaa" to "bbb"
+put that before they get to the lobby screen
+Smaller font for "hey the groups aren't equal"
+When they come into the lobby, have them type the password before they are able to press play
+Change the shadow player circles for the shadow players, so that you use smaller shadows, because having 18 of the shadows is just too big
+"Show me how" in the shadow players might be broken
+Try to do some shading of the region instead of just drawing the arc.
+Make the red text font slightly smaller for the red status messages.
+Disable the scratch paper when the user is enabled.
+In show me how change the people reference to dots.
+Take out the message, "Starting up the game, be patient ok?"
+move up the sending of the code over
+Make sure that them clicking to see suggested cards is logged.  
+Put some logging in of the scratch paper when they open it, and also when they quit or leave it
+Have them run off of the screen or get ready to tug, so like some transition into the tug of war
+You have a bug where the 1/2 air freshener became a different problem
+Also added it to the deck.
+The question you gave them was different than the answer you had to provid
+Placed 1/2 air freshener, but then had a visualization for a 1/2 stink bomb or 3/4 stink bomb
+Asked what is 1/2 of 8, but then did it for stinkiness.
+Did the air ok for the other side.
+
+
+---------Completed----------------------
+Do a help animation for the mancardpanel (develop some text for the intro figure out when to do it)
+also have it so that when they answer it wrong three times or take too long, have it suggest the show me how button.
+Check to make sure you are generating the incorrect moves to get not only the question but what they tried.
+Fix the -1 of -1 for the scratch paper stuff
+In the red x's you're going to do the red rectangle instead.
+But still do the red x for certain moves, like trying to stink your own people.
+So like all the game illegal moves to the red x
+And for the fraction illegal moves are the only ones that you do a red rectangle.
+From the loggin standpoint, make sure that you also log whether or not they clicked with any answer in there.
+
+Do a sequential dealing so that you can select cards and it will do it in that order.
+Do a dealer tester that can give you counts on probabilities, like a stress test for the dealer class
+Add some logging in for mistakes that they make, make sure that you denote it somehow in the logging part, when they make an incorrect move.
+In a successful move, we should also try to generate a list of all of the other possible moves that they could have made, so that we can make some type of determination of whether or not
+it was the optimal move.
+Have a discard pile
+Come up with an animation for the ice cream truck cards moving out of the way (like a transition out for the ice cream truck)
+Draw you and them closer to the screen so you know which cards you need to select
+Highlight cards that can be played.  For example.  Highlight green cards when you click on the empty space
+Put some points at the top of the tug at the very end of the tug pulling.
+also come up with the red text for when they go through the explanation you can do this by joining a bunch of labels together up there. so have it be 4 separate labels for the text of the question.
+Rig the deck to make sure the cards can be played on the first turn.
+Should for the air freshener animation have the number that are stinky.
+Have a transition out of the mancardpanel and into the gameplay for the air freshener and stink bomb
+do not launch the animation until manCardPanel is active
+figure out how to do the shadow players problem of having two panels jump up at the same time (maybe only allow for one shadow player card at a time, and much later)
+Come up with an animation for the shadow players.
+	-replace drawManipulatives with ManModels
+	-createManMover for the GamePanel
+Put some type of indicator that orange is good and purple is bad
+Add some extra logging on the move part.  Make sure that you elaborate on moves that they have made, so that it looks more like move 0;1 and then you put the type of the stink.to string
+
+Bugs:
+Stinky people not showing up in the animation of the airfreshener in the manpanel
+FreshTie needs to be reworked.
+
+---------Sample Usage-------------------
+oHand:{stink, Point-5.png, 1, 2_air, One-Quarter.png, 1, 4_stink, One-Third.png, 1, 3_air, Point-5.png, 1, 2}
+myHand:{combo[stink:1/3;air:1/3], Combo-2---One-Third-Bar.png, 1, 2_combo[stink:1/2;ice:2/2], Combo-1---Point-5-Ice.png, 1, 2_radio, Radio---General.png, 1, 1_ice, Two-Thirds.png, 2, 1}
+oTeam:{The Pirates, The Pirates Have Joined Your Team, The-Pirates.png, 2_The 1st Graders, The 1st Graders Have Joined Your Team, 1st-Graders.png, 4}
+myTeam:{Shadow Players, What Is 1/3 of 24?, Shadow-Players.png, 8_Shadow Players, What Is 2/3 of 18?, Shadow-Players.png, 12}
+
+
+oTeam:{Shadow Players, What Is 1/2 of 6?, Shadow-Players.png, 3_Shadow Players, What Is 1/3 of 24?, Shadow-Players.png, 8}
+myTeam:{Shadow Players, What Is 1/3 of 18?, Shadow-Players.png, 6_The Pirates, The Pirates Have Joined Your Team, The-Pirates.png, 2}
+oHand:{combo[stink:3/4;air:3/4], Combo-2---Three-Quarters-Bar.png, 1, 2}
+myHand:{combo[stink:1/4;air:1/4], Combo-2---One-Quarter-Bar.png, 1, 2}

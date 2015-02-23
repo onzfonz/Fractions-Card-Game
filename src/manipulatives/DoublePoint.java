@@ -37,6 +37,7 @@ public class DoublePoint {
 		return pt.distance(point.getPoint());
 	}
 	
+	@Override
 	public String toString() {
 		String sx = x + "";
 		sx = decimalPlaces(sx, 2);

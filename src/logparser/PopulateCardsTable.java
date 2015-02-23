@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import basic.Constants;
 
@@ -34,7 +35,7 @@ public class PopulateCardsTable
     
     public void uploadData(ArrayList<String> teams, ArrayList<String> tricks) {
     	try {
-            conn = DBUtils.getDBConnection("TUG", "tugofwar", DBUtils.DB_PROTOCOL);
+            conn = DBUtils.getDBConnection(DBUtils.DB_SCHEMA, DBUtils.DB_NAME, DBUtils.DB_PROTOCOL);
             conn.setAutoCommit(false);
             statements.add(conn.createStatement());
             
@@ -62,8 +63,8 @@ public class PopulateCardsTable
     	for(String l: lines) {
     		String[] vals = l.split(",");
     		String[] realVals = DBUtils.cleanUpTeamsData(vals);
-//    		System.out.println(Arrays.asList(realVals));
-    		DBUtils.prepareSingleInsertIntoTable(realVals, ps, DBUtils.SQL_TYPES_CARDS, false);
+    		System.out.println(Arrays.asList(realVals));
+//    		DBUtils.prepareSingleInsertIntoTable(realVals, ps, DBUtils.SQL_TYPES_CARDS, false);
     	}
     }
     
@@ -71,8 +72,8 @@ public class PopulateCardsTable
     	for(String l: lines) {
     		String[] vals = l.split(",");
     		String[] realVals = DBUtils.cleanUpTricksData(vals);
-//    		System.out.println(Arrays.asList(realVals));
-    		DBUtils.prepareSingleInsertIntoTable(realVals, ps, DBUtils.SQL_TYPES_CARDS, false);
+    		System.out.println(Arrays.asList(realVals));
+//    		DBUtils.prepareSingleInsertIntoTable(realVals, ps, DBUtils.SQL_TYPES_CARDS, false);
     	}
     }
 }

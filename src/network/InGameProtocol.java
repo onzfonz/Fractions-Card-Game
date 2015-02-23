@@ -21,7 +21,6 @@ import java.util.Map;
 
 import basic.Constants;
 import basic.ServerDealer;
-import extras.Debug;
 import extras.RandomGenerator;
 
 public class InGameProtocol {

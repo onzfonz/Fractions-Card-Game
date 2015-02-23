@@ -2,14 +2,7 @@ package manipulatives;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-
 import javax.swing.Timer;
-
-import extras.GameImages;
-
-
-import basic.Constants;
 
 
 public class PeopleRevealer implements ActionListener {

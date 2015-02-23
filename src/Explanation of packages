@@ -1,0 +1,29 @@
+Explanation of all the packages
+----------------------------
+basic - the base of the game, it contains files that do the most basic processes.
+
+cards - has a set of files that deal with everything that has to do with card model and the way that the cards are 
+viewed.
+
+combo - deals with the panel that has people choose which part of the combo card there is.
+
+deck - deck is how a set of cards namely on a teammate card should behave and the properties they should have.
+
+extras - utilities and other additional java files meant for support in the application
+
+generalbar - I'm not sure if these files are being used, these might be deprecated, but they are responsible for trying
+to draw the general bar representation based on the text.
+
+logparser - These are the files that are meant to process the data for machine learning.
+
+manipulatives - Responsible for the fractions question asking screen
+
+network - these are the main files needed to make the code run in network mode.  
+
+pebblebag - responsible for the screens and animation needed to play the ice cream truck card.
+
+test - meant to house any files that are meant to test other classes.
+
+tugstory - animation for the tug of war event at the end of each round.
+
+tutorial - classes meant to help me understand more advanced topics.  They aren't really part of the code, but were meant as resources for the code.

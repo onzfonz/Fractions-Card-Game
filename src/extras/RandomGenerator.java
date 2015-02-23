@@ -50,7 +50,8 @@ public class RandomGenerator extends Random{
 * @param n The size of the range
 * @return The next random <code>int</code> between <code>0</code> and <code>n</code>-1, inclusive
 */
-     public int nextInt(int n) {
+     @Override
+	public int nextInt(int n) {
           return nextInt(0, n - 1);
      }
 /* Method: nextInt(low, high) */

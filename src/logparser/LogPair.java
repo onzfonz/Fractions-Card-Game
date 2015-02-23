@@ -46,6 +46,7 @@ public class LogPair implements SQLType {
 		return qaid;
 	}
 	
+	@Override
 	public String toString() {
 		return ""+plid+", "+gid+", "+pid+", "+porder+", "+qaid+", "+plogtime+", "+plogtype;
 	}

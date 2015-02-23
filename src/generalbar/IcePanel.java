@@ -56,6 +56,7 @@ public class IcePanel extends RepPanel {
 		return num;
 	}
 
+	@Override
 	public void setNumerator(int num) {
 		this.num = num;
 	}
@@ -64,6 +65,7 @@ public class IcePanel extends RepPanel {
 		return den;
 	}
 
+	@Override
 	public void setDenominator(int den) {
 		this.den = den;
 	}

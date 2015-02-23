@@ -196,7 +196,7 @@ public class DeckViewPanel extends JPanel {
 	}
 	
 	public int getCenterY(){
-		return getY() + (int) calculateDeckHeight()/2;
+		return getY() + calculateDeckHeight()/2;
 	}
 	
 	public int getCenterX() {
@@ -246,7 +246,7 @@ public class DeckViewPanel extends JPanel {
 		int x = getTeammateCard().getX();
 		int y = getTeammateCard().getY();
 		int width = getCardWidth();
-		int height = (int) calculateDeckHeight();
+		int height = calculateDeckHeight();
 		GraphicUtils.drawThickRectangle(x, y, width, height, c, g);
 	}
 

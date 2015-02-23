@@ -21,7 +21,7 @@ public class LogQMine {
 	}
 	
 	private void recalculate() {
-		numTimesAsked = LogUserMine.totalQuestions(ulogsForQuestion);
+		numTimesAsked = LogUserMine.totalQuestions(ulogsForQuestion, false);
 		numTimesGotWrong = LogUserMine.numAnsweredIncorrectly(ulogsForQuestion);
 		numTimesShown = LogUserMine.numTimesShown(ulogsForQuestion);
 	}

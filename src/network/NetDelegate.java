@@ -1,6 +1,5 @@
 package network;
 
-import pebblebag.IceWindowListener;
 import pebblebag.PebbleListener;
 
 public interface NetDelegate {
