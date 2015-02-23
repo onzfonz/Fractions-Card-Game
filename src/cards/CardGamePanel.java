@@ -472,9 +472,8 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 				gamePanel.newRound();
 			}else{
 				String message = determineWinMessage(playerPoints, oppoPoints);
-				shufflin = new FYIMessage(myFrame, message);
-//				int option = JOptionPane.showOptionDialog(myFrame, message, "", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, Constants.YES_NO, 0);
-				handleWinScenario();
+				int option = JOptionPane.showOptionDialog(myFrame, message, "", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, Constants.YES_NO, 0);
+				handleWinScenario(option);
 			}
 			JOptionPane.showMessageDialog(myFrame, score);
 		}else{
@@ -510,10 +509,6 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 		}else{
 			System.exit(0);
 		}
-	}
-	
-	private void handleWinScenario() {
-		gamePanel.startGame(!Constants.NETWORK_MODE);
 	}
 
 	private void askToFinishRound() {
