@@ -2,8 +2,8 @@ package cards;
 /*
  * File: Card.java
  * ---------------
- * This will be the basic holder for holding the cards.  Each cards will have five pieces associated with it.
- * The image the name of the card and the description, as well as an x and y coordinate of where it is.
+ * This will be the basic holder for holding the cards.  Each cards will have three fields
+ * The image the name of the card and the description
  */
 
 import java.awt.datatransfer.Transferable;
