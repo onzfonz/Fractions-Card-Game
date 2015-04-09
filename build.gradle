@@ -3,6 +3,8 @@ apply plugin: 'application'
 
 sourceCompatibility = 1.5
 version = '2.5'
+
+mainClassName = "network.GameClientGUI"
 		
 repositories {
     mavenCentral()
