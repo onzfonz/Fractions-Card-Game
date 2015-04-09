@@ -71,6 +71,7 @@
 /sqldatausersgarfield2.csv
 /SwedenTeachersLogData-4-18-12.txt
 /.settings/
+/.gradle/
 /derbyDB/
 /images/
 /logs/
@@ -78,3 +79,6 @@
 /tugofwar/
 /derby (Compu-Diyei's conflicted copy 2012-06-13).log
 /derby.log
+/bin/
+/build/
+/buildtutorial.gradle

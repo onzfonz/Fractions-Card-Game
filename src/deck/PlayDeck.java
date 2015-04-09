@@ -5,6 +5,7 @@ package deck;
  * As of right now, PlayDeck is the main java file that
  * has the right properties for whether or not something can be applied to one of the decks.
  * It also has the logic that applies based on what trick cards are applied to a deck.
+ * Essentially it has all the rules needed.
  */
 
 import java.util.ArrayList;

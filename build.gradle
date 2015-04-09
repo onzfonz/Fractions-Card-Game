@@ -1,0 +1,64 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+sourceCompatibility = 1.5
+version = '2.5'
+		
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '3.+'
+    testCompile files('game.properties')
+    runtime files('game.properties')
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir 'src'
+			exclude '**/tutorial/**'
+			exclude '**/test/**'
+			exclude '**/logparser/**'
+		}
+	}
+	test {
+		java {
+			srcDir 'src'
+			exclude '**/tutorial/**'
+			exclude '**/logparser/**'
+		}
+		resources {
+			srcDir '.'
+			include 'game.properties'
+			include 'src/basic/Constants.java'
+		}
+	}
+}
+
+
+jar {
+   	from {
+   		[sourceSets.main.output, "game.properties", fileTree(dir: '.', includes: ['*Team*.txt', '*Tricks*.txt', '*images', '*images/**', '*images/**/**'], exclude: '*images/**/*.pdn')]
+   	}
+   	archiveName = "tug-of-war-${version}.jar"
+    manifest {
+        attributes 'Implementation-Title': 'Tug-of-War',
+                   'Implementation-Version': version,
+                   'Main-Class': 'network.GameClientGUI',
+                   'Class-Path': '.'
+    }
+}
+
+test {
+    systemProperties 'property': 'value'
+    testLogging {
+    	events 'started', 'passed'
+    }
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.3'
+}
+	

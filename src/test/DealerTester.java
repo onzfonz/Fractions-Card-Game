@@ -1,5 +1,10 @@
 package test;
 
+/*
+ * This is meant to give a distribution of the cards dealt out to check for any irregularities
+ * Does not use Junit framework, just prints stuff out
+ */
+
 import java.util.ArrayList;
 import java.util.TreeMap;
 
