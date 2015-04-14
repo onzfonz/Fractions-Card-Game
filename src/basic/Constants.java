@@ -492,7 +492,7 @@ public class Constants {
 	
 	public static String propValue(String propName) {
 		String val = props.getProperty(propName);
-		assert(val != null);
+		assert val != null;
 		return val;
 	}
 	

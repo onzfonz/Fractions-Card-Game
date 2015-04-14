@@ -347,7 +347,7 @@ public class PlayDeck extends Deck {
 			if(stinkAir != null) {
 				int oldStink = stinkAir[0];
 				//testing breaking build
-				stinkAir[0] -= result;
+				stinkAir[0] += result;
 				stinkAir[1] += result;
 				stinkAir[0] = Math.max(0, stinkAir[0]);
 				stinkAir[1] = Math.min(stinkAir[1], maxPosse);
