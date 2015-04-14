@@ -44,13 +44,13 @@ public class SimpleGameClientGUI extends JFrame implements GClientInterface, Key
 	private JList jLobbyPeople;
 	private DefaultListModel lobbyPeople;
 	private String myName = null;
-	private String oppoName = null;
+//	private String oppoName = null;
 	private JButton start;
 	private JPanel windows;
 	private String currentLayout = null;
 	private JPanel lobbyPanel;
 	private JPanel chatPanel;
-	private String chatSent;
+//	private String chatSent;
 	
 	private static final String LOBBY_PANEL = "Lobby Panel";
 	private static final String CHAT_PANEL = "Chat Panel";
@@ -233,7 +233,7 @@ public class SimpleGameClientGUI extends JFrame implements GClientInterface, Key
     		lobbyPeople.removeElement(name);
     	} else if(fromServer.startsWith(".start")) {
     		lobbyLabel.setText("playing against " + name);
-    		oppoName = name;
+//    		oppoName = name;
     		lobbyPeople.removeAllElements();
     		moveToChat();
     	} else if(fromServer.startsWith(".oppoleft")) {
@@ -241,13 +241,13 @@ public class SimpleGameClientGUI extends JFrame implements GClientInterface, Key
     		moveToLobby();
     		//more lobby stuff or restart lobby make it show up again
     	} else if(fromServer.startsWith(".play")) {
-    		oppoName = name;
+//    		oppoName = name;
     	} else {
     		if(inLobby()) {
     			lobbyLabel.setText(fromServer);
     		} else {
     			if(fromServer.startsWith("Message:")) {
-    				chatHistory.append(chatSent);
+    				chatHistory.append("chat sent");
     			}
     			chatHistory.append(fromServer + "\n");
     		}

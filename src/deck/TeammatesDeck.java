@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -47,7 +48,11 @@ public class TeammatesDeck extends Deck {
 		//File aFile = new File(aFileName);
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		InputStream is = cl.getResourceAsStream(aFileName);
-		bf = new BufferedReader(new InputStreamReader(is));
+		try {
+			bf = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 		processLineByLine(bf, cardList);
 	}
 	

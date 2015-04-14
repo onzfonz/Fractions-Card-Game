@@ -3,11 +3,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import basic.Constants;
-
 import cards.TeammateCard;
 import cards.TrickCard;
 import extras.StringUtils;
@@ -29,7 +29,11 @@ public class TricksDeck extends Deck {
 		BufferedReader bf = null;
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		InputStream is = cl.getResourceAsStream(aFileName);
-		bf = new BufferedReader(new InputStreamReader(is));
+		try {
+			bf = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 		cards = new ArrayList<TeammateCard>();
 		processCards(bf);
 		createBackup();

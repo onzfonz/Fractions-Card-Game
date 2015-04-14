@@ -27,8 +27,8 @@ public class ComboRepresentationPanel extends RepPanel {
 		card = tc;
 		TrickCard one = tc.getFirstCard();
 		TrickCard two = tc.getSecondCard();
-		RepPanel firstRep = buildRepresentation(one, true);
-		RepPanel secondRep = buildRepresentation(two, false);
+		firstRep = buildRepresentation(one, true);
+		secondRep = buildRepresentation(two, false);
 		//setLayout(new BorderLayout());
 		add(firstRep);
 		add(secondRep);

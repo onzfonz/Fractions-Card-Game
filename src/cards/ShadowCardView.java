@@ -21,7 +21,7 @@ import basic.Constants;
 import extras.GraphicUtils;
 
 public class ShadowCardView extends CardView{
-	private BufferedImage backGround;
+//	private BufferedImage backGround;  //code to add in later to support a background?
 	public static final int SHADOW_DEN_X = 5;
 	public static final int SHADOW_DEN_Y = 3; //was 10
 	public static final int SHADOW_NUM_Y = 2; //was 7
@@ -79,7 +79,7 @@ public class ShadowCardView extends CardView{
 	public void drawBigCard(Graphics g, int panelWidth, int panelHeight) {
 		int xCoord = panelWidth-Constants.HUGE_CARD_WIDTH;
 		int yCoord = panelHeight-Constants.HUGE_CARD_HEIGHT;
-		g.drawImage(backGround, xCoord, yCoord, Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT, null);
+//		g.drawImage(backGround, xCoord, yCoord, Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT, null);
 		drawCardComponents(g, Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT, xCoord, yCoord, true);
 		drawCardText(g, Constants.FONT_LARGE, xCoord, yCoord, SHADOW_DEN_X+1, SHADOW_DEN_Y, SHADOW_NUM_Y, Constants.HUGE_CARD_WIDTH, Constants.HUGE_CARD_HEIGHT);
 	}

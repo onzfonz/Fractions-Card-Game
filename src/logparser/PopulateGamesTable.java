@@ -22,16 +22,16 @@ public class PopulateGamesTable
 	private Connection conn;
 	private ArrayList<Statement> statements;
 	private PreparedStatement psInsert;
-	private ResultSet rs;
+//	private ResultSet rs;
 
 	public static void main(String[] args)
 	{
 		ArrayList<ArrayList<String>> qs = DBUtils.readFilesIntoListOfLists(DBUtils.USER_LOG_NAMES);
-//		DBUtils.printArrayList(teams);
-				
+		//		DBUtils.printArrayList(teams);
+
 		PopulateGamesTable db = new PopulateGamesTable();
 		db.uploadData(qs);
-//      System.out.println("PopulateGamesTable finished");
+		//      System.out.println("PopulateGamesTable finished");
 	}
 
 	public PopulateGamesTable() {
@@ -48,13 +48,13 @@ public class PopulateGamesTable
 			// parameter 1 is num (int), parameter 2 is addr (varchar)
 			psInsert = conn.prepareStatement(DBUtils.SQL_INSERT_GAMES);
 			statements.add(psInsert);
-			
+
 			PreparedStatement psSelect = conn.prepareStatement(DBUtils.SQL_PID_FROM_UIDS);
 			statements.add(psSelect);
-			
+
 			PreparedStatement psSelectNull = conn.prepareStatement(DBUtils.SQL_PID_FROM_UID);
 			statements.add(psSelectNull);
-			
+
 			PreparedStatement psGetUid = conn.prepareStatement(DBUtils.SQL_UID_FROM_NAME);
 			statements.add(psGetUid);
 
@@ -69,7 +69,7 @@ public class PopulateGamesTable
 				System.out.println("Session file started");
 				insertGamesIntoTable(session, psInsert, psSelect, psSelectNull, psGetUid, conn, allGames, cardMap); 
 			}
-			
+
 			//boolean argument at end specifies whether to print the statement or not
 			insertStatementsSQL(DBUtils.SQL_INSERT_GAMES, allGames, DBUtils.SQL_TYPES_GAMES, false);
 			for(LogGame lg: allGames) {
@@ -82,10 +82,10 @@ public class PopulateGamesTable
 			DBUtils.printSQLException(sqle);
 		} finally {
 			// release all open resources to avoid unnecessary memory usage
-			DBUtils.cleanUp(rs, statements, conn);
+			DBUtils.cleanUp(null, statements, conn);
 		}
 	}
-	
+
 	private void insertStatementsSQL(String sqlString, ArrayList games, int[] types, boolean shouldPrint) throws SQLException{
 		PreparedStatement ps = conn.prepareStatement(sqlString);
 		statements.add(ps);
@@ -98,7 +98,7 @@ public class PopulateGamesTable
 		}
 		conn.commit();
 	}
-	
+
 	private void cleanUpTeams(ArrayList<String> teams) {
 		for(int i = 0; i < teams.size(); i++) {
 			String t = teams.get(i);
@@ -106,7 +106,7 @@ public class PopulateGamesTable
 			teams.set(i, t);
 		}
 	}
-	
+
 	private HashMap<String, LogCard> cleanUpAndMapCards(int startPos, ArrayList<String> teams) {
 		HashMap<String, LogCard> cardMap = new HashMap<String, LogCard>();
 		for(int i = 0; i < teams.size(); i++) {
@@ -115,7 +115,7 @@ public class PopulateGamesTable
 			String newStr = line.substring(0, lastComma);
 			String[] vals = DBUtils.cleanUpCardData(line);
 			LogCard lc = new LogCard(startPos, vals);
-//			System.out.println("mapping card: " + newStr);
+			//			System.out.println("mapping card: " + newStr);
 			cardMap.put(newStr, lc);
 			startPos++;
 		}
@@ -128,14 +128,14 @@ public class PopulateGamesTable
 		ArrayList<String> pairList = generatePairList(lines);
 		System.out.println(pairList);
 		System.out.println("--------------");
-		
+
 		ArrayList<String[]> gamePairs = generateGamePairs(lines, pairList);
 		DBUtils.printArrayOfArrayList(gamePairs);
 		System.out.println("***************");
 		HashMap<String, String> pairMapping = new HashMap<String, String>();
 		gamePairs = cleanUpGamePairs(gamePairs, pairMapping);
 		DBUtils.printArrayOfArrayList(gamePairs);
-		
+
 		System.out.println("******pairs to IDs******");
 		ArrayList<String[]> pairIDs = convertPairsToIDs(gamePairs, ps, psNull);
 		ArrayList<LogGame> gamesList = generateLogGamesList(gamePairs, pairIDs, allGames, psGetUId, pairList, cardMap);
@@ -164,10 +164,10 @@ public class PopulateGamesTable
 		}
 		conn.commit();*/
 	}
-	
+
 	private void mapLogFileToGames(ArrayList<String> lines, HashMap<String, LogGame> gamesMap) {
 		for(String l: lines) {
-//			System.out.println("l - " + l);
+			//			System.out.println("l - " + l);
 			String name = DBUtils.getNameLineFromRegex(l);
 			LogGame game = gamesMap.get(name);
 			if(game == null && name != null) {
@@ -181,7 +181,7 @@ public class PopulateGamesTable
 			}
 		}
 	}
-	
+
 	private HashMap<String, LogGame> generateLogGamesMap(ArrayList<String> pairList, ArrayList<LogGame> gamesList, ArrayList<String[]> gamePairs) {
 		HashMap<String, LogGame> gamesMap = new HashMap<String, LogGame>();
 		int index=1;
@@ -190,12 +190,12 @@ public class PopulateGamesTable
 			int i = getGamePairIndex(gamePairs, names);
 			if(i != -1) {
 				gamesMap.put(pair, gamesList.get(i));
-//				System.out.println(index++ + ") linking " + pair + " to " + Arrays.asList(gamePairs.get(i)));
+				//				System.out.println(index++ + ") linking " + pair + " to " + Arrays.asList(gamePairs.get(i)));
 			}
 		}
 		return gamesMap;
 	}
-	
+
 	private ArrayList<LogGame> generateLogGamesList(ArrayList<String[]> gamePairs, ArrayList<String[]> pairIDs, ArrayList<LogGame> allGames, PreparedStatement ps, ArrayList<String> pairList, HashMap<String, LogCard> cardMap) throws SQLException {
 		if(gamePairs.size() != pairIDs.size()) {
 			return null;
@@ -219,7 +219,7 @@ public class PopulateGamesTable
 		}
 		return newGamePairs;
 	}
-	
+
 	private ArrayList<String[]> convertPairsToIDs(ArrayList<String[]> gamePairs, PreparedStatement ps, PreparedStatement psNull) throws SQLException {
 		ArrayList<String[]> idPairs = new ArrayList<String[]>();
 		for(String[] gamePair: gamePairs) {
@@ -230,14 +230,14 @@ public class PopulateGamesTable
 		}
 		return idPairs;
 	}
-	
+
 	private String convertPairToID(String name1, String name2, PreparedStatement ps, PreparedStatement psNull) throws SQLException {
 		if(name2 != null) {
 			return DBUtils.getPIDFromNames(name1, name2, ps);
 		}
 		return DBUtils.getPIDFromName(name1, psNull);
 	}
-	
+
 	private void addIntoGamePairs(ArrayList<String[]> newGamePairs, String[] pair1, String[] pair2, HashMap<String, String> pMapping) {
 		if(!inGamePairs(newGamePairs, pair1, pair2)) {
 			String[] pairArr = new String[4];
@@ -248,7 +248,7 @@ public class PopulateGamesTable
 			newGamePairs.add(pairArr);
 		}
 	}
-	
+
 	private boolean inGamePairs(ArrayList<String[]> newGamePairs, String[] pair1, String[] pair2) {
 		for(String[] alreadyAdded:newGamePairs) {
 			String addedKey1 = alreadyAdded[0] + alreadyAdded[1];
@@ -259,7 +259,7 @@ public class PopulateGamesTable
 		}
 		return false;
 	}
-	
+
 	private int getGamePairIndex(ArrayList<String[]> gamePairs, String[] pair) {
 		for(int i = 0; i < gamePairs.size(); i++) {
 			String[] gamePair = gamePairs.get(i);
@@ -271,7 +271,7 @@ public class PopulateGamesTable
 		}
 		return -1;
 	}
-	
+
 	private ArrayList<String[]> generateGamePairs(ArrayList<String> lines, ArrayList<String> pairList) {
 		ArrayList<String> pairsNotMatched = (ArrayList<String>) pairList.clone();
 		ArrayList<String[]> gamePairs = new ArrayList<String[]>();
@@ -281,7 +281,7 @@ public class PopulateGamesTable
 		}
 		return gamePairs;
 	}
-	
+
 	private String[] generateGamePair(ArrayList<String> lines, String pairName, ArrayList<String> pairsNotMatched) {
 		String[] gamePair = new String[2];
 		for(int i = 0; i < lines.size(); i++) {
@@ -304,29 +304,31 @@ public class PopulateGamesTable
 		}
 		return null;
 	}
-	
+
 	private boolean actionHasDeck(ArrayList<String> parsed) {
 		return actionHasSpecificDeck(parsed, "myTeam");
 	}
-	
+
 	private boolean actionHasODeck(ArrayList<String> parsed) {
 		return actionHasSpecificDeck(parsed, "oTeam");
 	}
-	
+
 	private boolean actionHasSpecificDeck(ArrayList<String> parsed, String text) {
 		return parsed.get(2).startsWith(text);
 	}
-	
+
 	private String findOppositePair(ArrayList<String> lines, int start, String pairName, String cardType, ArrayList<String> pairsNotMatched) {
 		cardType = cardType.substring(cardType.indexOf("{"));
 		for(int i = start; i < lines.size(); i++) {
 			String l = lines.get(i);
 			ArrayList<String> parsed = DBUtils.getParsedRegex(l);
-			String parsedName = DBUtils.getParsedNameString(parsed.get(1));
-			if(parsed != null && !DBUtils.pairNamesAreTheSame(parsedName, pairName) && actionHasODeck(parsed)) {
-				String oCardType = parsed.get(2).substring(parsed.get(2).indexOf("{"));
-				if(oCardType.equals(cardType)) {
-					return parsedName;
+			if(parsed != null) {
+				String parsedName = DBUtils.getParsedNameString(parsed.get(1));
+				if(!DBUtils.pairNamesAreTheSame(parsedName, pairName) && actionHasODeck(parsed)) {
+					String oCardType = parsed.get(2).substring(parsed.get(2).indexOf("{"));
+					if(oCardType.equals(cardType)) {
+						return parsedName;
+					}
 				}
 			}
 		}
@@ -343,7 +345,7 @@ public class PopulateGamesTable
 		}
 		return pairNames;
 	}
-	
+
 	private void cleanUpPairData(String[] pairNames, PreparedStatement ps) throws SQLException {
 		for(int i = 0; i < pairNames.length; i++) {
 			pairNames[i] = DBUtils.getUIDFromName(pairNames[i], ps);

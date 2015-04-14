@@ -9,8 +9,8 @@ import java.util.concurrent.Semaphore;
 import extras.Debug;
 
 public class Helpers {
-public static Semaphore cardDist = new Semaphore(1, true);
-public static Semaphore systemReady = new Semaphore(1, true);
+public static final Semaphore cardDist = new Semaphore(1, true);
+public static final Semaphore systemReady = new Semaphore(1, true);
 public static boolean isReady = true;
 	
 	public static void acquireSem(Semaphore sem, boolean drain) {

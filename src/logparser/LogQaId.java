@@ -11,9 +11,13 @@ public class LogQaId {
 	}
 	
 	public LogQaId(int qid, int start) {
-		count = start;
+		setCount(start);
 		setUp();
 		order = 1;
+	}
+	
+	public static void setCount(int c) {
+		LogQaId.count = c;
 	}
 	
 	public LogQaId(String qid) {

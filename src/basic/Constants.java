@@ -5,6 +5,9 @@ import java.awt.Font;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 public class Constants {
@@ -197,7 +200,7 @@ public class Constants {
 	public static final String BTN_PEBBLE_DONE_SHAKING;
 	public static final String BTN_BACK_TO_GAME;
 	
-	public static final String[] YES_NO;
+	public static final List<String> YES_NO;
 	public static final String[] RADIO_OPTIONS;
 	
 	
@@ -225,21 +228,21 @@ public class Constants {
 	//User Preferences
 	public static boolean SHOW_COMPUTER_CARDS;
 	public static boolean REGULAR_MODE;  //false gives green rectangle, doesn't have them calculate their mistakes, can be used for easy level
-	public static boolean ALLOW_ILLEGAL_MOVES; //false provides some guidance to them for the game's rules.
-	public static boolean SHOW_DECK_LABEL_NUMBER;
+	public static final boolean ALLOW_ILLEGAL_MOVES; //false provides some guidance to them for the game's rules.
+	public static final boolean SHOW_DECK_LABEL_NUMBER;
 	public static boolean SHOW_DECK_MANIPS;
-	public static boolean HAVE_MANIP_BUTTON;
+	public static final boolean HAVE_MANIP_BUTTON;
 	//Option not implemented yet...Whether or not to construct the question to the user
 	//When they have something like .5 of 12 to have them figure out all the values.
 	public static boolean GIVE_QUESTION_TO_USER;
 	public static boolean ASK_USERS_FRACTION_QS;
-	public static boolean MANIPS_OVERLAP;
+	public static final boolean MANIPS_OVERLAP;
 	public static final boolean DEBUG_MODE;
 	public static final boolean VERBOSE_MODE;
 	public static final boolean SHOW_COLOR_SLIDERS;
-	public static boolean NETWORK_MODE;
-	public static boolean SHOW_ME_HOW_ENABLED;
-	public static boolean SHOW_WORK_ON_COMPUTER;
+	public static final boolean NETWORK_MODE;
+	public static final boolean SHOW_ME_HOW_ENABLED;
+	public static final boolean SHOW_WORK_ON_COMPUTER;
 	public static final boolean USE_RIGGED_DECK;
 	public static final boolean USE_CHARACTER_MANIPS_IN_CALC;
 	public static final boolean USE_CHARACTER_MANIPS_IN_GAME;
@@ -248,7 +251,7 @@ public class Constants {
 	public static final boolean ASK_FOR_KEY;
 	public static final boolean FORCE_WINDOW_ON_TOP;
 	
-	public static int ANIMATION_DELAY;
+	public static final int ANIMATION_DELAY;
 	public static final int ANIMATION_MS_PAUSE;
 	public static final int BETWEEN_GAME_PAUSE;
 	
@@ -432,9 +435,10 @@ public class Constants {
 		BTN_PEBBLE_DONE_SHAKING = propValue("BTN_PEBBLE_DONE_SHAKING");
 		BTN_BACK_TO_GAME = propValue("BTN_BACK_TO_GAME");
 		MAN_FRAME_NO_ANSWER_BTN_TEXT = propValue("MAN_FRAME_NO_ANSWER_BTN_TEXT");
-		YES_NO = new String[2];
+		YES_NO = Collections.unmodifiableList(Arrays.asList(propValue("YES_NO_YES"), propValue("YES_NO_NO")));
+				/*new String[2];
 		YES_NO[0] = propValue("YES_NO_YES");
-		YES_NO[1] = propValue("YES_NO_NO");
+		YES_NO[1] = propValue("YES_NO_NO");*/
 		RADIO_OPTIONS = new String[3];
 		RADIO_OPTIONS[0] = propValue("RADIO_OPTIONS_0");
 		RADIO_OPTIONS[1] = propValue("RADIO_OPTIONS_1");
@@ -478,6 +482,7 @@ public class Constants {
 		GIVE_USERS_INSTRUCTIONS = propTFValue("GIVE_USERS_INSTRUCTIONS") && !DEBUG_MODE;
 		ASK_FOR_KEY = propTFValue("ASK_FOR_KEY");
 		FORCE_WINDOW_ON_TOP = propTFValue("FORCE_WINDOW_ON_TOP");
+		HAVE_MANIP_BUTTON = propTFValue("HAVE_MANIP_BUTTON");
 		
 		ANIMATION_DELAY = propIntValue("ANIMATION_DELAY");
 		ANIMATION_MS_PAUSE = propIntValue("ANIMATION_MS_PAUSE") / ((DEBUG_MODE)?2:1);
@@ -764,5 +769,5 @@ public class Constants {
 	public static final String NAME_SHADOW_PLAYERS = "The Shadow Players";
 	public static final String NAME_TWINS = "The Twins";
 
-	public static boolean TEXT_AS_IMAGES = true;  //Need to change ComboCardView superclass if you change this
+	public static final boolean TEXT_AS_IMAGES = true;  //Need to change ComboCardView superclass if you change this
 }

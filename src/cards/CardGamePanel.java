@@ -472,7 +472,8 @@ public class CardGamePanel extends JPanel implements PanelListener, KeyListener 
 				gamePanel.newRound();
 			}else{
 				String message = determineWinMessage(playerPoints, oppoPoints);
-				int option = JOptionPane.showOptionDialog(myFrame, message, "", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, Constants.YES_NO, 0);
+				String[] yesNo = Constants.YES_NO.toArray(new String[Constants.YES_NO.size()]);
+				int option = JOptionPane.showOptionDialog(myFrame, message, "", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, yesNo, 0);
 				handleWinScenario(option);
 			}
 			JOptionPane.showMessageDialog(myFrame, score);

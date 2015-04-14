@@ -1472,10 +1472,10 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 			n = JOptionPane.showOptionDialog(this, message, "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, oneRadioOptions, oneRadioOptions[1]);
 		}
 		numRadiosInPlay = Math.min(n, p.numRadiosInHand());
-		if(n > 0 && n != JOptionPane.CLOSED_OPTION) {
-			playARadio(p, dv);
-		}else{
+		if(n == 0) {
 			launchPebbleBagView(dv);
+		}else{
+			playARadio(p, dv);
 		}
 		return n;
 	}
@@ -1513,7 +1513,7 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		for(DeckView dv: decksInPlay) {
 			dv.setRoundOver(true);
 		}
-		TugPrepper p = new TugPrepper(this, decksInPlay, wasTold);
+		new TugPrepper(this, decksInPlay, wasTold);
 	}
 	
 	public void manipsReadyToTug(boolean wasTold) {
@@ -2125,8 +2125,10 @@ public class GamePanel extends JPanel implements PlayerListener, ComponentListen
 		panel.toggleManipView();
 	}
 
+//	@SuppressFBWarnings(value="NP_GUARANTEED_DEREF", justification="short circuit protecting against null here")
 	public void tidyUpCalculationClosing(DeckView deck) {
-		boolean shouldChangeText = status != null && (status.getText().length() < Constants.ERROR_CANT_PLACE_PREFIX.length() || !status.getText().substring(0, Constants.ERROR_CANT_PLACE_PREFIX.length()).equals(Constants.ERROR_CANT_PLACE_PREFIX));
+		assert(status != null);
+		boolean shouldChangeText = status.getText().length() < Constants.ERROR_CANT_PLACE_PREFIX.length() || !status.getText().substring(0, Constants.ERROR_CANT_PLACE_PREFIX.length()).equals(Constants.ERROR_CANT_PLACE_PREFIX);
 		String formerText = "";
 		if(shouldChangeText || status.getText().contains(Constants.ERROR_NOT_WHOLE_NUM_DIV)) {
 			formerText = status.getText();

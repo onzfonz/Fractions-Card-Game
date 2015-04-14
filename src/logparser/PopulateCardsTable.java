@@ -15,7 +15,7 @@ public class PopulateCardsTable
     private Connection conn;
     private ArrayList<Statement> statements;
     private PreparedStatement psInsert;
-    private ResultSet rs;
+//    private ResultSet rs;
     
 	public static void main(String[] args)
     {
@@ -50,7 +50,7 @@ public class PopulateCardsTable
             DBUtils.printSQLException(sqle);
         } finally {
             // release all open resources to avoid unnecessary memory usage
-        	DBUtils.cleanUp(rs, statements, conn);
+        	DBUtils.cleanUp(null, statements, conn);
         }
     }
     

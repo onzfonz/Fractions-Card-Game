@@ -12,7 +12,6 @@ import java.util.ArrayList;
 
 import basic.Constants;
 import basic.PebbleBag;
-
 import cards.Card;
 import cards.CardView;
 import cards.TeammateCard;
@@ -42,7 +41,7 @@ public class PlayDeck extends Deck {
 		}
 		return couldAddTrick;
 	}
-	
+
 	/**
 	 * Note: This method is player agnostic, meaning that if the player tries to apply a stink bomb
 	 * on itself, it would return true.  Also look at DeckView which calls this method using Delegation
@@ -191,7 +190,7 @@ public class PlayDeck extends Deck {
 		}
 		return isDivisible;
 	}
-	
+
 	private String generateNotAWholeNumberMessage() {
 		return Constants.ERROR_NOT_WHOLE_NUM + Constants.ERROR_NOT_WHOLE_NUM_DIV;
 	}
@@ -231,7 +230,7 @@ public class PlayDeck extends Deck {
 	public int[] calculateStinksAndAirsSeparately() {
 		return calculateStinksAndAirsSeparately(cards, team.getValue());
 	}
-	
+
 	public int[] calculateStinksAndAirsSeparately(boolean calcAllAirs) {
 		return calculateStinksAndAirsSeparately(cards, team.getValue(), calcAllAirs);
 	}
@@ -243,7 +242,7 @@ public class PlayDeck extends Deck {
 		//		}else{
 		//		}
 	}
-	
+
 	public int calculateDeckMinusTop() {
 		ArrayList<TrickCard> tcs = new ArrayList<TrickCard>();
 		for(int i = 0; i < cards.size()-1; i++) {
@@ -306,7 +305,7 @@ public class PlayDeck extends Deck {
 	public static int[] calculateStinksAndAirsSeparately(ArrayList<TrickCard> tcs, int curPosse) {
 		return calculateStinksAndAirsSeparately(tcs, curPosse, false);
 	}
-	
+
 	public static int[] calculateStinksAndAirsSeparately(ArrayList<TrickCard> tcs, int curPosse, boolean drawAllAirs) {
 		int posseLeft = curPosse;
 		int[] stinkAirs = new int[2];
@@ -332,7 +331,7 @@ public class PlayDeck extends Deck {
 	public static int playCardOnTeam(int posse, int maxPosse, TrickCard tc, int[] stinkAir) {
 		return playCardOnTeam(posse, maxPosse, tc, stinkAir, false);
 	}
-	
+
 	public static int playCardOnTeam(int posse, int maxPosse, TrickCard tc, int[] stinkAir, boolean drawAllAirs) {
 		if(tc.isStink()) {
 			int result = applyFraction(posse, tc);
@@ -466,14 +465,13 @@ public class PlayDeck extends Deck {
 		str += cards;
 		return str;
 	}
-	
-	@Override
-	public boolean equals(Object o) {
+
+	public boolean equalsOld(Object o) {
 		if(!(o instanceof PlayDeck)) return false;
 		PlayDeck pd = (PlayDeck) o;
 		return pd.calculateDeck() == calculateDeck();
 	}
-
+	
 	public static void main(String[] args) {
 		//quick test of the next boolean stuff
 		TrickCard ice = new TrickCard(Constants.TWO_TWO_ICE_FILENAME, 1, 2, "ice");
@@ -488,4 +486,24 @@ public class PlayDeck extends Deck {
 		System.out.println(2.0/4 * 1.0/3);
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ calculateDeck();
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PlayDeck other = (PlayDeck) obj;
+		return other.calculateDeck() == calculateDeck();
+	}
 }

@@ -83,27 +83,29 @@ public class Player {
 	}
 
 	//This was an older version when we would have text input from the user
-	public void addToPlayDeck(TrickCard t) {
-		Scanner s = new Scanner(System.in);
-		printPlayDecks();
-		System.out.println("Which Deck? Choose a number between 0 and " + decks.size());
-		int i = s.nextInt();
-		while(i < 0 || i > decks.size()) {
-			System.out.println("invalid number please try again ");
-			i = s.nextInt();
-		}
-		if(i == 0) {
-			System.out.println("Cancelling option...");
-			s.close();
-			return;
-		}
-		DeckView curDeck = decks.get(i-1);
-		if(!curDeck.addTrickCard(t)) {
-			System.out.println("That trick card cannot be applied, Please wait for next turn");
-		}
-		firePlayDeckChanged();
-		s.close();
-	}
+	//Commented out because it's not longer used and has an issue with findbugs
+	//in specifying a charset on System.in in the scanner.
+//	public void addToPlayDeck(TrickCard t) {
+//		Scanner s = new Scanner(System.in);
+//		printPlayDecks();
+//		System.out.println("Which Deck? Choose a number between 0 and " + decks.size());
+//		int i = s.nextInt();
+//		while(i < 0 || i > decks.size()) {
+//			System.out.println("invalid number please try again ");
+//			i = s.nextInt();
+//		}
+//		if(i == 0) {
+//			System.out.println("Cancelling option...");
+//			s.close();
+//			return;
+//		}
+//		DeckView curDeck = decks.get(i-1);
+//		if(!curDeck.addTrickCard(t)) {
+//			System.out.println("That trick card cannot be applied, Please wait for next turn");
+//		}
+//		firePlayDeckChanged();
+//		s.close();
+//	}
 	
 	private boolean addToPlayDeck(DeckView dv, CardView cv) {
 		if(decks.indexOf(dv) == -1) {
@@ -259,19 +261,20 @@ public class Player {
 	 * but for now we'll make a very lame computer simulation
 	 * of what they will pick from a card.
 	 */
-	public TrickCard chooseTrickToPlay() {
-		Scanner s = new Scanner(System.in);
-		printTrickCards();
-		System.out.println("Choose a number between 0 and " + numTrickCards());
-		int i = s.nextInt();
-		while(i < 0 || i > numTrickCards()) {
-			System.out.println("invalid number please try again ");
-			i = s.nextInt();
-		}
-		TrickCard t = getTrickFromHand(i-1);
-		fireTrickHandChanged();
-		return t;
-	}
+	//Also commented out due to lack of encoding
+//	public TrickCard chooseTrickToPlay() {
+//		Scanner s = new Scanner(System.in);
+//		printTrickCards();
+//		System.out.println("Choose a number between 0 and " + numTrickCards());
+//		int i = s.nextInt();
+//		while(i < 0 || i > numTrickCards()) {
+//			System.out.println("invalid number please try again ");
+//			i = s.nextInt();
+//		}
+//		TrickCard t = getTrickFromHand(i-1);
+//		fireTrickHandChanged();
+//		return t;
+//	}
 	
 	//might make this private later.
 	public void clearTrickHand() {

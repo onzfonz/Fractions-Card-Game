@@ -7,7 +7,7 @@ public class RandomSequence {
 	/**
 	 * @param args
 	 */
-	public static RandomGenerator rgen = RandomGenerator.getInstance();
+	public static final RandomGenerator rgen = RandomGenerator.getInstance();
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub

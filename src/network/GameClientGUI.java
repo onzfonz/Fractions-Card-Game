@@ -10,8 +10,10 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -25,13 +27,11 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 
 import pebblebag.PebbleListener;
 import basic.Constants;
-import basic.FYIMessage;
 import cards.CardGamePanel;
 import extras.Debug;
 
@@ -41,7 +41,7 @@ public class GameClientGUI extends JDialog implements GClientInterface, KeyListe
 	private BufferedReader read = null;
 	private SimpleGameClientThread clientThread = null;
 	private Thread thread = null;
-	private JTextField line;
+//	private JTextField line;
 	private JLabel lobbyLabel;
 	private JList jLobbyPeople;
 	private DefaultListModel lobbyPeople;
@@ -52,9 +52,9 @@ public class GameClientGUI extends JDialog implements GClientInterface, KeyListe
 	private String currentLayout = null;
 	private JPanel lobbyPanel;
 	private JPanel gamePanel;
-	private String chatSent;
+//	private String chatSent;
 	private CardGamePanel game;
-	private FYIMessage alertMsg;
+//	private FYIMessage alertMsg;
 	private GameClientLogger log;
 	private boolean passwordRequired;
 
@@ -87,9 +87,9 @@ public class GameClientGUI extends JDialog implements GClientInterface, KeyListe
 			makeWindowShowUp();
 			moveToGame();
 		}else{
-			if(alertMsg != null) {
-				alertMsg.killMessage();
-			}
+//			if(alertMsg != null) {
+//				alertMsg.killMessage();
+//			}
 			waitForPassword();
 		}
 	}
@@ -206,7 +206,8 @@ public class GameClientGUI extends JDialog implements GClientInterface, KeyListe
 				if(socket == null) {
 					System.exit(1);
 				}
-				out = new PrintWriter(socket.getOutputStream(), true);
+				//did this to appease charset encoding unhappiness
+				out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8")), true);
 				start();
 				return;
 			} catch (UnknownHostException e) {
@@ -243,7 +244,7 @@ public class GameClientGUI extends JDialog implements GClientInterface, KeyListe
 
 	/* In the future we don't really want this input here...*/
 	public void start() throws IOException {
-		read = new BufferedReader(new InputStreamReader(System.in));
+		read = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
 		if(thread == null) {
 			clientThread = new SimpleGameClientThread(this, socket);
 		}
@@ -376,27 +377,28 @@ public class GameClientGUI extends JDialog implements GClientInterface, KeyListe
 			e.printStackTrace();
 		}
 	}
+	//These three functions Used in bottom part of line, currently commented out
+//	private boolean enterTyped(KeyEvent ke) {
+//		return ke.getKeyCode() == KeyEvent.VK_ENTER;
+//	}
+//
+//	public void checkTextField(KeyEvent ke, JTextField field, String additional) {
+//		if(enterTyped(ke)) {
+//			String fromUser = field.getText();
+//			if(fromUser != null) {
+//				Debug.println("checkTextField: " + additional);
+//				sendToServer(fromUser);
+//				field.setText("");
+//			}else{
+//				thread = null;
+//			}
+//		}
+//	}
 
-	private boolean enterTyped(KeyEvent ke) {
-		return ke.getKeyCode() == KeyEvent.VK_ENTER;
-	}
-
-	public void checkTextField(KeyEvent ke, JTextField field, String additional) {
-		if(enterTyped(ke)) {
-			String fromUser = field.getText();
-			if(fromUser != null) {
-				Debug.println("checkTextField: " + additional);
-				sendToServer(fromUser);
-				field.setText("");
-			}else{
-				thread = null;
-			}
-		}
-	}
-
+	
 	public void keyPressed(KeyEvent arg0) {
-
-		checkTextField(arg0, line, "Client: " + line.getText());
+//
+//		checkTextField(arg0, line, "Client: " + line.getText());
 	}
 
 	public void keyReleased(KeyEvent arg0) {

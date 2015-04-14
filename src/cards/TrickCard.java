@@ -2,6 +2,7 @@ package cards;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+
 import basic.Constants;
 
 /* File: TrickCard.java
@@ -179,13 +180,6 @@ public class TrickCard extends Card {
 	}
 	
 	@Override
-	public boolean equals(Object o) {
-		if(!(o instanceof TrickCard)) return false;
-		TrickCard tc = (TrickCard) o;
-		return getType().equals(tc.getType()) && getNumerator() == tc.getNumerator() && getDenominator() == tc.getDenominator() && isDecimal == tc.isDecimal;
-	}
-	
-	@Override
 	public String toStream() {
 		return trickType + ", " + imgName + ", " + num + ", " + den;
 	}
@@ -278,5 +272,46 @@ public class TrickCard extends Card {
 		System.out.println(t4.toFraction());
 		TrickCard t5 = new TrickCard("cards.jpg", 3, 4, "combo[stink:1/2;air:1/2]");
 		System.out.println(t5.isCombo());
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + den;
+		result = prime * result + (isDecimal ? 1231 : 1237);
+		result = prime * result + num;
+		result = prime * result
+				+ ((trickType == null) ? 0 : trickType.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TrickCard other = (TrickCard) obj;
+		if (den != other.den)
+			return false;
+		if (isDecimal != other.isDecimal)
+			return false;
+		if (num != other.num)
+			return false;
+		if (trickType == null) {
+			if (other.trickType != null)
+				return false;
+		} else if (!trickType.equals(other.trickType))
+			return false;
+		return true;
+	}
+	
+	public boolean equalsOld(Object o) {
+		if(!(o instanceof TrickCard)) return false;
+		TrickCard tc = (TrickCard) o;
+		return getType().equals(tc.getType()) && getNumerator() == tc.getNumerator() && getDenominator() == tc.getDenominator() && isDecimal == tc.isDecimal;
 	}
 }

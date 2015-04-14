@@ -23,7 +23,7 @@ public class SimpleGameClientThread extends Thread {
 	
 	public void open() {
 		try {  
-			streamIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			streamIn = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
 		}
 		catch(IOException ioe) {
 			System.out.println("Error getting input stream: " + ioe);

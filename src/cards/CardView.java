@@ -540,16 +540,16 @@ public class CardView {
 		JComponent cont = (JComponent) f.getContentPane();
 		cont.setLayout(new FlowLayout());
 
-		TeammateCard tm0 = new TeammateCard(Constants.MUSIC_GEEKS_FILENAME, "Music Geeks", "joined team", 6);
-		TeammateCard tm1 = new TeammateCard(Constants.BBALL_TEAM_FILENAME, "Basketball Team", "joined team", 12);
+//		TeammateCard tm0 = new TeammateCard(Constants.MUSIC_GEEKS_FILENAME, "Music Geeks", "joined team", 6);
+//		TeammateCard tm1 = new TeammateCard(Constants.BBALL_TEAM_FILENAME, "Basketball Team", "joined team", 12);
 
-		TrickCard t0 = new TrickCard(Constants.RADIO_FILENAME, 1, 1, "radio");
+//		TrickCard t0 = new TrickCard(Constants.RADIO_FILENAME, 1, 1, "radio");
 		TrickCard t1 = new TrickCard(Constants.HALF_AIR_FILENAME, 1, 2, "air");
 		TrickCard t2 = new TrickCard(Constants.HALF_FILENAME, 2, 2, "ice");
 		TrickCard t3 = new TrickCard(Constants.HALF_FILENAME, 1, 2, "stink");
 
-		CardView pdm0 = CardViewFactory.createCard(tm0, 100, 400);
-		CardView pd0 = CardViewFactory.createCard(t0, 180, 180);
+//		CardView pdm0 = CardViewFactory.createCard(tm0, 100, 400);
+//		CardView pd0 = CardViewFactory.createCard(t0, 180, 180);
 		CardView pd1 = CardViewFactory.createCard(t1);
 		pd1.setHighlighted(true);
 		CardView pd2 = CardViewFactory.createCard(t2, 90, 135);

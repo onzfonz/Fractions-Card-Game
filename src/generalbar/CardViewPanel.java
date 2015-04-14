@@ -423,7 +423,7 @@ public class CardViewPanel extends JPanel{
 		cont.setLayout(new FlowLayout());
 
 		TeammateCard tm0 = new TeammateCard(Constants.MUSIC_GEEKS_FILENAME, "Music Geeks", "joined team", 6);
-		TeammateCard tm1 = new TeammateCard(Constants.BBALL_TEAM_FILENAME, "Basketball Team", "joined team", 12);
+//		TeammateCard tm1 = new TeammateCard(Constants.BBALL_TEAM_FILENAME, "Basketball Team", "joined team", 12);
 
 		TrickCard t0 = new TrickCard(Constants.RADIO_FILENAME, 1, 1, "radio");
 		TrickCard t1 = new TrickCard(Constants.HALF_AIR_FILENAME, 1, 2, "air");

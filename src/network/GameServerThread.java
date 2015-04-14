@@ -1,8 +1,10 @@
 package network;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
@@ -24,8 +26,8 @@ public class GameServerThread extends Thread {
 		clientSocket = client;
 		try {
 			//clientSocket.setSoTimeout(INACTIVE_MS);
-			out = new PrintWriter(clientSocket.getOutputStream(), true);
-			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream(), "UTF-8")), true);
+			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
 			System.out.println("setting up client from: " + client.getInetAddress());
 		}catch (SocketException se) {
 			System.err.println("Unable to set socket option SO_TIMEOUT");

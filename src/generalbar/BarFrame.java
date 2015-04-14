@@ -47,6 +47,6 @@ public class BarFrame extends JFrame{
 	}
 	
 	public static void main(String[] args) {
-		BarFrame bf = new BarFrame();
+		/*BarFrame bf = */new BarFrame();
 	}
 }

@@ -1,5 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'application'
+apply plugin: 'findbugs'
 
 sourceCompatibility = 1.7
 version = '2.5'
@@ -63,4 +64,14 @@ test {
 task wrapper(type: Wrapper) {
 	gradleVersion = '2.3'
 }
-	
+
+tasks.withType(FindBugs) {
+	reports {
+		xml.enabled = false;
+		html.enabled = true;
+	}
+}
+
+findbugs {
+	reportLevel = "high"
+}
