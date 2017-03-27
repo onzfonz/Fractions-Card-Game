@@ -1,6 +1,4 @@
 language: java
 
-# safelist
-branches:
-  only:
-  - 2012
+jdk:
+  -oraclejdk6
