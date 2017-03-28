@@ -337,7 +337,7 @@ public class PlayDeck extends Deck {
 			int result = applyFraction(posse, tc);
 			if(stinkAir != null) {
 				stinkAir[0] -= result;  //changed this from + to -
-				stinkAir[1] -= result;
+				stinkAir[1] += result;  //changed this from - to +
 				stinkAir[1] = Math.max(0, stinkAir[1]);
 				stinkAir[0] = Math.min(stinkAir[0], maxPosse);
 			}
