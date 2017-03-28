@@ -385,7 +385,6 @@ public class PlayDeck extends Deck {
 		for(int i = 0; i < tcs.size(); i++) {
 			TrickCard curTrick = tcs.get(i);
 			if(curTrick.isAir()) {
-				//TODO rechange this back to a += applyFraction
 				numFreshened -= applyFraction(curPosse, curTrick);
 			}
 		}
