@@ -43,7 +43,8 @@ sourceSets {
 
 jar {
    	from {
-   		[sourceSets.main.output, "game.properties", fileTree(dir: '.', includes: ['*Team*.txt', '*Tricks*.txt', '*images', '*images/**', '*images/**/**'], exclude: '*images/**/*.pdn')]
+   		// [sourceSets.main.output, "game.properties", fileTree(dir: '.', includes: ['*Team*.txt', '*Tricks*.txt', '*images', '*images/**', '*images/**/**'], exclude: '*images/**/*.pdn')]
+   		["game.properties", fileTree(dir: '.', includes: ['*Team*.txt', '*Tricks*.txt', '*images', '*images/**', '*images/**/**'], exclude: '*images/**/*.pdn')]
    	}
    	archiveName = "tug-of-war-${version}.jar"
     manifest {
