@@ -7,6 +7,7 @@ deploy:
   provider: pages
   skip_cleanup: true
   github_token: $GITHUB_TOKEN
+  file: build/libs/tug-of-war-2.5.jar
   on:
     branch: 2012
   
