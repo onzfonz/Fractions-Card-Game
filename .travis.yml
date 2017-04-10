@@ -2,12 +2,15 @@ language: java
 notifications:
   slack:
     secure: GrPAh76XwIRAYgrbV4ka8kimcHWWx9G/zNFCJTIpqLbwjmi0acJiCapd9MgEDMiPM5mk3g09JaIvgsBK6eeWAYEH2RkOoqQBJkafTFJhzCHbglgB7OVOsW3VBdh0oLYotl8btLT7Gt5KHrMZ9BYGY4kAXCrK1+w9JImGXpG3Jauz+XD2H5aHXvZKud4I2y4644LPCEEVPvv5t67Yd/2pLVysNS/wxpnb3e8taKiHCRWGtVbUaQ+QjBj5tECLcot+wiIk2T8Z7M5M2Xv0NxEcLRUc/qwnkrejFVnxAFog4wMOzI/xTUYXIRtUqKIWJiDPg72kFQHuw6R7b7toYXWvn8+B9l+yq5h9FQfxHrq+IuZUUJ1KajpjtIcErwJXO7SpFRDUUdL/ob41jd0l1WGv7YnqRvQDR0haki0YILoYMaB8koghJvYzGDCGnSvmLdWvbEtth8HPKgcq86dztVtTNKuML8XmDZe8w2KrMXxIMFAo6o1OB8SZzfmNFz1X6wjcvD06lxSM2DrWsZpbsJS50SEMlHw0DqJdBr1entCh57Ai1YReh+x4IhuDw5ntOTXFI6hn7AQVfLn01BTSGW3aNM/BT/3k0LWUoe4ClbSeNTcrDC6EMGLnZaP/Yac1lMgNaFlS3V7e7MJBmedUKKe6Mh4lt+FjBMtNYsx+pLR9vd0=
-
+before_deploy:
+  - export RELEASE_JAR_FILE=$(ls build/libs/*.jar)
+  - echo "deploying $RELEASE_JAR_FILE to Github pages"
 deploy:
   provider: pages
   skip_cleanup: true
   github_token: $GITHUB_TOKEN
-  file: build/libs/tug-of-war-2.5.jar
+  file_glob: true
+  file: "${RELEASE_JAR_FILE}"
   on:
-    branch: 2012
-  
+    repo: onzfonz/Fractions-Card-Game
+    branch: '2012'
