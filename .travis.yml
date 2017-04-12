@@ -6,7 +6,7 @@ before_deploy:
   - export RELEASE_JAR_FILE=$(ls build/libs/*.jar)
   - echo "deploying $RELEASE_JAR_FILE to Github pages"
 deploy:
-  provider: releases
+  provider: pages
   skip_cleanup: true
   github_token: $GITHUB_TOKEN
   file_glob: true
