@@ -10,7 +10,7 @@ deploy:
   skip_cleanup: true
   github_token: $GITHUB_TOKEN
   file_glob: true
-  file: $RELEASE_JAR_FILE
+  file: '$RELEASE_JAR_FILE'
   on:
     repo: onzfonz/Fractions-Card-Game
     branch: '2012'
