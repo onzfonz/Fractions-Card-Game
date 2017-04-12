@@ -4,4 +4,4 @@ Not well commented at the moment.
 
 [![Build Status](https://travis-ci.org/onzfonz/Fractions-Card-Game.svg?branch=2012)](https://travis-ci.org/onzfonz/Fractions-Card-Game)
 
-[Download the Jar in it's current form (version 2.5) here!](https://drone.io/github.com/onzfonz/Fractions-Card-Game/files/build/libs/tug-of-war-2.5.jar)
+[Download the Jar in it's current form (version 2.5) here!](https://onzfonz.github.io/Fractions-Card-Game/jar/tug-of-war-2.5.jar)
